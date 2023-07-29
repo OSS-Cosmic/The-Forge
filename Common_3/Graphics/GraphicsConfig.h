@@ -35,10 +35,11 @@
 
 // Comment/uncomment includes to disable/enable rendering APIs
 #if defined(_WINDOWS)
+//TODO: Direct3D12/11 is broken with the current implementation
 #ifndef _WINDOWS7
-#include "Direct3D12/Direct3D12Config.h"
+//#include "Direct3D12/Direct3D12Config.h"
 #endif
-#include "Direct3D11/Direct3D11Config.h"
+//#include "Direct3D11/Direct3D11Config.h"
 #include "Vulkan/VulkanConfig.h"
 #elif defined(XBOX)
 #include "Direct3D12/Direct3D12Config.h"

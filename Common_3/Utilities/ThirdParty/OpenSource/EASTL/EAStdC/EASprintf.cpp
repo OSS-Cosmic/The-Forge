@@ -13,8 +13,18 @@
 namespace EA {
 namespace StdC {
 
-EASTDC_API int Vsnprintf(char8_t* EA_RESTRICT pDestination, size_t n, const char8_t* EA_RESTRICT pFormat, va_list arguments)
-	{ return vsnprintf(pDestination, n, pFormat, arguments); }
+EASTDC_API int Vsnprintf(char* EA_RESTRICT pDestination,
+		                     size_t n,
+		                     const char* EA_RESTRICT pFormat,
+		                     va_list arguments)
+	{
+		return vsnprintf((char*)pDestination, n, (char*)pFormat, arguments);
+	}
+
+	EASTDC_API int Vsnprintf(char8_t* EA_RESTRICT pDestination, size_t n, const char8_t* EA_RESTRICT pFormat, va_list arguments)
+	{
+		return vsnprintf((char*)pDestination, n, (char*)pFormat, arguments);
+	}
 
 EASTDC_API int Vsnprintf(char16_t* EA_RESTRICT pDestination, size_t n, const char16_t* EA_RESTRICT pFormat, va_list arguments)
     { return vswprintf((wchar_t*)pDestination, n, (wchar_t*)pFormat, arguments); }

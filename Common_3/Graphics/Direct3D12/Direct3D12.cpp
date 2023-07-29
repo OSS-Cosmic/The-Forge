@@ -3766,7 +3766,7 @@ void d3d12_compileShader(
 		IDxcIncludeHandler* pInclude = NULL;
 		pLibrary->CreateIncludeHandler(&pInclude);
 
-		WCHAR* entryName = L"main";
+		wchar_t* entryName = (wchar_t*)L"main";
 		if (pEntryPoint != NULL)
 		{
 			entryName = (WCHAR*)tf_calloc(strlen(pEntryPoint) + 1, sizeof(WCHAR));
@@ -4678,7 +4678,7 @@ void d3d12_updateDescriptorSet(
 			for (uint32_t arr = 0; arr < arrayCount; ++arr)
 			{
 				VALIDATE_DESCRIPTOR(
-					pParam->ppSamplers[arr] != D3D12_GPU_VIRTUAL_ADDRESS_NULL, "NULL Sampler (%s [%u] )", pDesc->pName, arr);
+					pParam->ppSamplers[arr] != nullptr, "NULL Sampler (%s [%u] )", pDesc->pName, arr);
 
 				copy_descriptor_handle(
 					pRenderer->mD3D12.pCPUDescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER], pParam->ppSamplers[arr]->mD3D12.mDescriptor,

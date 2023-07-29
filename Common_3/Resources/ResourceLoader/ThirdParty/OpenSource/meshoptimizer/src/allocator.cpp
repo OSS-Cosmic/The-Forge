@@ -2,7 +2,7 @@
 #include "meshoptimizer.h"
 #include "../../../../../../Utilities/Interfaces/ILog.h"
 
-#include "../../../../../../Utilities/ThirdParty/OpenSource/ModifiedSonyMath/vectormath_settings.hpp"
+#include "../../../../../../Utilities/ThirdParty/OpenSource/ModifiedSonyMath/vectormath.hpp"
 #define MEM_MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN_ALLOC_ALIGNMENT MEM_MAX(VECTORMATH_MIN_ALIGN, MIN_MALLOC_ALIGNMENT)
 

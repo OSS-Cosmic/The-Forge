@@ -34,6 +34,9 @@
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/IMemory.h"
 
+#include <stdio.h>
+#include <wchar.h>
+
 // static
 template <typename T>
 static inline T withUTF16Path(const char* path, T (*function)(const wchar_t*))
@@ -369,7 +372,6 @@ bool fsRenameFile(const ResourceDirectory resourceDir, const char* fileName, con
 		size_t newpathStrLength = MultiByteToWideChar(CP_UTF8, 0, newfilePath, (int)newfilePathLen, newpathStr, (int)newfilePathLen);
 		newpathStr[newpathStrLength] = 0;
 	}
-
 	return !_wrename(pathStr, newpathStr);
 }
 
