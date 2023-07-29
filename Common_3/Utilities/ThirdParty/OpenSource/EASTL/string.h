@@ -181,6 +181,7 @@ EA_RESTORE_ALL_VC_WARNINGS()
 
 	namespace eastl
     {
+#if WIN32
 	    inline int Vsnprintf(char* EA_RESTRICT pDestination,
 	                         size_t n,
 	                         const char* EA_RESTRICT pFormat,
@@ -188,6 +189,7 @@ EA_RESTORE_ALL_VC_WARNINGS()
 	    {
 		        return EA::StdC::Vsnprintf(pDestination, n, pFormat, arguments);
 	    }
+#endif
 		inline int Vsnprintf(char8_t* EA_RESTRICT pDestination, size_t n, const char8_t* EA_RESTRICT pFormat, va_list arguments)
 			{ return EA::StdC::Vsnprintf(pDestination, n, pFormat, arguments); }
 
