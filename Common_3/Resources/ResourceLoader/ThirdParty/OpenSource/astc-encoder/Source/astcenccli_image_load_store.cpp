@@ -57,7 +57,7 @@ static astcenc_image* load_image_with_tinyexr(
 	const char* err;
 
 	int load_res = LoadEXR(&image, &dim_x, &dim_y, filename, &err);
-	if (load_res != TINYEXR_SUCCESS)
+	if (load_res != 0)
 	{
 		printf("ERROR: Failed to load image %s (%s)\n", filename, err);
 		free(reinterpret_cast<void*>(const_cast<char*>(err)));

@@ -35,6 +35,7 @@
 
 // Comment/uncomment includes to disable/enable rendering APIs
 #if defined(_WINDOWS)
+//TODO: Direct3D12/11 is broken with the current implementation
 #ifndef _WINDOWS7
 #include "Direct3D12/Direct3D12Config.h"
 #endif

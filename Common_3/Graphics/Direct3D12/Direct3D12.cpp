@@ -3766,7 +3766,7 @@ void d3d12_compileShader(
 		IDxcIncludeHandler* pInclude = NULL;
 		pLibrary->CreateIncludeHandler(&pInclude);
 
-		WCHAR* entryName = L"main";
+		wchar_t* entryName = (wchar_t*)L"main";
 		if (pEntryPoint != NULL)
 		{
 			entryName = (WCHAR*)tf_calloc(strlen(pEntryPoint) + 1, sizeof(WCHAR));
@@ -4678,7 +4678,7 @@ void d3d12_updateDescriptorSet(
 			for (uint32_t arr = 0; arr < arrayCount; ++arr)
 			{
 				VALIDATE_DESCRIPTOR(
-					pParam->ppSamplers[arr] != D3D12_GPU_VIRTUAL_ADDRESS_NULL, "NULL Sampler (%s [%u] )", pDesc->pName, arr);
+					pParam->ppSamplers[arr] != nullptr, "NULL Sampler (%s [%u] )", pDesc->pName, arr);
 
 				copy_descriptor_handle(
 					pRenderer->mD3D12.pCPUDescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER], pParam->ppSamplers[arr]->mD3D12.mDescriptor,
@@ -6414,7 +6414,9 @@ void d3d12_cmdBeginQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery)
 	D3D12_QUERY_TYPE type = pQueryPool->mD3D12.mType;
 	switch (type)
 	{
-		case D3D12_QUERY_TYPE_OCCLUSION: break;
+        case D3D12_QUERY_TYPE_OCCLUSION:
+                pCmd->mD3D12.pDxCmdList->BeginQuery(pQueryPool->mD3D12.pDxQueryHeap, type, pQuery->mIndex);
+                break;
 		case D3D12_QUERY_TYPE_BINARY_OCCLUSION: break;
 		case D3D12_QUERY_TYPE_TIMESTAMP: pCmd->mD3D12.pDxCmdList->EndQuery(pQueryPool->mD3D12.pDxQueryHeap, type, pQuery->mIndex); break;
 		case D3D12_QUERY_TYPE_PIPELINE_STATISTICS: break;
@@ -6426,7 +6428,17 @@ void d3d12_cmdBeginQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery)
 	}
 }
 
-void d3d12_cmdEndQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery) { cmdBeginQuery(pCmd, pQueryPool, pQuery); }
+void d3d12_cmdEndQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery) {
+    D3D12_QUERY_TYPE type = pQueryPool->mD3D12.mType;
+    switch (type) {
+        case D3D12_QUERY_TYPE_OCCLUSION:
+            pCmd->mD3D12.pDxCmdList->EndQuery(pQueryPool->mD3D12.pDxQueryHeap, type, pQuery->mIndex);
+            break;
+        default:
+            cmdBeginQuery(pCmd, pQueryPool, pQuery);
+            break;
+    }
+}
 
 void d3d12_cmdResolveQuery(Cmd* pCmd, QueryPool* pQueryPool, Buffer* pReadbackBuffer, uint32_t startQuery, uint32_t queryCount)
 {
