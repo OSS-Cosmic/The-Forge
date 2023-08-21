@@ -6413,7 +6413,9 @@ void d3d12_cmdBeginQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery)
 	D3D12_QUERY_TYPE type = pQueryPool->mD3D12.mType;
 	switch (type)
 	{
-		case D3D12_QUERY_TYPE_OCCLUSION: break;
+        case D3D12_QUERY_TYPE_OCCLUSION:
+                pCmd->mD3D12.pDxCmdList->BeginQuery(pQueryPool->mD3D12.pDxQueryHeap, type, pQuery->mIndex);
+                break;
 		case D3D12_QUERY_TYPE_BINARY_OCCLUSION: break;
 		case D3D12_QUERY_TYPE_TIMESTAMP: pCmd->mD3D12.pDxCmdList->EndQuery(pQueryPool->mD3D12.pDxQueryHeap, type, pQuery->mIndex); break;
 		case D3D12_QUERY_TYPE_PIPELINE_STATISTICS: break;
@@ -6425,8 +6427,17 @@ void d3d12_cmdBeginQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery)
 	}
 }
 
-void d3d12_cmdEndQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery) { cmdBeginQuery(pCmd, pQueryPool, pQuery); }
-
+void d3d12_cmdEndQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery) {
+        D3D12_QUERY_TYPE type = pQueryPool->mD3D12.mType;
+        switch (type) {
+        case D3D12_QUERY_TYPE_OCCLUSION:
+                pCmd->mD3D12.pDxCmdList->EndQuery(pQueryPool->mD3D12.pDxQueryHeap, type, pQuery->mIndex);
+                break;
+        default:
+                cmdBeginQuery(pCmd, pQueryPool, pQuery);
+                break;
+        }
+}
 void d3d12_cmdResolveQuery(Cmd* pCmd, QueryPool* pQueryPool, Buffer* pReadbackBuffer, uint32_t startQuery, uint32_t queryCount)
 {
 	pCmd->mD3D12.pDxCmdList->ResolveQueryData(
