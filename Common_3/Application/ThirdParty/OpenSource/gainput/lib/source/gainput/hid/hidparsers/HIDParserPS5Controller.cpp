@@ -2,7 +2,7 @@
 #include "../GainputHIDTypes.h"
 #include "../GainputHIDWhitelist.h"
 #include "../../../hidapi/hidapi.h"
-#include "../../../../../../Utilities/Interfaces/ILog.h"
+#include "../../../../Utilities/Interfaces/ILog.h"
 
 #include "../../../../include/gainput/gainput.h"
 #include "../../../../include/gainput/GainputInputDeltaState.h"
