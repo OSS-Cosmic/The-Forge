@@ -34,6 +34,8 @@
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/IMemory.h"
 
+#include <wchar.h>
+
 // static
 template <typename T>
 static inline T withUTF16Path(const char* path, T (*function)(const wchar_t*))
