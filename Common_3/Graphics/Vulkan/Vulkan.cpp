@@ -219,7 +219,7 @@ VkFrontFace gVkFrontFaceTranslator[] =
 	VK_FRONT_FACE_CLOCKWISE
 };
 
-VkAttachmentLoadOp gVkAttachmentLoadOpTranslator[LoadActionType::MAX_LOAD_ACTION] = 
+VkAttachmentLoadOp gVkAttachmentLoadOpTranslator[LoadActionType::MAX_LOAD_ACTION] =
 {
 	VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 	VK_ATTACHMENT_LOAD_OP_LOAD,
@@ -351,7 +351,7 @@ const char* gVkWantedDeviceExtensions[] =
 #ifdef VK_RAYTRACING_AVAILABLE
 	VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
 	VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-	VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME, 
+	VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
 
 	VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
 	VK_KHR_SPIRV_1_4_EXTENSION_NAME,
@@ -2148,7 +2148,7 @@ void util_query_gpu_settings(VkPhysicalDevice gpu, VkPhysicalDeviceProperties2* 
         minor = (gpuProperties->properties.driverVersion >> 14) & 0x0ff;
         secondaryBranch = (gpuProperties->properties.driverVersion >> 6) & 0x0ff;
         tertiaryBranch = (gpuProperties->properties.driverVersion) & 0x003f;
-        
+
         sprintf( gpuSettings->mGpuVendorPreset.mGpuDriverVersion, "%u.%u.%u.%u", major,minor,secondaryBranch,tertiaryBranch);
 		break;
 	default:
@@ -2795,7 +2795,7 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 #endif
 #ifdef VK_RAYTRACING_AVAILABLE
 						// KHRONOS VULKAN RAY TRACING
-						uint32_t khrRaytracingSupported = 1; 
+						uint32_t khrRaytracingSupported = 1;
 
 						if (strcmp(wantedDeviceExtensions[k], VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME) == 0)
 							pRenderer->mVulkan.mShaderFloatControlsExtension = 1;
@@ -2905,7 +2905,7 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 	VkPhysicalDeviceRayTracingPipelineFeaturesKHR enabledRayTracingPipelineFeatures = {};
 	enabledRayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
 	enabledRayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
-	ADD_TO_NEXT_CHAIN(pRenderer->mVulkan.mKHRRayTracingPipelineExtension, enabledRayTracingPipelineFeatures); 
+	ADD_TO_NEXT_CHAIN(pRenderer->mVulkan.mKHRRayTracingPipelineExtension, enabledRayTracingPipelineFeatures);
 #endif
 #if VK_KHR_acceleration_structure
 	VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures = {};
@@ -2916,8 +2916,8 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 #if VK_KHR_ray_query
 	VkPhysicalDeviceRayQueryFeaturesKHR enabledRayQueryFeatures = {};
 	enabledRayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
-	enabledRayQueryFeatures.rayQuery = VK_TRUE; 
-	ADD_TO_NEXT_CHAIN(pRenderer->mVulkan.mKHRRayQueryExtension, enabledRayQueryFeatures); 
+	enabledRayQueryFeatures.rayQuery = VK_TRUE;
+	ADD_TO_NEXT_CHAIN(pRenderer->mVulkan.mKHRRayQueryExtension, enabledRayQueryFeatures);
 #endif
 
 #ifdef NX64
@@ -3396,7 +3396,7 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
 #else
 	vkGetPhysicalDeviceFeatures2KHR(pRenderer->mVulkan.pVkActiveGPU, &gpuFeatures);
 #endif
-	
+
 	pRenderer->mVulkan.mShaderSampledImageArrayDynamicIndexingSupported = (uint32_t)(gpuFeatures.features.shaderSampledImageArrayDynamicIndexing);
 	if (pRenderer->mVulkan.mShaderSampledImageArrayDynamicIndexingSupported)
 	{
@@ -7641,14 +7641,14 @@ void vk_acquireNextImage(Renderer* pRenderer, SwapChain* pSwapChain, Semaphore* 
 			return;
 		}
 
-		// Commonly returned immediately following swapchain resize. 
+		// Commonly returned immediately following swapchain resize.
 		// Vulkan spec states that this return value constitutes a successful call to vkAcquireNextImageKHR
 		// https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/vkAcquireNextImageKHR.html
 		if (vk_res == VK_SUBOPTIMAL_KHR)
 		{
-			LOGF(LogLevel::eINFO, "vkAcquireNextImageKHR returned VK_SUBOPTIMAL_KHR. If window was just resized, ignore this message."); 
+			LOGF(LogLevel::eINFO, "vkAcquireNextImageKHR returned VK_SUBOPTIMAL_KHR. If window was just resized, ignore this message.");
 			pSignalSemaphore->mVulkan.mSignaled = true;
-			return; 
+			return;
 		}
 
 		CHECK_VKRESULT(vk_res);
@@ -7932,11 +7932,11 @@ void vk_addIndirectCommandSignature(Renderer* pRenderer, const CommandSignatureD
 	ASSERT(pRenderer);
 	ASSERT(pDesc);
 	ASSERT(pDesc->mIndirectArgCount == 1);
-	
+
 	CommandSignature* pCommandSignature =
 		(CommandSignature*)tf_calloc(1, sizeof(CommandSignature) + sizeof(IndirectArgument) * pDesc->mIndirectArgCount);
 	ASSERT(pCommandSignature);
-	
+
 	pCommandSignature->mDrawType = pDesc->pArgDescs[0].mType;
 	switch (pDesc->pArgDescs[0].mType)
 	{
@@ -8091,7 +8091,11 @@ void vk_cmdBeginQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery)
 				pCmd->mVulkan.pVkCmdBuf, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, pQueryPool->mVulkan.pVkQueryPool, pQuery->mIndex);
 			break;
 		case VK_QUERY_TYPE_PIPELINE_STATISTICS: break;
-		case VK_QUERY_TYPE_OCCLUSION: break;
+		case VK_QUERY_TYPE_OCCLUSION: {
+            const uint32_t index = pQuery->mIndex;
+			vkCmdBeginQuery(pCmd->mVulkan.pVkCmdBuf, pQueryPool->mVulkan.pVkQueryPool, index, 0);
+		}
+		break;
 		default: break;
 	}
 }
@@ -8106,7 +8110,10 @@ void vk_cmdEndQuery(Cmd* pCmd, QueryPool* pQueryPool, QueryDesc* pQuery)
 			pCmd->mVulkan.pVkCmdBuf, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, pQueryPool->mVulkan.pVkQueryPool, pQuery->mIndex);
 		break;
 	case VK_QUERY_TYPE_PIPELINE_STATISTICS: break;
-	case VK_QUERY_TYPE_OCCLUSION: break;
+	case VK_QUERY_TYPE_OCCLUSION: {
+        const uint32_t index = pQuery->mIndex;
+		vkCmdEndQuery(pCmd->mVulkan.pVkCmdBuf, pQueryPool->mVulkan.pVkQueryPool, index);
+	}
 	default: break;
 	}
 }
