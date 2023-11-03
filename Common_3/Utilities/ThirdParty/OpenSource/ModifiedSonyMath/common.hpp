@@ -841,6 +841,8 @@ inline const uint2& operator*=(uint2&a, uint2& b) { return a = a * b; }
 inline const uint2& operator/=(uint2& a, uint b) { return a = a / b; }
 inline const uint2& operator/=(uint2&a, const uint2& b) { return a = a / b; }
 
+inline const bool operator==(const uint2& a, const uint2& b) { return a.x == b.x && a.y == b.y; }
+inline const bool operator!=(const uint2& a, const uint2& b) { return !(a == b); }
 
 //----------------------------------------------------------------------------
 // uint3
