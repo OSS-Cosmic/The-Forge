@@ -3973,10 +3973,14 @@ static bool load_shader_stage_byte_code(Renderer* pRenderer, const char* name, S
 
     void*      pCachedByteCode = NULL;
     uint32_t   cachedByteCodeSize = 0;
+
+#ifdef ENABLE_FORGE_RELOAD_SHADER
     const bool result = platformReloadClientGetShaderBinary(binaryShaderPath, &pCachedByteCode, &cachedByteCodeSize)
                             ? fsOpenStreamFromMemory(pCachedByteCode, cachedByteCodeSize, FM_READ, false, &binaryFileStream)
                             : fsOpenStreamFromPath(RD_SHADER_BINARIES, binaryShaderPath, FM_READ, &binaryFileStream);
-
+#else
+    const bool result = fsOpenStreamFromPath(RD_SHADER_BINARIES, binaryShaderPath, FM_READ, &binaryFileStream);
+#endif
     ASSERT(result);
     if (!result)
         return result;

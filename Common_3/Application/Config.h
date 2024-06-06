@@ -282,7 +282,7 @@ COMPILE_ASSERT(sizeof(ssize_t) == sizeof(int64_t));
 //////////////////////////////////////////////
 // #define ENABLE_MATH_CHECKS // Enables low level math library debug checks like SIMD variable alignment checks
 #define ENABLE_FORGE_SCRIPTING
-#define ENABLE_FORGE_RELOAD_SHADER
+//#define ENABLE_FORGE_RELOAD_SHADER
 #define ENABLE_FORGE_UI
 #define ENABLE_FORGE_FONTS
 #define ENABLE_FORGE_INPUT
