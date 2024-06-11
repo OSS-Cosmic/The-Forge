@@ -2459,6 +2459,7 @@ FORGE_API void uiSetSameLine(UIWidget* pGuiComponent, bool sameLine)
 
 void uiNewFrame()
 {
+#ifdef ENABLE_FORGE_UI
 #if defined(ENABLE_FORGE_REMOTE_UI)
     if (pUserInterface->mEnableRemoteUI && remoteAppIsConnected())
     {
@@ -2475,6 +2476,7 @@ void uiNewFrame()
     }
 #endif
     pUserInterface->mDynamicTexturesCount = 0;
+#endif
     ImGui::NewFrame();
 }
 

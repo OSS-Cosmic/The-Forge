@@ -1932,6 +1932,8 @@ void initProfiler(ProfilerDesc* pDesc)
     // store active gpu settings
     ProfileGet()->pGpuSettings = &pDesc->pRenderer->pGpu->mSettings;
 
+#ifdef ENABLE_FORGE_FONTS
+
     // set gpu profiler title text
     if (pDesc->pRenderer->pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion[0] != '\0')
     {
@@ -1943,6 +1945,8 @@ void initProfiler(ProfilerDesc* pDesc)
     {
         snprintf(gGpuProfileTitleText, sizeof(gGpuProfileTitleText), "%s", pDesc->pRenderer->pGpu->mSettings.mGpuVendorPreset.mGpuName);
     }
+#endif
+
 #endif
 
     // PROFILER UI
