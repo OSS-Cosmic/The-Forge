@@ -612,6 +612,7 @@ int2 fntGetFontAtlasSize()
     fonsGetAtlasSize(fs, &size.x, &size.y);
     return size;
 #endif
+    return int2(0,0);
 }
 
 void fntResetFontAtlas(int2 newAtlasSize)
