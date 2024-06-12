@@ -546,11 +546,11 @@ int LinuxMain(int argc, char** argv, IApp* app)
         {
             togglePlatformUI();
         }
-
+#ifdef ENABLE_FORGE_RELOAD_SHADER
         extern bool platformReloadClientShouldQuit(void);
         if (platformReloadClientShouldQuit())
             gQuit = true;
-
+#endif
 #ifdef AUTOMATED_TESTING
         extern bool gAutomatedTestingScriptsFinished;
         // wait for the automated testing if it hasn't managed to finish in time

@@ -705,9 +705,10 @@ int WindowsMain(int argc, char** argv, IApp* app)
         {
             togglePlatformUI();
         }
-
+#ifdef ENABLE_FORGE_RELOAD_SHADER
         if (platformReloadClientShouldQuit())
             quit = true;
+#endif
 
 #ifdef AUTOMATED_TESTING
         extern bool gAutomatedTestingScriptsFinished;

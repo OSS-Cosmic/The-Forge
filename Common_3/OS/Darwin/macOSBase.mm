@@ -777,7 +777,7 @@ char     benchmarkOutput[1024] = { "\0" };
     {
         togglePlatformUI();
     }
-
+#ifdef ENABLE_FORGE_RELOAD_SHADER
     extern bool platformReloadClientShouldQuit(void);
     if (platformReloadClientShouldQuit())
     {
@@ -788,6 +788,7 @@ char     benchmarkOutput[1024] = { "\0" };
 
         [NSApp terminate:nil];
     }
+#endif
 
 #ifdef AUTOMATED_TESTING
     extern bool gAutomatedTestingScriptsFinished;

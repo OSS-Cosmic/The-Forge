@@ -795,14 +795,14 @@ int AndroidMain(void* param, IApp* app)
         {
             togglePlatformUI();
         }
-
+#ifdef ENABLE_FORGE_RELOAD_SHADER
         extern bool platformReloadClientShouldQuit(void);
         if (platformReloadClientShouldQuit())
         {
             ANativeActivity_finish(android_app->activity);
             pApp->mSettings.mQuit = true;
         }
-
+#endif
 #ifdef AUTOMATED_TESTING
         extern bool gAutomatedTestingScriptsFinished;
         // wait for the automated testing if it hasn't managed to finish in time

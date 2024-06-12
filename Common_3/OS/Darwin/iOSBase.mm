@@ -678,12 +678,14 @@ char     benchmarkOutput[1024] = { "\0" };
         togglePlatformUI();
     }
 
+#ifdef ENABLE_FORGE_RELOAD_SHADER
     extern bool platformReloadClientShouldQuit(void);
     if (platformReloadClientShouldQuit())
     {
         [self shutdown];
         exit(0);
     }
+#endif
 
 #ifdef AUTOMATED_TESTING
     extern bool gAutomatedTestingScriptsFinished;
