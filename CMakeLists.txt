@@ -276,4 +276,6 @@ endif()
 
 target_include_directories(TheForge PUBLIC "${EXTERNAL_DIR}/VulkanSDK/include")
 target_include_directories(TheForge PUBLIC "${EXTERNAL_DIR}")
+target_include_directories(TheForge PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Include")
+target_include_directories(TheForge PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
