@@ -243,3 +243,24 @@ Common_3/Application/ThirdParty/noesisgui/SDK/_build/**/build
 Tools/clang-tools/clang-format-files.txt
 Tools/clang-tools/out-files.txt
 build/
+
+# Ignore cmake generated files
+**/CMakeCache.txt
+**/CPackConfig.cmake
+**/CPackSourceConfig.cmake
+**/CMakeFiles/
+**/CMakeScripts/
+**/qfusion.build/
+**/*.xcodeproj
+**/commit.txt
+**/steam_appid.txt
+**/Makefile
+*cmake_install.cmake
+.cache/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+source/compile_commands.json
+
+# ignore cache files
+.cache/

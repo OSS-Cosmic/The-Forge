@@ -49,98 +49,44 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-struct bstr_s {
+#define TFSTR_LLSTR_SIZE 21
+#define TFSTR_LSTR_SIZE 16 
+
+struct TStr {
   size_t alloc;
   size_t len;
   char* buf;
 };
 
-// a const slice
-struct bstr_const_slice_s {
-  const char * buf;
-  size_t len;
-}; 
-struct bstr_slice_s {
+
+struct TStrSpan {
   char * buf;
   size_t len;
 }; 
 
-#ifdef __cplusplus
-static inline struct bstr_const_slice_s bstr_const_ref(const char* c) { return (struct bstr_const_slice_s){c, strlen(c)}; }
-static inline struct bstr_const_slice_s bstr_const_ref(struct bstr_s str) { return (struct bstr_const_slice_s){str.buf, str.len};}
-static inline struct bstr_const_slice_s bstr_const_ref(struct bstr_slice_s slice){return (struct bstr_const_slice_s){slice.buf, slice.len};}
+static inline struct TStrSpan tfToRef(char* c) { return (struct TStrSpan){ c, strlen(c) }; }
+static inline struct TStrSpan tfToRef(const char* c) { return (struct TStrSpan){ (char*)c, strlen(c) }; }
+static inline struct TStrSpan tfToRef(struct TStr str) { return (struct TStrSpan){ str.buf, str.len }; }
 
-static inline struct bstr_slice_s bstr_ref(char *c) { return (struct bstr_slice_s){c, strlen(c)}; }
-static inline struct bstr_slice_s bstr_ref(struct bstr_s str) { return (struct bstr_slice_s){str.buf, str.len}; }
-
-static inline struct bstr_slice_s bstr_sub(struct bstr_slice_s slice, size_t a, size_t b) {
+static inline struct TStrSpan tfSub(struct TStrSpan slice, size_t a, size_t b) {
   assert((b - a) <= slice.len);
-  return (struct bstr_slice_s){slice.buf + a, b - a};
-}
-static inline struct bstr_const_slice_s bstr_sub(struct bstr_const_slice_s slice, size_t a, size_t b) {
-  assert((b - a) <= slice.len);
-  return (struct bstr_const_slice_s){slice.buf + a, b - a};
-}
-#endif
-
-
-#define BSTR_LLSTR_SIZE 21
-#define BSTR_LSTR_SIZE 16 
-
-#define bstr_avail_len(b) ((b).alloc - (b).len)
-#define bstr_avail_slice(b)((struct bstr_slice_s){(b).buf + (b).len, bstr_avail_len(b)})
-#define bstr_is_empty(b) ((b).buf == NULL || (b).len == 0)
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifndef __cplusplus
-static inline struct bstr_const_slice_s cstr_to_const_slice(const char* c) { return (struct bstr_const_slice_s){c, strlen(c)}; }
-static inline struct bstr_const_slice_s bstr_to_const_slice(struct bstr_s str) { return (struct bstr_const_slice_s){str.buf, str.len};}
-static inline struct bstr_const_slice_s bstr_slice_to_const_slice(struct bstr_slice_s slice){return (struct bstr_const_slice_s){slice.buf, slice.len};}
-
-static inline struct bstr_slice_s cstr_to_slice(char *c) { return (struct bstr_slice_s){c, strlen(c)}; }
-static inline struct bstr_slice_s bstr_to_slice(struct bstr_s str) { return (struct bstr_slice_s){str.buf, str.len}; }
-
-static inline struct bstr_slice_s bstr_sub_slice(struct bstr_slice_s slice, size_t a, size_t b) {
-  assert((b - a) <= slice.len);
-  return (struct bstr_slice_s){slice.buf + a, b - a};
-}
-static inline struct bstr_const_slice_s bstr_sub_const_slice(struct bstr_const_slice_s slice, size_t a, size_t b) {
-  assert((b - a) <= slice.len);
-  return (struct bstr_const_slice_s){slice.buf + a, b - a};
+  return (struct TStrSpan){slice.buf + a, b - a};
 }
 
-#define bstr_const_ref(T) \
-    _Generic((T), \
-      struct bstr_s: bstr_to_const_slice, \
-      struct bstr_slice_s: bstr_slice_to_const_slice, \
-      char*: cstr_to_const_slice)(T)
-
-#define bstr_ref(T) \
-    _Generic((T), \
-      struct bstr_s: bstr_to_slice, \
-      char*: cstr_to_slice)(T)
-
-#define bstr_sub(T,a,b) \
-    _Generic((T), \
-      struct bstr_const_slice_s: bstr_sub_const_slice, \
-      struct bstr_slice_s: bstr_sub_slice)(T, a, b)
-
-#endif
-
+static inline size_t tfStrAvailLen(TStr str) { return str.alloc - str.len;}
+static inline TStrSpan tfStrAvailSpan(TStr str) { return (struct TStrSpan){str.buf + str.len, tfStrAvailLen(str)};}
 
 /**
  * Creates a string from a slice 
  **/
-void bstrfree(struct bstr_s* str);
-void bstrupper(struct bstr_slice_s slice);
-void bstrlower(struct bstr_slice_s slice);
+void tfStrFree(struct TStr* str);
+void tfStrUpper(struct TStrSpan slice);
+void tfStrLower(struct TStrSpan slice);
+#define tfStrEmpty(b) ((b).buf == NULL || (b).len == 0)
 
-struct bstr_const_slice_s bstrtrim(struct bstr_const_slice_s slice);
-struct bstr_const_slice_s bstrrtrim(struct bstr_const_slice_s slice);
-struct bstr_const_slice_s bstrltrim(struct bstr_const_slice_s slice);
+struct TStrSpan tfStrTrim(struct TStrSpan slice);
+struct TStrSpan tfStrRTrim(struct TStrSpan  slice);
+struct TStrSpan tfStrLTrim(struct TStrSpan  slice);
 
 /* Enlarge the free space at the end of the bstr string so that the caller
  * is sure that after calling this function can overwrite up to addlen
@@ -148,7 +94,7 @@ struct bstr_const_slice_s bstrltrim(struct bstr_const_slice_s slice);
  *
  * Note: this does not change the *length* of the bstr string as len 
  * but only the free buffer space we have. */
-bool bstrMakeRoomFor(struct bstr_s* str, size_t addlen);
+bool bstrMakeRoomFor(struct TStr* str, size_t addlen);
 /* 
  * set the length of the buffer to the length specified. this
  * will also trigger a realloction if the length is greater then the size
@@ -157,14 +103,14 @@ bool bstrMakeRoomFor(struct bstr_s* str, size_t addlen);
  * Note: this does not set the null terminator for the string.
  * this will corrupt slices that are referencing a slice out of this buffer.
  **/
-bool bstrsetlen(struct bstr_s* str, size_t len);
+bool bstrsetlen(struct TStr* str, size_t len);
 /**
  * set the amount of memory reserved by the bstr. will only ever increase
  * the size of the string 
  * 
  * A reserved string can be assigned with bstrAssign
  **/
-bool bstrsetresv(struct bstr_s* str, size_t reserveLen); 
+bool bstrsetresv(struct TStr* str, size_t reserveLen); 
 
 /** 
  * Modify an bstr string in-place to make it empty (zero length) set null terminator.
@@ -172,7 +118,7 @@ bool bstrsetresv(struct bstr_s* str, size_t reserveLen);
  * so that next append operations will not require allocations up to the
  * number of bytes previously available. 
  **/
-bool bstr_clear(struct bstr_s* str);
+bool bstr_clear(struct TStr* str);
 
 /**
  * takes a bstr and duplicates the underlying buffer.
@@ -181,12 +127,12 @@ bool bstr_clear(struct bstr_s* str);
  *
  * if the buffer fails to allocate then BSTR_IS_EMPTY(b) will be true
  **/
-struct bstr_s bstrDup(const struct bstr_s* str);
-bool bstrAppendSlice(struct bstr_s* str, const struct bstr_const_slice_s slice);
-bool bstrAppendChar(struct bstr_s* str, char b);
-bool bstrInsertChar(struct bstr_s* str, size_t i, char b);
-bool bstrInserSlice(struct bstr_s* str, size_t i, const struct bstr_const_slice_s slice);
-bool bstrAssign(struct bstr_s* str, struct bstr_const_slice_s slice);
+struct TStr tfStrDup(const struct TStr* str);
+bool tfStrAppendSlice(struct TStr* str, const struct TStrSpan slice);
+bool tfStrAppendChar(struct TStr* str, char b);
+bool tfStrInsertChar(struct TStr* str, size_t i, char b);
+bool tfStrInserSlice(struct TStr* str, size_t i, const struct TStrSpan slice);
+bool tfStrAssign(struct TStr* str, struct TStrSpan slice);
 /**
  * resizes the allocation of the bstr will truncate if the allocation is less then the size 
  *
@@ -194,15 +140,15 @@ bool bstrAssign(struct bstr_s* str, struct bstr_const_slice_s slice);
  *
  * If the buffer fails to reallocate then false is returned
  **/
-bool bstrresize(struct bstr_s* str, size_t len);
+bool tfStrResize(struct TStr* str, size_t len);
 
 
-struct bstr_split_iterable_s {
-  const struct bstr_const_slice_s buffer; // the buffer to iterrate over
-  const struct bstr_const_slice_s delim; // delim to split across 
+struct TFStrSplitIterable {
+  const struct TStrSpan buffer; // the buffer to iterrate over
+  const struct TStrSpan delim; // delim to split across 
   size_t cursor; // the current position in the buffer
 };
-#define bstr_iter_has_more(it) (it.cursor < it.buffer.len)
+//#define bstr_iter_has_more(it) (it.cursor < it.buffer.len)
 
 /** 
  * splits a string using an iterator and returns a slice. a valid slice means there are 
@@ -222,7 +168,7 @@ struct bstr_split_iterable_s {
  * }
  *
  **/
-struct bstr_const_slice_s bstrSplitIter(struct bstr_split_iterable_s*);
+struct TStrSpan bstrSplitIter(struct TFStrSplitIterable*);
 
 /** 
  * splits a string using an iterator and returns a slice. a valid slice means there are 
@@ -244,7 +190,7 @@ struct bstr_const_slice_s bstrSplitIter(struct bstr_split_iterable_s*);
  * }
  *
  **/
-struct bstr_const_slice_s bstrSplitRevIter(struct bstr_split_iterable_s*);
+struct TStrSpan bstrSplitRevIter(struct TFStrSplitIterable*);
 
 /* Set the bstr string length to the length as obtained with strlen(), so
  * considering as content only up to the first null term character.
@@ -263,7 +209,7 @@ struct bstr_const_slice_s bstrSplitRevIter(struct bstr_split_iterable_s*);
  * the output will be "6" as the string was modified but the logical length
  * remains 6 bytes. 
  ** */
-bool bstrUpdateLen(struct bstr_s* str);
+bool bstrUpdateLen(struct TStr* str);
 
 /* Append to the bstr string 's' a string obtained using printf-alike format
  * specifier.
@@ -278,11 +224,11 @@ bool bstrUpdateLen(struct bstr_s* str);
  *
  * if valid BSTR_OK else BSTR_ERR
  */
-bool bstrcatprintf(struct bstr_s* s, const char *fmt, ...); 
-bool bstrcatvprintf(struct bstr_s* str, const char* fmt, va_list ap);
+bool bstrcatprintf(struct TStr* s, const char *fmt, ...); 
+bool bstrcatvprintf(struct TStr* str, const char* fmt, va_list ap);
 
-int bstrsscanf(struct bstr_const_slice_s slice, const char* fmt, ...);
-int bstrvsscanf(struct bstr_const_slice_s slice, const char* fmt, va_list ap);
+int bstrsscanf(struct TStrSpan slice, const char* fmt, ...);
+int bstrvsscanf(struct TStrSpan slice, const char* fmt, va_list ap);
 
 /* This function is similar to bstrcatprintf, but much faster as it does
  * not rely on sprintf() family functions implemented by the libc that
@@ -303,7 +249,7 @@ int bstrvsscanf(struct bstr_const_slice_s slice, const char* fmt, va_list ap);
  * %U - 64 bit unsigned integer (unsigned long long, uint64_t)
  * %% - Verbatim "%" character.
  */
-bool bstrcatfmt(struct bstr_s*, char const *fmt, ...);
+bool bstrcatfmt(struct TStr*, char const *fmt, ...);
 
 
 /*
@@ -312,11 +258,11 @@ bool bstrcatfmt(struct bstr_s*, char const *fmt, ...);
  *
  * this modifies bstr so slices that reference this bstr can become invalid.
  **/
-bool bstrcatjoin(struct bstr_s*, struct bstr_const_slice_s* slices, size_t numSlices, struct bstr_const_slice_s sep);
+bool bstrcatjoin(struct TStr*, struct TStrSpan* slices, size_t numSlices, struct TStrSpan sep);
 /*
  * join an array of strings and cat them to bstr 
  **/
-bool bstrCatJoinCStr(struct bstr_s*, const char** argv, size_t argc, struct bstr_const_slice_s sep);
+bool bstrCatJoinCStr(struct TStr*, const char** argv, size_t argc, struct TStrSpan sep);
 
 /**
  * this should fit safetly within BSTR_LLSTR_SIZE. 
@@ -325,8 +271,8 @@ bool bstrCatJoinCStr(struct bstr_s*, const char** argv, size_t argc, struct bstr
  * value is unable to be written or the length of the slice is greater
  *
  **/
-int bstrfmtll(struct bstr_slice_s slice, long long value); 
-int bstrfmtull(struct bstr_slice_s slice, unsigned long long value); 
+int bstrfmtll(struct TStrSpan slice, long long value); 
+int bstrfmtull(struct TStrSpan slice, unsigned long long value); 
 
 /*  
  * Parse a string into a 64-bit integer.
@@ -337,8 +283,8 @@ int bstrfmtull(struct bstr_slice_s slice, unsigned long long value);
  *   * if the string starts with 0o, the base will be 8
  *   * otherwise the base will be 10
  */
-bool bstrReadll(struct bstr_const_slice_s, long long* result);
-bool bstrReadull(struct bstr_const_slice_s, unsigned long long* result);
+bool bstrReadll(struct TStrSpan, long long* result);
+bool bstrReadull(struct TStrSpan, unsigned long long* result);
 
 /* Scan/search functions */
 /*  
@@ -348,38 +294,34 @@ bool bstrReadull(struct bstr_const_slice_s, unsigned long long* result);
  *  returned indicating that the strings are equal. If the lengths are
  *  different, if the first slice is longer 1 else -1. 
  */
-int bstrCaselessCompare (const struct bstr_const_slice_s b0, const struct bstr_const_slice_s b1);
+int bstrCaselessCompare (const struct TStrSpan b0, const struct TStrSpan b1);
 /*
  *  The return value is the difference of the values of the characters where the
  *  two strings first differ after lower case transformation, otherwise 0 is
  *  returned indicating that the strings are equal. If the lengths are
  *  different, if the first slice is longer 1 else -1.
  */
-int bstrCompare  (const struct bstr_const_slice_s b0, const struct bstr_const_slice_s b1);
+int bstrCompare  (const struct TStrSpan b0, const struct TStrSpan b1);
 /**
 *  Test if two strings are equal ignores case true else false.  
 **/
-bool bstrCaselessEqual (const struct bstr_const_slice_s b0, const struct bstr_const_slice_s b1);
+bool bstrCaselessEqual (const struct TStrSpan b0, const struct TStrSpan b1);
 /**
 *  Test if two strings are equal return true else false.  
 **/
-bool bstrEqual (const struct bstr_const_slice_s b0, const struct bstr_const_slice_s b1);
+bool bstrEqual (const struct TStrSpan b0, const struct TStrSpan b1);
 
-int bstrIndexOfOffset(const struct bstr_const_slice_s haystack, size_t offset, const struct bstr_const_slice_s needle);
-int bstrIndexOf(const struct bstr_const_slice_s haystack, const struct bstr_const_slice_s needle);
-int bstrLastIndexOfOffset(const struct bstr_const_slice_s str, size_t offset, const struct bstr_const_slice_s needle);
-int bstrLastIndexOf(const struct bstr_const_slice_s str, const struct bstr_const_slice_s needle);
+int bstrIndexOfOffset(const struct TStrSpan haystack, size_t offset, const struct TStrSpan needle);
+int tfStrIndexOf(const struct TStrSpan haystack, const struct TStrSpan needle);
+int bstrLastIndexOfOffset(const struct TStrSpan str, size_t offset, const struct TStrSpan needle);
+int bstrLastIndexOf(const struct TStrSpan str, const struct TStrSpan needle);
 
-int bstrIndexOfCaselessOffset(const struct bstr_const_slice_s haystack, size_t offset, const struct bstr_const_slice_s needle);
-int bstrIndexOfCaseless(const struct bstr_const_slice_s haystack, const struct bstr_const_slice_s needle);
-int bstrLastIndexOfCaseless(const struct bstr_const_slice_s haystack, const struct bstr_const_slice_s needle);
-int bstrLastIndexOfCaselessOffset(const struct bstr_const_slice_s haystack, size_t offset, const struct bstr_const_slice_s needle);
+int tfStrIndexOfCaselessOffset(const struct TStrSpan haystack, size_t offset, const struct TStrSpan needle);
+int tfStrIndexOfCaseless(const struct TStrSpan haystack, const struct TStrSpan needle);
+int bstrLastIndexOfCaseless(const struct TStrSpan haystack, const struct TStrSpan needle);
+int bstrLastIndexOfCaselessOffset(const struct TStrSpan haystack, size_t offset, const struct TStrSpan needle);
 
-int bstrIndexOfAny(const struct bstr_const_slice_s haystack, const struct bstr_const_slice_s characters);
-int bstrLastIndexOfAny(const struct bstr_const_slice_s haystack, const struct bstr_const_slice_s characters);
-
-#ifdef __cplusplus
-}
-#endif
+int bstrIndexOfAny(const struct TStrSpan haystack, const struct TStrSpan characters);
+int bstrLastIndexOfAny(const struct TStrSpan haystack, const struct TStrSpan characters);
 
 #endif
