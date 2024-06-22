@@ -1,18 +1,14 @@
 cmake_minimum_required(VERSION 3.26)
 cmake_policy(SET CMP0112 NEW)
 cmake_policy(SET CMP0141 NEW) # https://cmake.org/cmake/help/latest/policy/CMP0141.html#policy:CMP0141
-set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 include(utils)
 enable_language(ASM)
 
 add_subdirectory(External)
+set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/External")
 
-
-set(EXTERNAL_DIR "${PROJECT_SOURCE_DIR}/External")
-
-#set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
-#set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
-#add_subdirectory(tinygltf)
 
 add_library(cpu_features OBJECT 
      Common_3/OS/ThirdParty/OpenSource/cpu_features/src/impl_x86_macos.c

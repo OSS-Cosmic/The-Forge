@@ -315,37 +315,37 @@ int LinuxMain(int argc, char** argv, IApp* app)
 
     fsSetPathForResourceDir(pSystemFileIO, RM_DEBUG, RD_LOG, "");
 
-#if defined(ENABLE_GRAPHICS_DEBUG) && defined(VULKAN) && VK_OVERRIDE_LAYER_PATH
-    // We are now shipping validation layer in the repo itself to remove dependency on Vulkan SDK to be installed
-    // Set VK_LAYER_PATH to executable location so it can find the layer files that our application wants to use
-    const char* debugPath = pSystemFileIO->GetResourceMount(RM_DEBUG);
-    VERIFY(!setenv("VK_LAYER_PATH", debugPath, true));
-    // HACK: we can't simply specify LD_LIBRARY_PATH at runtime,
-    // so we have to patch the .json file to use the full path for the shared library.
-    // This currently works only for one library, because we use only one library.
-    char jsonPath[256] = { 0 };
-    snprintf(jsonPath, sizeof(jsonPath), "%s/VkLayer_khronos_validation.json", debugPath);
-
-    FILE* file;
-    VERIFY(file = fopen(jsonPath, "r+"));
-    fseek(file, 0, SEEK_END);
-    long  size = ftell(file) + strlen(debugPath) + 1;
-    char* buffer = (char*)tf_calloc(size, 1);
-    fseek(file, 0, SEEK_SET);
-    fread(buffer, 1, size, file);
-
-    const char* libNameInQuotes = "\"libVkLayer_khronos_validation.so\"";
-    char        libPathInQuotes[256] = { 0 };
-    snprintf(libPathInQuotes, sizeof(libPathInQuotes), "\"%s/libVkLayer_khronos_validation.so\"", debugPath);
-    if (strreplace(buffer, libNameInQuotes, libPathInQuotes))
-    {
-        fseek(file, 0, SEEK_SET);
-        fwrite(buffer, 1, size, file);
-    }
-
-    fclose(file);
-    tf_free(buffer);
-#endif
+//#if defined(ENABLE_GRAPHICS_DEBUG) && defined(VULKAN) && VK_OVERRIDE_LAYER_PATH
+//    // We are now shipping validation layer in the repo itself to remove dependency on Vulkan SDK to be installed
+//    // Set VK_LAYER_PATH to executable location so it can find the layer files that our application wants to use
+//    const char* debugPath = pSystemFileIO->GetResourceMount(RM_DEBUG);
+//    VERIFY(!setenv("VK_LAYER_PATH", debugPath, true));
+//    // HACK: we can't simply specify LD_LIBRARY_PATH at runtime,
+//    // so we have to patch the .json file to use the full path for the shared library.
+//    // This currently works only for one library, because we use only one library.
+//    char jsonPath[256] = { 0 };
+//    snprintf(jsonPath, sizeof(jsonPath), "%s/VkLayer_khronos_validation.json", debugPath);
+//
+//    FILE* file;
+//    VERIFY(file = fopen(jsonPath, "r+"));
+//    fseek(file, 0, SEEK_END);
+//    long  size = ftell(file) + strlen(debugPath) + 1;
+//    char* buffer = (char*)tf_calloc(size, 1);
+//    fseek(file, 0, SEEK_SET);
+//    fread(buffer, 1, size, file);
+//
+//    const char* libNameInQuotes = "\"libVkLayer_khronos_validation.so\"";
+//    char        libPathInQuotes[256] = { 0 };
+//    snprintf(libPathInQuotes, sizeof(libPathInQuotes), "\"%s/libVkLayer_khronos_validation.so\"", debugPath);
+//    if (strreplace(buffer, libNameInQuotes, libPathInQuotes))
+//    {
+//        fseek(file, 0, SEEK_SET);
+//        fwrite(buffer, 1, size, file);
+//    }
+//
+//    fclose(file);
+//    tf_free(buffer);
+//#endif
 
 #if TF_USE_MTUNER
     rmemInit(0);

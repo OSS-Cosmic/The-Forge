@@ -131,7 +131,7 @@ bool Panini::Init(Renderer* renderer, PipelineCache* pCache)
 {
     pRenderer = renderer;
     pPipelineCache = pCache;
-    mIndex = -1;
+    mIndex = (uint32_t)-1;
 
     // SHADER
     //----------------------------------------------------------------------------------------------------------------
