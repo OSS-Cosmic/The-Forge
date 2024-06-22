@@ -30,14 +30,14 @@
 #include "AssetPipeline.h"
 
 // Math
-#include "../../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_base.h"
+#include "../tinyimageformat/tinyimageformat_base.h"
 #include "../../../Utilities/ThirdParty/OpenSource/ModifiedSonyMath/vectormath.hpp"
 
 #include "../../../Resources/ResourceLoader/TextureContainers.h"
 
 // TinyImage
-#include "../../../Resources/ResourceLoader/ThirdParty/OpenSource/tinydds/tinydds.h"
-#include "../../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyktx/tinyktx.h"
+#include "../tinydds/tinydds.h"
+#include "../tinyktx/tinyktx.h"
 
 // ISPC texcomp
 #include "../../ThirdParty/OpenSource/ISPCTextureCompressor/ispc_texcomp/ispc_texcomp.h"

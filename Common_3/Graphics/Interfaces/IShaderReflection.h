@@ -26,7 +26,7 @@
 
 #include "../GraphicsConfig.h"
 #ifdef GLES
-#include "../ThirdParty/OpenSource/OpenGL/GLES2/gl2.h"
+#include "OpenGL/GLES2/gl2.h"
 #endif
 
 #include <ctype.h>

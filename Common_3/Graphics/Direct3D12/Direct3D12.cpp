@@ -50,8 +50,8 @@
 #include "../../OS/ThirdParty/OpenSource/winpixeventruntime/Include/WinPixEventRuntime/pix3.h"
 #endif
 
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_base.h"
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_query.h"
+#include "tinyimageformat/tinyimageformat_base.h"
+#include "tinyimageformat/tinyimageformat_query.h"
 #include "../ThirdParty/OpenSource/ags/AgsHelper.h"
 #include "../ThirdParty/OpenSource/nvapi/NvApiHelper.h"
 #include "../ThirdParty/OpenSource/renderdoc/renderdoc_app.h"

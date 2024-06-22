@@ -28,8 +28,8 @@
 
 #ifdef DIRECT3D11
 
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_apis.h"
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_base.h"
+#include "tinyimageformat/tinyimageformat_apis.h"
+#include "tinyimageformat/tinyimageformat_base.h"
 
 inline void d3d11CapsBuilder(ID3D11Device* pDevice, GPUCapBits* pCapBits)
 {

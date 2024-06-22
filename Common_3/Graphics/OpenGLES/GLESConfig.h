@@ -30,7 +30,7 @@
 
 #define GLES
 
-#include "../ThirdParty/OpenSource/OpenGL/GLES2/gl2.h"
+#include "OpenGL/GLES2/gl2.h"
 typedef void* GLContext;
 typedef void* GLConfig;
 typedef void* GLSurface;

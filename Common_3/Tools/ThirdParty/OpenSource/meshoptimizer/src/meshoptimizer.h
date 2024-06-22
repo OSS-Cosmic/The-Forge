@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include "../../../../../../Utilities/Interfaces/ILog.h"
+#include "../../../../../Utilities/Interfaces/ILog.h"
 #include <stddef.h>
 #include <math.h>
 
@@ -349,7 +349,7 @@ MESHOPTIMIZER_EXPERIMENTAL size_t meshopt_simplifyPoints(unsigned int* destinati
 
 /**
  * Experimental: Returns the error scaling factor used by the simplifier to convert between absolute and relative extents
- * 
+ *
  * Absolute error must be *divided* by the scaling factor before passing it to meshopt_simplify as target_error
  * Relative error returned by meshopt_simplify via result_error must be *multiplied* by the scaling factor to get absolute error.
  */

@@ -24,7 +24,7 @@
 
 #ifndef VULKAN_H_
 #       ifdef VOLK_VULKAN_H_PATH
-#               include "../VulkanSDK/include/vulkan/vulkan.h"
+#               include "vulkan/vulkan.h"
 #	elif defined(VK_USE_PLATFORM_WIN32_KHR)
 #		include <vulkan/vk_platform.h>
 #		include <vulkan/vulkan_core.h>

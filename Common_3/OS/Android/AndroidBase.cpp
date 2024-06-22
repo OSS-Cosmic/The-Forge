@@ -34,8 +34,8 @@
 #include "../../Graphics/GraphicsConfig.h"
 
 #if defined(GLES)
-#include <EGL/egl.h>
-#include <GLES2/gl2.h>
+#include <OpenGL/EGL/egl.h>
+#include <OpenGL/GLES2/gl2.h>
 #endif
 
 #include "../../Application/Interfaces/IApp.h"

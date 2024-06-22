@@ -26,7 +26,7 @@
 
 #if defined(GLES)
 
-#include "../ThirdParty/OpenSource/OpenGL/GLES2/gl2.h"
+#include "OpenGL/GLES2/gl2.h"
 
 #include "../../Utilities/Interfaces/ILog.h"
 #include "../Interfaces/IGraphics.h"

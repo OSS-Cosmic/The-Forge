@@ -30,7 +30,7 @@
 #include "../ThirdParty/PrivateNvidia/NsightAftermath/include/AftermathTracker.h"
 #endif
 
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_base.h"
+#include "tinyimageformat/tinyimageformat_base.h"
 
 #include "../../OS/Interfaces/IOperatingSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"

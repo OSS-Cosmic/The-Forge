@@ -24,10 +24,10 @@
 
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
-#include "ThirdParty/OpenSource/tinyimageformat/tinyimageformat_apis.h"
-#include "ThirdParty/OpenSource/tinyimageformat/tinyimageformat_base.h"
-#include "ThirdParty/OpenSource/tinyimageformat/tinyimageformat_bits.h"
-#include "ThirdParty/OpenSource/tinyimageformat/tinyimageformat_query.h"
+#include "tinyimageformat/tinyimageformat_apis.h"
+#include "tinyimageformat/tinyimageformat_base.h"
+#include "tinyimageformat/tinyimageformat_bits.h"
+#include "tinyimageformat/tinyimageformat_query.h"
 
 #include "../../Graphics/GraphicsConfig.h"
 

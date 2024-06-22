@@ -37,7 +37,7 @@
 #include "../../../Resources/AnimationSystem/ThirdParty/OpenSource/ozz-animation/include/ozz/animation/offline/skeleton_builder.h"
 #include "../../../Resources/AnimationSystem/ThirdParty/OpenSource/ozz-animation/include/ozz/animation/offline/track_optimizer.h"
 #include "../../../Resources/AnimationSystem/ThirdParty/OpenSource/ozz-animation/include/ozz/base/io/archive.h"
-#include "../../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_base.h"
+#include "../tinyimageformat/tinyimageformat_base.h"
 
 // TressFX
 #include "../../../Resources/AnimationSystem/ThirdParty/OpenSource/TressFX/TressFXAsset.h"
@@ -53,7 +53,7 @@
 #endif
 // We are using jsmn to parse joints, these functions are static so it doesn't matter if they are defined in other files.
 #define CGLTF_JSMN_IMPLEMENTATION
-#include "../../../Resources/ResourceLoader/ThirdParty/OpenSource/cgltf/cgltf_write.h"
+#include "../cgltf/cgltf_write.h"
 
 #ifdef ENABLE_ASSET_PIPELINE_TINYDDS_IMPLEMENTATION
 #define TINYDDS_IMPLEMENTATION

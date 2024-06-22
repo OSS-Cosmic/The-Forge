@@ -24,9 +24,9 @@
 
 #pragma once
 
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_apis.h"
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_base.h"
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_query.h"
+#include "tinyimageformat/tinyimageformat_apis.h"
+#include "tinyimageformat/tinyimageformat_base.h"
+#include "tinyimageformat/tinyimageformat_query.h"
 
 inline void glCapsBuilder(GpuInfo* pGpu, const char* availableExtensions)
 {

@@ -26,8 +26,8 @@
 #include "Interfaces/IScreenshot.h"
 
 #if defined(ENABLE_SCREENSHOT)
-#include "../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_decode.h"
-#include "../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_query.h"
+#include "tinyimageformat/tinyimageformat_decode.h"
+#include "tinyimageformat/tinyimageformat_query.h"
 
 #include "../Utilities/Interfaces/IFileSystem.h"
 #include "../Utilities/Interfaces/ILog.h"

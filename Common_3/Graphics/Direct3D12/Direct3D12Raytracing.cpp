@@ -43,7 +43,7 @@
 #include "../../Utilities/Math/MathTypes.h"
 
 // Renderer
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_apis.h"
+#include "tinyimageformat/tinyimageformat_apis.h"
 
 #include "../Interfaces/IGraphics.h"
 #include "../Interfaces/IRay.h"

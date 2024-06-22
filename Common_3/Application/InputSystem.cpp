@@ -60,7 +60,7 @@
 #endif
 #endif
 
-#include "../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_query.h"
+#include "tinyimageformat/tinyimageformat_query.h"
 
 #include "../Graphics/Interfaces/IGraphics.h"
 #include "../OS/Interfaces/IOperatingSystem.h"

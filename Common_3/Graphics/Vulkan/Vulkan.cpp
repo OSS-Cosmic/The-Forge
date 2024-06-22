@@ -68,8 +68,8 @@
 #pragma GCC diagnostic pop
 #endif
 
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_base.h"
-#include "../../Resources/ResourceLoader/ThirdParty/OpenSource/tinyimageformat/tinyimageformat_query.h"
+#include "tinyimageformat/tinyimageformat_base.h"
+#include "tinyimageformat/tinyimageformat_query.h"
 
 #include "../../Utilities/Math/AlgorithmsImpl.h"
 #include "../../Utilities/Threading/Atomics.h"
