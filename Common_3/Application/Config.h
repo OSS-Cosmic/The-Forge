@@ -79,7 +79,7 @@
 #define NDEBUG
 #endif
 
-#define UNREF_PARAM(x)         (x)
+#define UNREF_PARAM(x)         ((void)(x))
 #define ALIGNAS(x)             __declspec(align(x))
 #define DEFINE_ALIGNED(def, a) __declspec(align(a)) def
 #define FORGE_CALLCONV         __cdecl
@@ -132,7 +132,7 @@ typedef SSIZE_T ssize_t;
 #define ALIGNOF(x)   __alignof__(x)
 #define THREAD_LOCAL __thread
 
-#ifdef __clang__
+#if defined(__clang__) && !defined(__cplusplus)
 #define COMPILE_ASSERT(exp) _Static_assert(exp, #exp)
 #else
 #define COMPILE_ASSERT(exp) static_assert(exp, #exp)
@@ -282,12 +282,12 @@ COMPILE_ASSERT(sizeof(ssize_t) == sizeof(int64_t));
 // #define ENABLE_MATH_CHECKS // Enables low level math library debug checks like SIMD variable alignment checks
 //#define ENABLE_FORGE_SCRIPTING
 //#define ENABLE_FORGE_RELOAD_SHADER
-//#define ENABLE_FORGE_UI
-//#define ENABLE_FORGE_FONTS
-//#define ENABLE_FORGE_INPUT
+#define ENABLE_FORGE_UI
+#define ENABLE_FORGE_FONTS
+#define ENABLE_FORGE_INPUT
 #define ENABLE_FORGE_ANIMATION_DEBUG
 //#define ENABLE_FORGE_GPU_ANIMATION_DEBUG
-//#define ENABLE_FORGE_MATERIALS
+#define ENABLE_FORGE_MATERIALS
 #define ENABLE_ZIP_FILESYSTEM
 #define ENABLE_SCREENSHOT
 #define ENABLE_PROFILER

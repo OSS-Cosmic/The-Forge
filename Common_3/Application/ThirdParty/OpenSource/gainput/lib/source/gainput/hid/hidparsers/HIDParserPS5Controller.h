@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../../../Application/Config.h"
+#include "Common_3/Application/Config.h"
 
 struct HIDDeviceInfo;
 struct HIDController;

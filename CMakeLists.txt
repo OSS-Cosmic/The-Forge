@@ -3,11 +3,17 @@ cmake_policy(SET CMP0112 NEW)
 cmake_policy(SET CMP0141 NEW) # https://cmake.org/cmake/help/latest/policy/CMP0141.html#policy:CMP0141
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+option(TF_SAMPLES "Build TF Samples" OFF)
+option(TF_TESTS "Build TF Test cases" OFF)
+
 include(utils)
 enable_language(ASM)
 
 add_subdirectory(External)
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/External")
+set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
+
+set(FSL_COMPILER_PY "${CMAKE_CURRENT_SOURCE_DIR}/Common_3/Tools/ForgeShadingLanguage/fsl.py" )
 
 
 add_library(cpu_features OBJECT 
@@ -98,9 +104,9 @@ target_include_directories(tinyimageformat INTERFACE
 #target_include_directories(ozz-animation PUBLIC Common_3/Resources/AnimationSystem/ThirdParty/OpenSource/ozz-animation/include)
 
 
-file(GLOB MESH_OPTIMIZER_SOURCES Common_3/Tools/ThirdParty/OpenSource/meshoptimizer/src/*.cpp)
-add_library(meshoptimizer STATIC ${MESH_OPTIMIZER_SOURCES})
-target_include_directories(meshoptimizer PUBLIC Common_3/Tools/ThirdParty/OpenSource/meshoptimizer/src)
+#file(GLOB MESH_OPTIMIZER_SOURCES Common_3/Tools/ThirdParty/OpenSource/meshoptimizer/src/*.cpp)
+#add_library(meshoptimizer STATIC ${MESH_OPTIMIZER_SOURCES})
+#target_include_directories(meshoptimizer PUBLIC Common_3/Tools/ThirdParty/OpenSource/meshoptimizer/src)
 
 add_library(tinydds INTERFACE)
 target_include_directories(tinydds INTERFACE 
@@ -109,40 +115,6 @@ target_include_directories(tinydds INTERFACE
 add_library(tinyktx INTERFACE)
 target_include_directories(tinyktx INTERFACE 
     Common_3/Resources/ResourceLoader/ThirdParty/OpenSource/tinyktx)
-
-
-# # ga input
-# file(GLOB GAINPUT_SOURCES 
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/*.cpp
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/builtin/*.cpp
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/dev/*.cpp
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/gestures/*.cpp
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/keyboard/*.cpp
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/mouse/*.cpp
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/pad/*.cpp
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/recorder/*.cpp
-#     )
-# 
-# if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-#     file(GLOB GAINPUT_SOURCES_MACOS
-#         Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/hidapi/mac/*.c
-#         Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/gainput/*.mm)
-#     list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_MACOS})
-# elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-#     file(GLOB GAINPUT_SOURCES_WINDOWS
-#         Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/hidapi/windows/*.c
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp
-#         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp
-#     )
-#     list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_WINDOWS})
-# elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
-#     file(GLOB GAINPUT_SOURCES_LINUX
-#         Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/hidapi/linux/*.c)
-#     list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_LINUX})
-# endif()
-# 
-# add_library(ga STATIC ${GAINPUT_SOURCES})
-# target_include_directories(ga PUBLIC Common_3/ThirdParty/OpenSource/lua)
 
 file(GLOB THE_FORGE_SOURCES
     Common_3/Graphics/*.cpp
@@ -163,7 +135,10 @@ file(GLOB THE_FORGE_SOURCES
     Common_3/Utilities/MemoryTracking/*.c
     Common_3/Utilities/Threading/*.c
     Common_3/Utilities/*.c
-    
+   
+    Common_3/Tools/Network/*.c
+    Common_3/Tools/ReloadServer/*.cpp
+
     Common_3/Renderer/ShaderServer/Network.c
     Common_3/Renderer/ShaderServer/ShaderServer.cpp
 
@@ -172,8 +147,44 @@ file(GLOB THE_FORGE_SOURCES
     Source/Forge/Core/TF_String.cpp
 
     Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.c
-   # Common_3/Game/Scripting/*.cpp
+    
+    Common_3/Tools/ThirdParty/OpenSource/meshoptimizer/src/*.cpp
 )
+add_library(TF STATIC ${THE_FORGE_SOURCES})
+
+# ga input
+file(GLOB GAINPUT_SOURCES 
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/builtin/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/dev/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/gestures/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/keyboard/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/mouse/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/pad/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/recorder/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/touch/*.cpp   
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp   
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp   
+)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    file(GLOB GAINPUT_SOURCES_MACOS
+        Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/hidapi/mac/*.c
+        Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/gainput/*.mm)
+    list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_MACOS})
+elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    file(GLOB GAINPUT_SOURCES_WINDOWS
+        Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/hidapi/windows/*.c
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp
+    )
+    list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_WINDOWS})
+elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    file(GLOB GAINPUT_SOURCES_LINUX
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/linux/*.c)
+    list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_LINUX})
+    target_link_libraries(TF PRIVATE udev)
+endif()
 
 # volk
 add_library(volk STATIC 
@@ -193,14 +204,13 @@ file(GLOB IMGUI_SOURCES Common_3/Application/ThirdParty/OpenSource/imgui/*.cpp)
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC Common_3/ThirdParty/OpenSource/imgui)
 
-
-add_library(TF STATIC ${THE_FORGE_SOURCES})
 target_compile_definitions(
     TF PRIVATE -DSTB_TRUETYPE_IMPLEMENTATION
 )
-target_link_libraries(TF PUBLIC cpu_features imgui cgltf lz4 zstd_filesystem tinydds tinyimageformat tinyktx meshoptimizer)
+target_link_libraries(TF PUBLIC cpu_features imgui cgltf lz4 zstd_filesystem tinydds tinyimageformat tinyktx )
 target_include_directories(TF PUBLIC ${THE_FORGE_DIR})
 
+target_sources(TF PRIVATE ${GAINPUT_SOURCES})
 IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     file(GLOB THE_FORGE_OS_DARWIN_SOURCES
         Common_3/OS/Darwin/*.cpp
@@ -279,10 +289,12 @@ target_include_directories(TF PUBLIC "${EXTERNAL_DIR}")
 target_include_directories(TF PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Include")
 target_include_directories(TF PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_include_directories(TF PUBLIC "Common_3/Utilities/ThirdParty/OpenSource/bstrlib")
+target_include_directories(TF PUBLIC "Common_3/Tools/ThirdParty/OpenSource/meshoptimizer/src")
 install (TARGETS TF 
          ARCHIVE DESTINATION lib
          LIBRARY DESTINATION lib
          RUNTIME DESTINATION bin)
 
 add_subdirectory(Test)
+add_subdirectory(TFSamples)
 

@@ -1,0 +1,3 @@
+[submodule "TFSamples"]
+	path = TFSamples
+	url = git@github.com:OSS-Cosmic/TFSamples.git

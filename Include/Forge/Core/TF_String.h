@@ -36,8 +36,8 @@
 // this is a modified string library that implements features from both bstring and sds
 
 
-#ifndef BSTR_H_INCLUDED
-#define BSTR_H_INCLUDED
+#ifndef TF_STRING_H_INCLUDED
+#define TF_STRING_H_INCLUDED
 
 #include <stdio.h>
 #include <limits.h>

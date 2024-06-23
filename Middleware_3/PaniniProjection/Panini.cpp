@@ -182,6 +182,7 @@ void Panini::Exit()
 
 bool Panini::Load(RenderTarget** rts, uint32_t count)
 {
+    UNREF_PARAM(count);
     // Vertexlayout
     VertexLayout vertexLayoutPanini = {};
     vertexLayoutPanini.mBindingCount = 1;

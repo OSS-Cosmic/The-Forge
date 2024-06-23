@@ -1073,6 +1073,15 @@ static inline int STBDS_HM_CONST_BSTRING_default_storage_mode(void)
 
 static inline void STBDS_HM_BINARY_free_key(stbds_hash_index* table, const void* key, size_t keysize STBDS_FN_ALLOC_ARGS)
 {
+	#ifdef ENABLE_MEMORY_TRACKING
+    UNREF_PARAM(PARENT_FUNCTION_NAME);
+	UNREF_PARAM(FUNCTION_NAME);
+	UNREF_PARAM(FILE_NAME);
+	UNREF_PARAM(FILE_LINE);
+    #endif
+    UNREF_PARAM(table); 
+    UNREF_PARAM(key); 
+    UNREF_PARAM(keysize); 
 }
 
 static inline void STBDS_HM_STRING_free_key(stbds_hash_index* table, const void* key, size_t keysize STBDS_FN_ALLOC_ARGS)

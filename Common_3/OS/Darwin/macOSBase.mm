@@ -49,7 +49,12 @@
 #include "../Interfaces/IOperatingSystem.h"
 
 #include "../../OS/CPUConfig.h"
+#if defined(ENABLE_FORGE_REMOTE_UI)
 #include "../../Tools/Network/Network.h"
+#endif
+#if defined(ENABLE_FORGE_RELOAD_SHADER)
+#include "../../Tools/ReloadServer/ReloadClient.h"
+#endif
 #include "../../Utilities/Math/MathTypes.h"
 
 #include "../../Utilities/Interfaces/IMemory.h"

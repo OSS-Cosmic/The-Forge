@@ -51,8 +51,12 @@
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/ITime.h"
 
+#if defined(ENABLE_FORGE_REMOTE_UI)
 #include "../../Tools/Network/Network.h"
+#endif
+#if defined(ENABLE_FORGE_RELOAD_SHADER)
 #include "../../Tools/ReloadServer/ReloadClient.h"
+#endif
 #include "../../Utilities/Math/MathTypes.h"
 
 #include "../../Utilities/Interfaces/IMemory.h"
@@ -76,11 +80,13 @@ static OSInfo      gOsInfo = {};
 // UI
 static UIComponent* pAPISwitchingComponent = NULL;
 static UIComponent* pToggleVSyncComponent = NULL;
+#if defined(ENABLE_FORGE_RELOAD_SHADER)
 static UIComponent* pReloadShaderComponent = NULL;
-static UIWidget*    pSwitchComponentLabelWidget = NULL;
-static UIWidget*    pSelectApUIWidget = NULL;
-static UIWidget*    pSelectGraphicCardWidget = NULL;
-static uint32_t     gSelectedApiIndex = 0;
+#endif
+static UIWidget* pSwitchComponentLabelWidget = NULL;
+static UIWidget* pSelectApUIWidget = NULL;
+static UIWidget* pSelectGraphicCardWidget = NULL;
+static uint32_t  gSelectedApiIndex = 0;
 
 // PickRenderingAPI.cpp
 extern PlatformParameters gPlatformParameters;
@@ -117,6 +123,7 @@ void requestReload(const ReloadDesc* pReloadDesc) { gReloadDescriptor = *pReload
 
 void errorMessagePopup(const char* title, const char* msg, WindowHandle* handle, errorMessagePopupCallbackFn callback)
 {
+    UNREF_PARAM(handle);
 #if defined(AUTOMATED_TESTING)
     LOGF(eERROR, title);
     LOGF(eERROR, msg);
@@ -141,7 +148,7 @@ void getOsVersion(ULONG& majorVersion, ULONG& minorVersion, ULONG& buildNumber)
     void(WINAPI * pfnRtlGetNtVersionNumbers)(__out_opt ULONG * pNtMajorVersion, __out_opt ULONG * pNtMinorVersion,
                                              __out_opt ULONG * pNtBuildNumber);
 
-    (FARPROC&)pfnRtlGetNtVersionNumbers = GetProcAddress(GetModuleHandle(TEXT("ntdll.dll")), "RtlGetNtVersionNumbers");
+    (FARPROC&)pfnRtlGetNtVersionNumbers = GetProcAddress(GetModuleHandle(L"ntdll.dll"), "RtlGetNtVersionNumbers");
 
     if (pfnRtlGetNtVersionNumbers)
     {
@@ -270,12 +277,14 @@ void setupPlatformUI(const IApp::Settings* pSettings)
     // MICROPROFILER UI
     toggleProfilerMenuUI(true);
 
+#if defined(ENABLE_FORGE_RELOAD_SHADER)
     // RELOAD CONTROL
     uiDesc = {};
     uiDesc.mStartPosition = vec2(pSettings->mWidth * 0.7f, pSettings->mHeight * 0.9f);
     uiCreateComponent("Reload Control", &uiDesc, &pReloadShaderComponent);
 
     platformReloadClientAddReloadShadersButton(pReloadShaderComponent);
+#endif
 
     // API SWITCHING
     uiDesc = {};
@@ -312,6 +321,7 @@ void setupPlatformUI(const IApp::Settings* pSettings)
     pSelectApUIWidget = uiCreateComponentWidget(pAPISwitchingComponent, "Select API", &selectApUIWidget, WIDGET_TYPE_DROPDOWN);
     pSelectApUIWidget->pOnEdited = [](void* pUserData)
     {
+        UNREF_PARAM(pUserData);
         ResetDesc resetDescriptor{ RESET_TYPE_API_SWITCH };
         requestReset(&resetDescriptor);
     };
@@ -329,6 +339,7 @@ void setupPlatformUI(const IApp::Settings* pSettings)
         uiCreateComponentWidget(pAPISwitchingComponent, "Select Graphic Card", &selectGraphicCardUIWidget, WIDGET_TYPE_DROPDOWN);
     pSelectGraphicCardWidget->pOnEdited = [](void* pUserData)
     {
+        UNREF_PARAM(pUserData);
         ResetDesc resetDescriptor{ RESET_TYPE_GRAPHIC_CARD_SWITCH };
         requestReset(&resetDescriptor);
     };
@@ -358,7 +369,9 @@ void togglePlatformUI()
 
     uiSetComponentActive(pToggleVSyncComponent, gShowPlatformUI);
     uiSetComponentActive(pAPISwitchingComponent, gShowPlatformUI);
+#if defined(ENABLE_FORGE_RELOAD_SHADER)
     uiSetComponentActive(pReloadShaderComponent, gShowPlatformUI);
+#endif
 #endif
 }
 
@@ -375,6 +388,8 @@ const char** IApp::argv;
 
 int WindowsMain(int argc, char** argv, IApp* app)
 {
+    UNREF_PARAM(argc);
+    UNREF_PARAM(argv);
     if (!initMemAlloc(app->GetName()))
         return EXIT_FAILURE;
 
@@ -705,7 +720,7 @@ int WindowsMain(int argc, char** argv, IApp* app)
         {
             togglePlatformUI();
         }
-#ifdef ENABLE_FORGE_RELOAD_SHADER
+#if defined(ENABLE_FORGE_RELOAD_SHADER)
         if (platformReloadClientShouldQuit())
             quit = true;
 #endif

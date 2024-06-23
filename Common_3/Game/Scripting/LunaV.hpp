@@ -218,6 +218,7 @@ public:
     // REGISTER CLASS AS A GLOBAL TABLE
     static void RegisterMethod(lua_State* L, const char* methodName, const int methodIndex, const char* namespac = NULL)
     {
+        UNREF_PARAM(namespac);
         // TODO:
         // if (namespac && strlen(namespac))
         //{
