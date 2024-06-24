@@ -1,20 +1,17 @@
-
-#include <stdbool.h>
-
+#include "Common_3/Application/Config.h"
 #include "Forge/Core/TF_String.h"
-
 #include "utest.h"
 
 UTEST(bstr, bstrCaselessCompare)
 {
-    EXPECT_EQ(bstrCaselessCompare(tfToRef("test"), tfToRef("TEST")), 0);
-    EXPECT_EQ(bstrCaselessCompare(tfToRef("testAA"), tfToRef("TEST")), 1);
+    EXPECT_EQ(tfStrCaselessCompare(tfToRef("test"), tfToRef("TEST")), 0);
+    EXPECT_EQ(tfStrCaselessCompare(tfToRef("testAA"), tfToRef("TEST")), 1);
 }
 
 UTEST(bstr, bstrCompare)
 {
-    EXPECT_EQ(bstrCompare(tfToRef("test"), tfToRef("TEST")), 32);
-    EXPECT_EQ(bstrCompare(tfToRef("Test"), tfToRef("test")), -32);
+    EXPECT_EQ(tfStrCompare(tfToRef("test"), tfToRef("TEST")), 32);
+    EXPECT_EQ(tfStrCompare(tfToRef("Test"), tfToRef("test")), -32);
 }
 
 UTEST(bstr, bstrIndexOf)
@@ -35,27 +32,27 @@ UTEST(bstr, bstrIndexOf)
 
 UTEST(bstr, bstrLastIndexOf)
 {
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("foo foo"), tfToRef(" ")), 3);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("foo foo"), tfToRef("foo")), 4);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("banana"), tfToRef("ana")), 3);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("textbook"), tfToRef("book")), 4);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("abababcabababcbab"), tfToRef("ababc")), 9);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("This is a test string to see how Boyer-Moore handles longer searches"), tfToRef("searches")), 60);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("hello world"), tfToRef("hello")), 0);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("apple banana"), tfToRef("nana")), 8);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("goodbye"), tfToRef("bye")), 4);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("cat"), tfToRef("dog")), -1);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef(""), tfToRef("abc")), -1);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("hello"), tfToRef("")), -1);
-    EXPECT_EQ(bstrLastIndexOf(tfToRef("abc"), tfToRef("abcd")), -1);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("foo foo"), tfToRef(" ")), 3);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("foo foo"), tfToRef("foo")), 4);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("banana"), tfToRef("ana")), 3);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("textbook"), tfToRef("book")), 4);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("abababcabababcbab"), tfToRef("ababc")), 9);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("This is a test string to see how Boyer-Moore handles longer searches"), tfToRef("searches")), 60);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("hello world"), tfToRef("hello")), 0);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("apple banana"), tfToRef("nana")), 8);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("goodbye"), tfToRef("bye")), 4);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("cat"), tfToRef("dog")), -1);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef(""), tfToRef("abc")), -1);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("hello"), tfToRef("")), -1);
+    EXPECT_EQ(tfStrLastIndexOf(tfToRef("abc"), tfToRef("abcd")), -1);
 }
 
 UTEST(bstr, bstrEq)
 {
-    EXPECT_EQ(bstrEqual(tfToRef("Hello world"), tfToRef("Hello world")), 1);
-    EXPECT_EQ(bstrEqual(tfToRef("Helloworld"), tfToRef("Hello world")), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("Hello World"), tfToRef("Hello world")), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("Hello"), tfToRef("Hello ")), 0);
+    EXPECT_EQ(tfStrEqual(tfToRef("Hello world"), tfToRef("Hello world")), 1);
+    EXPECT_EQ(tfStrEqual(tfToRef("Helloworld"), tfToRef("Hello world")), 0);
+    EXPECT_EQ(tfStrEqual(tfToRef("Hello World"), tfToRef("Hello world")), 0);
+    EXPECT_EQ(tfStrEqual(tfToRef("Hello"), tfToRef("Hello ")), 0);
 }
 
 UTEST(bstr, bstrDuplicate)
@@ -73,36 +70,36 @@ UTEST(bstr, bstrIterateRev)
     struct TStrSpan           buf = tfToRef("one two three four five");
     struct TFStrSplitIterable iterable = { .buffer = buf, .delim = tfToRef(" "), .cursor = buf.len };
     struct TStrSpan           s = { 0 };
-    s = bstrSplitRevIter(&iterable);
+    s = tfStrSplitRevIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("five"), s), 1);
-    s = bstrSplitRevIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("five"), s), 1);
+    s = tfStrSplitRevIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("four"), s), 1);
-    s = bstrSplitRevIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("four"), s), 1);
+    s = tfStrSplitRevIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("three"), s), 1);
-    s = bstrSplitRevIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("three"), s), 1);
+    s = tfStrSplitRevIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("two"), s), 1);
-    s = bstrSplitRevIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("two"), s), 1);
+    s = tfStrSplitRevIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("one"), s), 1);
-    s = bstrSplitRevIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("one"), s), 1);
+    s = tfStrSplitRevIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 1);
 }
 
 UTEST(bstr, bstrReadull)
 {
     unsigned long long res = 0;
-    EXPECT_EQ(bstrReadull(tfToRef("123456"), &res), 1);
+    EXPECT_EQ(tfStrReadull(tfToRef("123456"), &res), 1);
     EXPECT_EQ(res, 123456);
 }
 
 UTEST(bstr, bstrReadu32)
 {
     long long res = 0;
-    EXPECT_EQ(bstrReadll(tfToRef("123456"), &res), 1);
+    EXPECT_EQ(tfStrReadll(tfToRef("123456"), &res), 1);
     EXPECT_EQ(res, 123456);
 }
 
@@ -111,17 +108,17 @@ UTEST(bstr, bstrIterateWhiteSpace)
     struct TFStrSplitIterable iterable = { .buffer = tfToRef("one  two"), .delim = tfToRef(" "), .cursor = 0 };
     struct TStrSpan           s = { 0 };
 
-    s = bstrSplitIter(&iterable);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("one"), s), 1);
+    EXPECT_EQ(tfStrEqual(tfToRef("one"), s), 1);
 
-    s = bstrSplitIter(&iterable);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 1);
 
-    s = bstrSplitIter(&iterable);
-    EXPECT_EQ(bstrEqual(tfToRef("two"), s), 1);
+    s = tfStrSplitIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("two"), s), 1);
 
-    s = bstrSplitIter(&iterable);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 1);
 }
 
@@ -135,8 +132,8 @@ UTEST(bstr, bstrIterateCount)
         size_t i = 0;
         while (iterable.cursor < iterable.buffer.len)
         {
-            struct TStrSpan it = bstrSplitIter(&iterable);
-            EXPECT_EQ(bstrEqual(slices[i++], it), 1);
+            struct TStrSpan it = tfStrSplitIter(&iterable);
+            EXPECT_EQ(tfStrEqual(slices[i++], it), 1);
         }
     }
     {
@@ -150,8 +147,8 @@ UTEST(bstr, bstrIterateCount)
         size_t i = 0;
         while (iterable.cursor < iterable.buffer.len)
         {
-            struct TStrSpan it = bstrSplitIter(&iterable);
-            EXPECT_EQ(bstrEqual(slices[i++], it), 1);
+            struct TStrSpan it = tfStrSplitIter(&iterable);
+            EXPECT_EQ(tfStrEqual(slices[i++], it), 1);
         }
     }
 }
@@ -161,39 +158,39 @@ UTEST(bstr, bstrIterate)
     struct TFStrSplitIterable iterable = { .buffer = tfToRef("one two three four five"), .delim = tfToRef(" "), .cursor = 0 };
 
     struct TStrSpan s = { 0 };
-    s = bstrSplitIter(&iterable);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("one"), s), 1);
-    s = bstrSplitIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("one"), s), 1);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("two"), s), 1);
-    s = bstrSplitIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("two"), s), 1);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("three"), s), 1);
-    s = bstrSplitIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("three"), s), 1);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("four"), s), 1);
-    s = bstrSplitIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("four"), s), 1);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
-    EXPECT_EQ(bstrEqual(tfToRef("five"), s), 1);
-    s = bstrSplitIter(&iterable);
+    EXPECT_EQ(tfStrEqual(tfToRef("five"), s), 1);
+    s = tfStrSplitIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 1);
 }
 
 UTEST(bstr, bstrfmtWriteLongLong)
 {
     char   test_buffer[TFSTR_LLSTR_SIZE];
-    size_t len = bstrfmtll((struct TStrSpan){ .buf = test_buffer, .len = TFSTR_LLSTR_SIZE }, 12481);
+    size_t len = tfstrfmtll((struct TStrSpan){ .buf = test_buffer, .len = TFSTR_LLSTR_SIZE }, 12481);
     EXPECT_EQ(len, 5);
-    EXPECT_EQ(bstrEqual(tfToRef("12481"), (struct TStrSpan){ .buf = test_buffer, .len = len }), true);
+    EXPECT_EQ(tfStrEqual(tfToRef("12481"), (struct TStrSpan){ .buf = test_buffer, .len = len }), true);
 }
 
 UTEST(bstr, bstrCaselessEq)
 {
-    EXPECT_EQ(bstrCaselessEqual(tfToRef("Hello world"), tfToRef("Hello world")), 1);
-    EXPECT_EQ(bstrCaselessEqual(tfToRef("Helloworld"), tfToRef("Hello world")), 0);
-    EXPECT_EQ(bstrCaselessEqual(tfToRef("Hello World"), tfToRef("Hello world")), 1);
-    EXPECT_EQ(bstrCaselessEqual(tfToRef("Hello"), tfToRef("Hello ")), 0);
+    EXPECT_EQ(tfStrCaselessEqual(tfToRef("Hello world"), tfToRef("Hello world")), 1);
+    EXPECT_EQ(tfStrCaselessEqual(tfToRef("Helloworld"), tfToRef("Hello world")), 0);
+    EXPECT_EQ(tfStrCaselessEqual(tfToRef("Hello World"), tfToRef("Hello world")), 1);
+    EXPECT_EQ(tfStrCaselessEqual(tfToRef("Hello"), tfToRef("Hello ")), 0);
 }
 
 UTEST(bstr, bstrCatJoin)
@@ -205,8 +202,8 @@ UTEST(bstr, bstrCatJoin)
         tfToRef("three"),
         tfToRef("four"),
     };
-    EXPECT_EQ(bstrcatjoin(&buf, slices, 4, tfToRef(" ")), true);
-    EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("one two three four")), true);
+    EXPECT_EQ(tfstrcatjoin(&buf, slices, 4, tfToRef(" ")), true);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("one two three four")), true);
     tfStrFree(&buf);
 }
 
@@ -219,8 +216,8 @@ UTEST(bstr, bstrCatJoinCstr)
         "three",
         "four",
     };
-    EXPECT_EQ(bstrCatJoinCStr(&buf, slices, 4, tfToRef(" ")), true);
-    EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("one two three four")), true);
+    EXPECT_EQ(tfstrcatjoinCStr(&buf, slices, 4, tfToRef(" ")), true);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("one two three four")), true);
     tfStrFree(&buf);
 }
 
@@ -229,26 +226,26 @@ UTEST(bstr, appendSlice)
     struct TStr buf = { 0 };
     tfStrAssign(&buf, tfToRef("Hello"));
     EXPECT_EQ(tfStrAppendSlice(&buf, tfToRef(" world")), true);
-    EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("Hello world")), true);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("Hello world")), true);
     tfStrFree(&buf);
 }
 
 UTEST(bstr, bstrcatprintf)
 {
     struct TStr buf = { 0 };
-    EXPECT_EQ(bstrcatprintf(&buf, "Hello %s", "world"), true);
-    EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("Hello world")), true);
+    EXPECT_EQ(tfstrcatprintf(&buf, "Hello %s", "world"), true);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("Hello world")), true);
 
-    bstrsetlen(&buf, 0);
-    EXPECT_EQ(bstrcatprintf(&buf, "%d", 123), true);
-    EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("123")), true);
+    tfStrSetLen(&buf, 0);
+    EXPECT_EQ(tfstrcatprintf(&buf, "%d", 123), true);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("123")), true);
 
-    EXPECT_EQ(bstrcatprintf(&buf, " %lu", 156), true);
-    EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("123 156")), true);
+    EXPECT_EQ(tfstrcatprintf(&buf, " %lu", 156), true);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("123 156")), true);
 
-    bstrsetlen(&buf, 0);
-    EXPECT_EQ(bstrcatprintf(&buf, "a%cb", 0), true);
-    EXPECT_EQ(bstrEqual(tfToRef(buf), (struct TStrSpan){ .buf = "a\0"
+    tfStrSetLen(&buf, 0);
+    EXPECT_EQ(tfstrcatprintf(&buf, "a%cb", 0), true);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), (struct TStrSpan){ .buf = "a\0"
                                                                 "b",
                                                          .len = 3 }),
               1);
@@ -259,19 +256,19 @@ UTEST(bstr, bstrcatfmt)
 {
     struct TStr s = { 0 };
     {
-        bstrcatfmt(&s, "%S\n", tfToRef("Hello World"));
-        EXPECT_EQ(bstrEqual(tfToRef(s), tfToRef("Hello World\n")), true);
-        bstr_clear(&s);
+        tfstrcatfmt(&s, "%S\n", tfToRef("Hello World"));
+        EXPECT_EQ(tfStrEqual(tfToRef(s), tfToRef("Hello World\n")), true);
+        tfStrClear(&s);
     }
     {
-        bstrcatfmt(&s, "%i\n", 125);
-        EXPECT_EQ(bstrEqual(tfToRef(s), tfToRef("125\n")), true);
-        bstr_clear(&s);
+        tfstrcatfmt(&s, "%i\n", 125);
+        EXPECT_EQ(tfStrEqual(tfToRef(s), tfToRef("125\n")), true);
+        tfStrClear(&s);
     }
     {
-        bstrcatfmt(&s, "%i\n", -125);
-        EXPECT_EQ(bstrEqual(tfToRef(s), tfToRef("-125\n")), true);
-        bstr_clear(&s);
+        tfstrcatfmt(&s, "%i\n", -125);
+        EXPECT_EQ(tfStrEqual(tfToRef(s), tfToRef("-125\n")), true);
+        tfStrClear(&s);
     }
     tfStrFree(&s);
 }
@@ -281,9 +278,9 @@ UTEST(bstr, updateLen)
     struct TStr buf = { 0 };
     tfStrAssign(&buf, tfToRef("Hello World"));
     buf.buf[5] = '\0';
-    bstrUpdateLen(&buf);
+    tfStrUpdateLen(&buf);
 
-    EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("Hello")), true);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("Hello")), true);
     EXPECT_EQ(buf.len, 5);
 
     tfStrFree(&buf);
@@ -294,32 +291,32 @@ UTEST(bstr, tfStrAssign)
     struct TStr buf = { 0 };
     {
         tfStrAssign(&buf, tfToRef("Hello World"));
-        EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("Hello World")), true);
+        EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("Hello World")), true);
     }
     {
         tfStrAssign(&buf, tfStrTrim(tfToRef("   Hello World   ")));
-        EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("Hello World")), true);
+        EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("Hello World")), true);
     }
     tfStrFree(&buf);
 }
 
 UTEST(bstr, bstr_rtrim)
 {
-    EXPECT_EQ(bstrEqual(tfStrRTrim(tfToRef("Hello world  ")), tfToRef("Hello world")), true);
-    EXPECT_EQ(bstrEqual(tfStrRTrim(tfToRef("  Hello world  ")), tfToRef("  Hello world")), true);
-    EXPECT_EQ(bstrEqual(tfStrRTrim(tfToRef("  ")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrRTrim(tfToRef(" ")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrRTrim(tfToRef("\n")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrRTrim(tfToRef("\t")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrRTrim(tfToRef("Hello world  ")), tfToRef("Hello world")), true);
+    EXPECT_EQ(tfStrEqual(tfStrRTrim(tfToRef("  Hello world  ")), tfToRef("  Hello world")), true);
+    EXPECT_EQ(tfStrEqual(tfStrRTrim(tfToRef("  ")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrRTrim(tfToRef(" ")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrRTrim(tfToRef("\n")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrRTrim(tfToRef("\t")), tfToRef("")), true);
 }
 
 UTEST(bstr, bstr_ltrim)
 {
-    EXPECT_EQ(bstrEqual(tfStrLTrim(tfToRef("Hello world  ")), tfToRef("Hello world  ")), true);
-    EXPECT_EQ(bstrEqual(tfStrLTrim(tfToRef("  ")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrLTrim(tfToRef(" ")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrLTrim(tfToRef("\n")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrLTrim(tfToRef("\t")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrLTrim(tfToRef("Hello world  ")), tfToRef("Hello world  ")), true);
+    EXPECT_EQ(tfStrEqual(tfStrLTrim(tfToRef("  ")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrLTrim(tfToRef(" ")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrLTrim(tfToRef("\n")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrLTrim(tfToRef("\t")), tfToRef("")), true);
 }
 
 UTEST(bstr, tfStrTrim)
@@ -328,16 +325,16 @@ UTEST(bstr, tfStrTrim)
         struct TStr buf = { 0 };
         tfStrAssign(&buf, tfToRef("  Hello World "));
         tfStrAssign(&buf, tfStrTrim(tfToRef(buf)));
-        EXPECT_EQ(bstrEqual(tfToRef(buf), tfToRef("Hello World")), true);
+        EXPECT_EQ(tfStrEqual(tfToRef(buf), tfToRef("Hello World")), true);
         tfStrFree(&buf);
     }
 
-    EXPECT_EQ(bstrEqual(tfStrTrim(tfToRef("Hello world  ")), tfToRef("Hello world")), true);
-    EXPECT_EQ(bstrEqual(tfStrTrim(tfToRef("  \t Hello world  ")), tfToRef("Hello world")), true);
-    EXPECT_EQ(bstrEqual(tfStrTrim(tfToRef("  ")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrTrim(tfToRef(" ")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrTrim(tfToRef("\n")), tfToRef("")), true);
-    EXPECT_EQ(bstrEqual(tfStrTrim(tfToRef("\t")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrTrim(tfToRef("Hello world  ")), tfToRef("Hello world")), true);
+    EXPECT_EQ(tfStrEqual(tfStrTrim(tfToRef("  \t Hello world  ")), tfToRef("Hello world")), true);
+    EXPECT_EQ(tfStrEqual(tfStrTrim(tfToRef("  ")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrTrim(tfToRef(" ")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrTrim(tfToRef("\n")), tfToRef("")), true);
+    EXPECT_EQ(tfStrEqual(tfStrTrim(tfToRef("\t")), tfToRef("")), true);
 }
 
 UTEST(bstr, bstrsscanf)
@@ -345,7 +342,7 @@ UTEST(bstr, bstrsscanf)
     {
         uint32_t a = 0;
         uint32_t b = 0;
-        int      read = bstrsscanf(tfToRef("10.132"), "%u.%u", &a, &b);
+        int      read = tfstrsscanf(tfToRef("10.132"), "%u.%u", &a, &b);
         EXPECT_EQ(read, 2);
         EXPECT_EQ(a, 10);
         EXPECT_EQ(b, 132);
@@ -492,11 +489,9 @@ UTEST(bstr, bstrsscanf)
 //   }
 // }
 
-UTEST_STATE();
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-
 #include "Common_3/Utilities/Interfaces/IMemory.h"
-
+UTEST_STATE();
 int main(int argc, const char* const argv[])
 {
     if (!initMemAlloc("TF_StringTest"))
