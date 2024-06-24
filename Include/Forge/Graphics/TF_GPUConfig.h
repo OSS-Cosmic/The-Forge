@@ -27,9 +27,12 @@ struct GPUModelDefinition
 
 struct GPUConfiguration {
   TFScratchAlloc mAlloc;
-
+    
+  GPUPresetLevel mDefaultPresetLevel; 
+  // data.gpu
   uint32_t mVendorCount;
   GPUVendorDefinition mVendorDefinitions[MAX_GPU_VENDOR_COUNT]; 
+  struct GPUModelDefinition* mGpuModels;
 };
 
 void tfInitGPUConfiguration(struct GPUConfiguration* def);

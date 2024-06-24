@@ -1,3 +1,4 @@
+#include "TF_TestMain.h"
 #include "Forge/Core/Mem/TF_ScratchAllocator.h"
 #include "utest.h"
 
@@ -40,26 +41,10 @@ UTEST(TF, scratchAlloc_2)
 }
 
 
-UTEST_STATE();
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "Common_3/Utilities/Interfaces/IMemory.h"
-
-int main(int argc, const char* const argv[])
-{
-    if (!initMemAlloc("TF_StringTest"))
-        return EXIT_FAILURE;
-
-    FileSystemInitDesc fsDesc = {};
-    fsDesc.pAppName = "TF_StringTest";
-
-    if (!initFileSystem(&fsDesc))
-        return EXIT_FAILURE;
-
-    fsSetPathForResourceDir(pSystemFileIO, RM_DEBUG, RD_LOG, "");
-
-    int res = utest_main(argc, argv);
-    exitMemAlloc();
-    return res;
-}
+#include "Common_3/Utilities/Interfaces/ILog.h"
+UTEST_STATE();
+TF_UTEST_MAIN("TF_ScratchAllocatorTest")
 
 

@@ -46,14 +46,31 @@ static struct TStrSpan tfGPUConfigIter(struct TFStrGpuConfigIterable* iterable)
 void tfInitGPUConfiguration(struct GPUConfiguration* config) {
 
     struct TFScratchAllocDesc allocDesc = {
-      .blockSize = 4096 
+      .blockSize = 8192 
     };
     tfInitScratchAlloc(&config->mAlloc, &allocDesc);
 }
 void tfFreeGPUConfiguration(struct GPUConfiguration* config) {
   tfFreeScratchAlloc(&config->mAlloc);
+  arrfree(config->mGpuModels);
 }
 
+static GPUPresetLevel strToPresetLevel(TStrSpan input)
+{
+    if (tfStrEqual(input, tfToRef("office")))
+        return GPU_PRESET_OFFICE;
+    if (tfStrIndexOfCaseless(input, tfToRef("verylow")))
+        return GPU_PRESET_VERYLOW;
+    if (tfStrIndexOfCaseless(input, tfToRef("low")))
+        return GPU_PRESET_LOW;
+    if (tfStrIndexOfCaseless(input, tfToRef("medium")))
+        return GPU_PRESET_MEDIUM;
+    if (tfStrIndexOfCaseless(input, tfToRef("high")))
+        return GPU_PRESET_HIGH;
+    if (tfStrIndexOfCaseless(input, tfToRef("ultra")))
+        return GPU_PRESET_ULTRA;
+    return GPU_PRESET_NONE;
+}
 
 bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* config, TStrSpan input)
 {
@@ -88,12 +105,98 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
             return false;
         }
     }
-    TStr errorMsg = { 0 };
+    TStr tempLineMsg = { 0 };
 
     while (iterable.cursor < iterable.buffer.len)
     {
         line = tfGPUConfigIter(&iterable);
-        if (tfStrIndexOf(line, tfToRef("BEGIN_VENDOR_LIST;")) >= 0)
+
+        if (tfStrIndexOf(line, tfToRef("BEGIN_DEFAULT_CONFIGURATION;")) >= 0)
+        {
+            while (iterable.cursor < iterable.buffer.len)
+            {
+                line = tfGPUConfigIter(&iterable);
+                if (tfStrEmpty(line))
+                {
+                    continue;
+                }
+                if (tfStrIndexOf(line, tfToRef("END_DEFAULT_CONFIGURATION;")) >= 0)
+                {
+                    break;
+                }
+                struct TFStrSplitIterable iterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
+                TStrSpan                  ruleNameSpan = tfStrTrim(tfStrSplitIter(&iterable));
+                TStrSpan                  assignmentSpan = tfStrTrim(tfStrSplitIter(&iterable));
+                if (tfStrIndexOf(ruleNameSpan, tfToRef("DefaultPresetLevel")) >= 0)
+                {
+                    GPUPresetLevel defaultLevel = strToPresetLevel(assignmentSpan);
+                    if (defaultLevel != GPUPresetLevel::GPU_PRESET_NONE)
+                    {
+                        config->mDefaultPresetLevel = defaultLevel;
+                    }
+                    else
+                    {
+                        tfStrClear(&tempLineMsg);
+                        tfstrcatfmt(&tempLineMsg, "Error invalid preset level in GPU Default Data Configuration value '%S' in '%S'.",
+                                    ruleNameSpan, line);
+                        LOGF(eDEBUG, tempLineMsg.buf);
+                    }
+                }
+                else
+                {
+                        tfStrClear(&tempLineMsg);
+                        tfstrcatfmt(&tempLineMsg, "Error could not parse GPU Default Data Configuration rule '%S' in '%S'.",
+                                    ruleNameSpan, assignmentSpan);
+                        LOGF(eDEBUG, tempLineMsg.buf);
+                }
+            }
+        }
+        else if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_LIST;")) >= 0)
+        {
+            while (iterable.cursor < iterable.buffer.len)
+            {
+                line = tfGPUConfigIter(&iterable);
+                if (tfStrEmpty(line))
+                {
+                    continue;
+                }
+                if (tfStrIndexOf(line, tfToRef("END_GPU_LIST;")) >= 0)
+                {
+                    break;
+                }
+                struct GPUModelDefinition modelDef = { 0 };
+                struct TFStrSplitIterable iterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
+                TStrSpan                  vendorIdSpan = tfStrTrim(tfStrSplitIter(&iterable));
+                TStrSpan                  modelIdSpan = tfStrTrim(tfStrSplitIter(&iterable));
+                TStrSpan                  presetSpan = tfStrTrim(tfStrSplitIter(&iterable));
+                TStrSpan                  vendorNameSpan = tfStrTrim(tfStrSplitIter(&iterable));
+                TStrSpan                  modelNameSpan = tfStrTrim(tfStrSplitIter(&iterable));
+
+                unsigned long long vendorId = 0;
+                unsigned long long modelId = 0;
+                if (tfStrReadull(vendorIdSpan, &vendorId))
+                {
+                    modelDef.mVendorId = vendorId;
+                }
+                if (tfStrReadull(modelIdSpan, &modelId))
+                {
+                    modelDef.mDeviceId = modelId;
+                }
+                modelDef.mPreset = strToPresetLevel(presetSpan);
+                if (!tfStrEmpty(modelNameSpan))
+                {
+                    modelDef.mModelName.buf = (char*)tfScratchAllocMalloc(&config->mAlloc, modelNameSpan.len);
+                    modelDef.mModelName.len = modelNameSpan.len;
+                    memcpy(modelDef.mModelName.buf, modelNameSpan.buf, modelNameSpan.len);
+                }
+
+                if (modelDef.mVendorId && modelDef.mDeviceId)
+                {
+                    arrpush(config->mGpuModels, modelDef);
+                }
+            }
+        }
+        else if (tfStrIndexOf(line, tfToRef("BEGIN_VENDOR_LIST;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
@@ -109,7 +212,6 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
                 GPUVendorDefinition* vendorDef = &config->mVendorDefinitions[config->mVendorCount];
                 memset(vendorDef, 0, sizeof(GPUVendorDefinition));
 
-                bool                      validVendor = 0;
                 struct TFStrSplitIterable iterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
                 TStrSpan                  vendorSpan = tfStrSplitIter(&iterable);
                 TStrSpan                  identiferSpan = tfStrSplitIter(&iterable);
@@ -131,10 +233,9 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
                     }
                     else
                     {
-                        tfStrClear(&errorMsg);
-                        tfstrcatfmt(&errorMsg, "Invalid GPU vendor identifier %S from line: '%S'.", vendorSpan, identiferSpan);
-                        LOGF(eDEBUG, errorMsg.buf);
-                        tfStrFree(&errorMsg);
+                        tfStrClear(&tempLineMsg);
+                        tfstrcatfmt(&tempLineMsg, "Invalid GPU vendor identifier %S from line: '%S'.", vendorSpan, identiferSpan);
+                        LOGF(eDEBUG, tempLineMsg.buf);
                         break;
                     }
                 }
@@ -148,13 +249,33 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
                 }
                 else
                 {
-                    tfStrClear(&errorMsg);
-                    tfstrcatfmt(&errorMsg, "Error could not parse GPU vendor in '%S'.", line);
-                    LOGF(eDEBUG, errorMsg.buf);
-                    tfStrFree(&errorMsg);
+                    tfStrClear(&tempLineMsg);
+                    tfstrcatfmt(&tempLineMsg, "Error could not parse GPU vendor in '%S'.", line);
+                    LOGF(eDEBUG, tempLineMsg.buf);
                 }
             }
         }
     }
+
+    // log default configuration
+    LOGF(eINFO, "Default GPU Data:");
+    LOGF(eINFO, "    DefaultGPUPresetLevel set to %s", presetLevelToString(config->mDefaultPresetLevel));
+    // log gpu vendors
+    LOGF(eINFO, "GPU vendors:");
+    for(uint32_t vendorIdx = 0; vendorIdx < config->mVendorCount; vendorIdx++) {
+        GPUVendorDefinition* vendorDef = &config->mVendorDefinitions[vendorIdx];
+        tfStrClear(&tempLineMsg);
+        tfstrcatfmt(&tempLineMsg, "%S: ", vendorDef->mVendorName);
+        for (uint32_t identIdx = 0; identIdx < vendorDef->mIdentifierCount; identIdx++)
+        {
+            if (identIdx > 0)
+            {
+                tfstrcatfmt(&tempLineMsg, ", ");
+            }
+            tfstrcatprintf(&tempLineMsg, "%#x", vendorDef->mIdentifierArray[identIdx]);
+        }
+        LOGF(eINFO, tempLineMsg.buf);
+    }
+    tfStrFree(&tempLineMsg);
     return true;
 }
