@@ -1,4 +1,5 @@
 #include "Forge/Graphics/TF_GPUConfig.h"
+#include "Forge/Core/TF_String.h"
 
 #define GPUCFG_VERSION_MAJOR           0
 #define GPUCFG_VERSION_MINOR           2
@@ -72,19 +73,84 @@ static GPUPresetLevel strToPresetLevel(TStrSpan input)
     return GPU_PRESET_NONE;
 }
 
-static bool parseRuleOp(TStrSpan input) {
-    struct TFStrSplitIterable tokenIterable = { .buffer = input, .delim = tfToRef(" "), .cursor = 0 };
-    size_t ruleIndex = 0;
-    TStrSpan rules[6] = {0}; 
-    while (tokenIterable.cursor < tokenIterable.buffer.len)
+
+static bool isOpRuleToken(const char token) {
+    switch (token)
     {
-        TStrSpan strSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
-        if (tfStrEmpty(strSpan))
-        {
-            continue;
-        }
-        rules[ruleIndex++] = strSpan;
+    case '<':
+    case '>':
+    case '=':
+    case '!':
+        return false;
+    default:
+        break;
     }
+    return true;
+}
+
+static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input) {
+   if(tfStrEqual(input, tfToRef(">=")))
+        return GPUConfigExprSymbol::GPUSymbolOpGTE;
+   if(tfStrEqual(input, tfToRef(">")))
+        return GPUConfigExprSymbol::GPUSymbolOpGT;
+   if(tfStrEqual(input, tfToRef("<=")))
+        return GPUConfigExprSymbol::GPUSymbolOpLTE;
+   if(tfStrEqual(input, tfToRef(">")))
+        return GPUConfigExprSymbol::GPUSymbolOpGT;
+   if(tfStrEqual(input, tfToRef("<")))
+        return GPUConfigExprSymbol::GPUSymbolOpLT;
+   if(tfStrEqual(input, tfToRef("==")))
+        return GPUConfigExprSymbol::GPUSymbolOpEQ;
+   if(tfStrEqual(input, tfToRef("!=")))
+        return GPUConfigExprSymbol::GPUSymbolOpNE;
+    return GPUConfigExprSymbol::GPUSymbolNone;
+}
+
+
+static bool parseGPUConfiguration(struct GPUConfigExpression* expr, TStrSpan input) {
+    TStrSpan leftParam = { 0 };
+    TStrSpan rightParam = { 0 };
+    TStrSpan op = { 0 };
+
+    TStrSpan consume = tfStrLTrim(input);
+    size_t   cursor = 0;
+    for (cursor = 0; cursor < consume.len; cursor++)
+    {
+        if (isspace(consume.buf[cursor]) || !isalnum(consume.buf[cursor]))
+            break;
+        leftParam = tfSub(consume, 0, cursor);
+    }
+
+    consume = tfStrLTrim(tfSub(consume, 0, cursor));
+    for (cursor = 0; cursor < consume.len; cursor++)
+    {
+        if (isspace(consume.buf[cursor]) || !isOpRuleToken(consume.buf[cursor]))
+            break;
+        op = tfSub(consume, 0, cursor);
+    }
+
+    consume = tfStrLTrim(tfSub(consume, 0, cursor));
+    for (cursor = 0; cursor < consume.len; cursor++)
+    {
+        if (isspace(consume.buf[cursor]) || !isalnum(consume.buf[cursor]))
+            break;
+        rightParam = tfSub(consume, 0, cursor);
+    }
+    consume = tfStrLTrim(tfSub(consume, 0, cursor));
+
+    // still have characters left in the expression something is malformed
+    if(!tfStrEmpty(consume))
+        return false;
+
+    if(!tfStrEmpty(leftParam) && !tfStrEmpty(op) && !tfStrEmpty(rightParam)) {
+        GPUConfigExprSymbol operatorSym = getOpSymbol(op);
+        ASSERT(operatorSym != GPUConfigExprSymbol::GPUSymbolNone); // this should never happen
+        expr->op = operatorSym; 
+
+    }
+
+    return false;
+
 }
 
 bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* config, TStrSpan input)

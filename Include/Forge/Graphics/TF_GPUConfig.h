@@ -12,25 +12,27 @@
 #define MAX_INDENTIFIER_PER_GPU_VENDOR_COUNT 12 
 #define MAX_GPU_COMPARISON_OP_COUNT 16 
 
-enum class GPUConfigTokenType: uint8_t {
-    GPUTokenNone,
+enum class GPUConfigExprSymbol: uint8_t {
+    GPUSymbolNone,
     
     // term
-    GPUTokenDigit,
-    GPUTokenVariable,
+    GPUSymbolDigit,
+    GPUSymbolVariable,
 
     // op
-    GPUTokenOpEQ,
-    GPUTokenOpLT,
-    GPUTokenOpLTE,
-    GPUTokenOpGTE,
+    GPUSymbolOpEQ,
+    GPUSymbolOpNE,
+    GPUSymbolOpLT,
+    GPUSymbolOpGT,
+    GPUSymbolOpLTE,
+    GPUSymbolOpGTE,
 };
 
 // comparison expression to test against
 struct GPUConfigExpression{
-    GPUConfigTokenType mPrimaryToken;
-    GPUConfigTokenType op; 
-    GPUConfigTokenType mSecondaryToken;
+    GPUConfigExprSymbol mPrimaryToken;
+    GPUConfigExprSymbol op; 
+    GPUConfigExprSymbol mSecondaryToken;
     union {
         TStrSpan mVariable;
         uint64_t mValue;
