@@ -72,6 +72,21 @@ static GPUPresetLevel strToPresetLevel(TStrSpan input)
     return GPU_PRESET_NONE;
 }
 
+static bool parseRuleOp(TStrSpan input) {
+    struct TFStrSplitIterable tokenIterable = { .buffer = input, .delim = tfToRef(" "), .cursor = 0 };
+    size_t ruleIndex = 0;
+    TStrSpan rules[6] = {0}; 
+    while (tokenIterable.cursor < tokenIterable.buffer.len)
+    {
+        TStrSpan strSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
+        if (tfStrEmpty(strSpan))
+        {
+            continue;
+        }
+        rules[ruleIndex++] = strSpan;
+    }
+}
+
 bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* config, TStrSpan input)
 {
     TFStrGpuConfigIterable iterable = { .buffer = input, .cursor = 0 };
@@ -80,9 +95,44 @@ bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* conf
     while (iterable.cursor < iterable.buffer.len)
     {
         line = tfGPUConfigIter(&iterable);
+
+        if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_SELECTION;")) >= 0)
+        {
+            while (iterable.cursor < iterable.buffer.len)
+            {
+                line = tfGPUConfigIter(&iterable);
+                if (tfStrEmpty(line))
+                {
+                    continue;
+                }
+                if (tfStrIndexOf(line, tfToRef("END_GPU_SELECTION;")) >= 0)
+                {
+                    break;
+                }
+                struct TFStrSplitIterable tokenIterable  = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
+
+                while (tokenIterable.cursor < tokenIterable.buffer.len)
+                {
+                    TStrSpan ruleSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
+                    if(tfStrEmpty(ruleSpan)) {
+                      continue;
+                    }
+                }
+            }
+        }
+        else if (tfStrIndexOf(line, tfToRef("BEGIN_DRIVER_REJECTION;")) >= 0)
+        {
+        }
+        else if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_SETTINGS;")) >= 0)
+        {
+        }
+        else if (tfStrIndexOf(line, tfToRef("BEGIN_USER_SETTINGS;")) >= 0)
+        {
+        }
     }
     return true;
 }
+
 
 bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
 {
@@ -124,9 +174,9 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
                 {
                     break;
                 }
-                struct TFStrSplitIterable iterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
-                TStrSpan                  ruleNameSpan = tfStrTrim(tfStrSplitIter(&iterable));
-                TStrSpan                  assignmentSpan = tfStrTrim(tfStrSplitIter(&iterable));
+                struct TFStrSplitIterable tokenIterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
+                TStrSpan                  ruleNameSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
+                TStrSpan                  assignmentSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 if (tfStrIndexOf(ruleNameSpan, tfToRef("DefaultPresetLevel")) >= 0)
                 {
                     GPUPresetLevel defaultLevel = strToPresetLevel(assignmentSpan);

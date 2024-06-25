@@ -10,6 +10,50 @@
 #define MAX_GPU_VENDOR_COUNT                 64
 #define MAX_GPU_VENDOR_IDENTIFIER_LENGTH     16
 #define MAX_INDENTIFIER_PER_GPU_VENDOR_COUNT 12 
+#define MAX_GPU_COMPARISON_OP_COUNT 16 
+
+enum class GPUConfigTokenType: uint8_t {
+    GPUTokenNone,
+    
+    // term
+    GPUTokenDigit,
+    GPUTokenVariable,
+
+    // op
+    GPUTokenOpEQ,
+    GPUTokenOpLT,
+    GPUTokenOpLTE,
+    GPUTokenOpGTE,
+};
+
+// comparison expression to test against
+struct GPUConfigExpression{
+    GPUConfigTokenType mPrimaryToken;
+    GPUConfigTokenType op; 
+    GPUConfigTokenType mSecondaryToken;
+    union {
+        TStrSpan mVariable;
+        uint64_t mValue;
+    } mPrimary;
+    union {
+        TStrSpan mVariable;
+        uint64_t mValue;
+    } mSecondary;
+};
+
+
+struct GPUConfigurationSetting {
+    TStrSpan mUpdateProperty; // the property this is refering to 
+    uint32_t mComparisonExprCount;
+    GPUConfigExpression mComparisonExpr[MAX_GPU_COMPARISON_OP_COUNT];
+    uint64_t mAssignmentValue;
+};
+
+struct GPUConfigurationSelection {
+    uint32_t mComparisonExprCount;
+    GPUConfigExpression  mComparisonExpr[MAX_GPU_COMPARISON_OP_COUNT];
+
+};
 
 struct GPUVendorDefinition {
     TStrSpan mVendorName = {};
@@ -26,9 +70,14 @@ struct GPUModelDefinition
 };
 
 struct GPUConfiguration {
-  TFScratchAlloc mAlloc;
+  struct TFScratchAlloc mAlloc; // temporary scratch allocator for the lifetime of the configuration
     
-  GPUPresetLevel mDefaultPresetLevel; 
+  GPUPresetLevel mDefaultPresetLevel;
+
+  struct GPUConfigurationSetting  mConfigurationUserSettings[256];
+  struct GPUConfigurationSetting  mConfigurationSetting[256];
+  struct GPUConfigurationSelection  mGPUSelection[256];
+
   // data.gpu
   uint32_t mVendorCount;
   GPUVendorDefinition mVendorDefinitions[MAX_GPU_VENDOR_COUNT]; 
