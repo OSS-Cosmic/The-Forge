@@ -93,11 +93,12 @@ struct GPUConfiguration {
     
   GPUPresetLevel mDefaultPresetLevel;
 
+  size_t mGpuUserSettingCount;
   struct GPUConfigurationSetting  mConfigurationUserSettings[256];
+  size_t mGpuConfigurationSettingCount;
   struct GPUConfigurationSetting  mConfigurationSetting[256];
   size_t mGpuSelectionCount;
   struct GPUConfigurationSelection  mGPUSelection[256];
-
   size_t mGpuRejectionCount;
   struct GPUConfigurationRejection mGPURejection[256];
 
