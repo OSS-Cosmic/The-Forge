@@ -18,6 +18,7 @@ enum class GPUConfigExprSymbol: uint8_t {
     // term
     GPUSymbolDigit,
     GPUSymbolVariable,
+    GPUSymbolDriverVersion,
 
     // op
     GPUSymbolOpEQ,
@@ -28,21 +29,37 @@ enum class GPUConfigExprSymbol: uint8_t {
     GPUSymbolOpGTE,
 };
 
-// comparison expression to test against
-struct GPUConfigExpression{
-    GPUConfigExprSymbol mPrimaryToken;
-    GPUConfigExprSymbol op; 
-    GPUConfigExprSymbol mSecondaryToken;
-    union {
-        TStrSpan mVariable;
-        uint64_t mValue;
-    } mPrimary;
-    union {
-        TStrSpan mVariable;
-        uint64_t mValue;
-    } mSecondary;
+struct GPUDriverVersion
+{
+    uint32_t versionNumbers[4];
+    uint32_t versionNumbersCount;
 };
 
+struct GPUConfigTerm
+{
+    GPUConfigExprSymbol mSymbol;
+    union
+    {
+        TStrSpan         mVariable;
+        uint64_t         mValue;
+        GPUDriverVersion mDriverVersion;
+    };
+};
+
+// comparison expression to test against
+struct GPUConfigExpression{
+    GPUConfigExprSymbol opToken; 
+    struct GPUConfigTerm mPrimary;
+    struct GPUConfigTerm mSecondary;
+};
+
+
+struct GPUConfigurationRejection {
+    uint32_t mVendorID; // the property this is refering to 
+    uint32_t mComparisonExprCount;
+    GPUConfigExpression mComparisonExpr[MAX_GPU_COMPARISON_OP_COUNT];
+    TStrSpan mReasonStr;
+};
 
 struct GPUConfigurationSetting {
     TStrSpan mUpdateProperty; // the property this is refering to 
@@ -78,7 +95,11 @@ struct GPUConfiguration {
 
   struct GPUConfigurationSetting  mConfigurationUserSettings[256];
   struct GPUConfigurationSetting  mConfigurationSetting[256];
+  size_t mGpuSelectionCount;
   struct GPUConfigurationSelection  mGPUSelection[256];
+
+  size_t mGpuRejectionCount;
+  struct GPUConfigurationRejection mGPURejection[256];
 
   // data.gpu
   uint32_t mVendorCount;

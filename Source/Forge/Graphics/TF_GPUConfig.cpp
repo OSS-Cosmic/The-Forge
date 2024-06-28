@@ -4,11 +4,14 @@
 #define GPUCFG_VERSION_MAJOR           0
 #define GPUCFG_VERSION_MINOR           2
 
-
+static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input);
+static bool parseGPUExpression(struct TFScratchAlloc* alloc,struct GPUConfigExpression* expr, TStrSpan input); 
 struct TFStrGpuConfigIterable {
   const struct TStrSpan buffer; // the buffer to iterrate over
   size_t cursor; // the current position in the buffer
 };
+
+
 
 static struct TStrSpan tfGPUConfigIter(struct TFStrGpuConfigIterable* iterable)
 {
@@ -45,12 +48,12 @@ static struct TStrSpan tfGPUConfigIter(struct TFStrGpuConfigIterable* iterable)
 }
 
 void tfInitGPUConfiguration(struct GPUConfiguration* config) {
-
     struct TFScratchAllocDesc allocDesc = {
       .blockSize = 8192 
     };
     tfInitScratchAlloc(&config->mAlloc, &allocDesc);
 }
+
 void tfFreeGPUConfiguration(struct GPUConfiguration* config) {
   tfFreeScratchAlloc(&config->mAlloc);
   arrfree(config->mGpuModels);
@@ -58,19 +61,24 @@ void tfFreeGPUConfiguration(struct GPUConfiguration* config) {
 
 static GPUPresetLevel strToPresetLevel(TStrSpan input)
 {
-    if (tfStrEqual(input, tfToRef("office")))
+    if (tfStrCaselessEqual(input, tfToRef("office")))
         return GPU_PRESET_OFFICE;
-    if (tfStrIndexOfCaseless(input, tfToRef("verylow")))
+    if (tfStrCaselessEqual(input, tfToRef("verylow")))
         return GPU_PRESET_VERYLOW;
-    if (tfStrIndexOfCaseless(input, tfToRef("low")))
+    if (tfStrCaselessEqual(input, tfToRef("low")))
         return GPU_PRESET_LOW;
-    if (tfStrIndexOfCaseless(input, tfToRef("medium")))
+    if (tfStrCaselessEqual(input, tfToRef("medium")))
         return GPU_PRESET_MEDIUM;
-    if (tfStrIndexOfCaseless(input, tfToRef("high")))
+    if (tfStrCaselessEqual(input, tfToRef("high")))
         return GPU_PRESET_HIGH;
-    if (tfStrIndexOfCaseless(input, tfToRef("ultra")))
+    if (tfStrCaselessEqual(input, tfToRef("ultra")))
         return GPU_PRESET_ULTRA;
     return GPU_PRESET_NONE;
+}
+
+
+static bool isTermToken(const char token) {
+    return isalnum(token) || token == '.';
 }
 
 
@@ -106,8 +114,42 @@ static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input) {
     return GPUConfigExprSymbol::GPUSymbolNone;
 }
 
+static bool parseGPUTerm(struct TFScratchAlloc* alloc, struct GPUConfigTerm* term, TStrSpan input) {
+    unsigned long long value = 0;
+    memset(term, 0, sizeof(struct GPUConfigTerm));
+    if (tfStrIndexOf(input, tfToRef(".")) > 0)
+    {
+        struct TFStrSplitIterable versionIter = { .buffer = input, .delim = tfToRef("."), .cursor = 0 };
 
-static bool parseGPUConfiguration(struct GPUConfigExpression* expr, TStrSpan input) {
+        while (versionIter.cursor < versionIter.buffer.len)
+        {
+            struct TStrSpan verSpan = tfStrSplitIter(&versionIter);
+            if (tfStrEmpty(verSpan))
+                continue;
+            if (!tfStrReadull(verSpan, &value))
+                return false;
+
+            term->mDriverVersion.versionNumbers[term->mDriverVersion.versionNumbersCount++] = value;
+        }
+        term->mSymbol = GPUConfigExprSymbol::GPUSymbolDriverVersion;
+    }
+    else if (tfStrReadull(input, &value))
+    {
+        term->mValue = value;
+        term->mSymbol = GPUConfigExprSymbol::GPUSymbolDigit;
+    }
+    else
+    {
+        term->mSymbol = GPUConfigExprSymbol::GPUSymbolVariable;
+        term->mVariable.buf = (char*)tfScratchAllocMalloc(alloc, input.len);
+        term->mVariable.len = input.len;
+        memcpy(term->mVariable.buf, input.buf, input.len);
+    }
+    return true;
+}
+
+
+static bool parseGPUExpression(struct TFScratchAlloc* alloc,struct GPUConfigExpression* expr, TStrSpan input) {
     TStrSpan leftParam = { 0 };
     TStrSpan rightParam = { 0 };
     TStrSpan op = { 0 };
@@ -116,7 +158,7 @@ static bool parseGPUConfiguration(struct GPUConfigExpression* expr, TStrSpan inp
     size_t   cursor = 0;
     for (cursor = 0; cursor < consume.len; cursor++)
     {
-        if (isspace(consume.buf[cursor]) || !isalnum(consume.buf[cursor]))
+        if (isspace(consume.buf[cursor]) || !isTermToken(consume.buf[cursor]))
             break;
         leftParam = tfSub(consume, 0, cursor);
     }
@@ -132,7 +174,7 @@ static bool parseGPUConfiguration(struct GPUConfigExpression* expr, TStrSpan inp
     consume = tfStrLTrim(tfSub(consume, 0, cursor));
     for (cursor = 0; cursor < consume.len; cursor++)
     {
-        if (isspace(consume.buf[cursor]) || !isalnum(consume.buf[cursor]))
+        if (isspace(consume.buf[cursor]) || !isTermToken(consume.buf[cursor]))
             break;
         rightParam = tfSub(consume, 0, cursor);
     }
@@ -142,21 +184,32 @@ static bool parseGPUConfiguration(struct GPUConfigExpression* expr, TStrSpan inp
     if(!tfStrEmpty(consume))
         return false;
 
+
     if(!tfStrEmpty(leftParam) && !tfStrEmpty(op) && !tfStrEmpty(rightParam)) {
         GPUConfigExprSymbol operatorSym = getOpSymbol(op);
         ASSERT(operatorSym != GPUConfigExprSymbol::GPUSymbolNone); // this should never happen
-        expr->op = operatorSym; 
-
+        if (operatorSym == GPUConfigExprSymbol::GPUSymbolNone)
+        {
+            return false;
+        }
+        expr->opToken = operatorSym;
+        unsigned long long value = 0;
+        if(!parseGPUTerm(alloc, &expr->mPrimary, leftParam))
+            return false;
+        if(!parseGPUTerm(alloc, &expr->mSecondary, leftParam))
+            return false;
+    } else if(!tfStrEmpty(leftParam)) {
+        if(!parseGPUTerm(alloc, &expr->mPrimary, leftParam))
+            return false;
     }
-
     return false;
-
 }
 
 bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* config, TStrSpan input)
 {
     TFStrGpuConfigIterable iterable = { .buffer = input, .cursor = 0 };
     TStrSpan               line = tfGPUConfigIter(&iterable);
+    TStr tempLineMsg = { 0 };
 
     while (iterable.cursor < iterable.buffer.len)
     {
@@ -168,26 +221,133 @@ bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* conf
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
-                {
                     continue;
-                }
                 if (tfStrIndexOf(line, tfToRef("END_GPU_SELECTION;")) >= 0)
-                {
+                    break;
+                
+                if(def->mGpuSelectionCount >= TF_ARRAY_COUNT(def->mGPUSelection)) {
+                    tfStrClear(&tempLineMsg);
+                    tfstrcatfmt(&tempLineMsg, "Max number of rules exausted '%d'.", TF_ARRAY_COUNT(def->mGPUSelection));
                     break;
                 }
-                struct TFStrSplitIterable tokenIterable  = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
+                
+                struct TFStrSplitIterable tokenIterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
+                TStrSpan                  ruleSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
 
-                while (tokenIterable.cursor < tokenIterable.buffer.len)
+                struct TFStrSplitIterable         ruleIterable = { .buffer = ruleSpan, .delim = tfToRef(","), .cursor = 0 };
+                bool                              isValid = true;
+                
+                struct GPUConfigurationSelection* configurationSelection = &def->mGPUSelection[def->mGpuSelectionCount];
+                configurationSelection->mComparisonExprCount = 0;
+
+                while (ruleIterable.cursor < ruleIterable.buffer.len)
                 {
-                    TStrSpan ruleSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
-                    if(tfStrEmpty(ruleSpan)) {
-                      continue;
+                    struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
+                    if(configurationSelection->mComparisonExprCount >= TF_ARRAY_COUNT(configurationSelection->mComparisonExpr)) {
+                        isValid = false;
+                        tfStrClear(&tempLineMsg);
+                        tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(configurationSelection->mComparisonExpr));
+                        LOGF(eDEBUG, tempLineMsg.buf);
+                        break;
                     }
+
+                    if (!parseGPUExpression(&def->mAlloc, &configurationSelection->mComparisonExpr[configurationSelection->mComparisonExprCount], exprSpan))
+                    {
+                        isValid = false;
+                        tfStrClear(&tempLineMsg);
+                        tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
+                        LOGF(eDEBUG, tempLineMsg.buf);
+                    }
+                    else
+                    {
+                        configurationSelection->mComparisonExprCount++;
+                    }
+                }
+
+                if (isValid)
+                {
+                    def->mGpuSelectionCount++;
+                }
+                else
+                {
+                    tfStrClear(&tempLineMsg);
+                    tfstrcatfmt(&tempLineMsg, "Invalid GPU selection rule '%S'.", line);
+                    LOGF(eDEBUG, tempLineMsg.buf);
                 }
             }
         }
         else if (tfStrIndexOf(line, tfToRef("BEGIN_DRIVER_REJECTION;")) >= 0)
         {
+            while (iterable.cursor < iterable.buffer.len)
+            {
+                line = tfGPUConfigIter(&iterable);
+                if (tfStrEmpty(line))
+                    continue;
+                if (tfStrIndexOf(line, tfToRef("END_DRIVER_REJECTION;")) >= 0)
+                    break;
+
+
+                if(def->mGpuRejectionCount >= TF_ARRAY_COUNT(def->mGPURejection)) {
+                    tfStrClear(&tempLineMsg);
+                    tfstrcatfmt(&tempLineMsg, "Max number of rules exausted '%d'.", TF_ARRAY_COUNT(def->mGPUSelection));
+                    break;
+                }
+
+                struct TFStrSplitIterable tokenIterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
+                TStrSpan                  vendorSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
+                TStrSpan                  ruleParametersSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
+                TStrSpan                  reasonSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
+                long long                 vendorId = 0;
+                bool                      isValid = true;
+                
+                struct GPUConfigurationRejection* rejection = &config->mGPURejection[config->mGpuRejectionCount];
+                rejection->mComparisonExprCount = 0;
+
+                if (!tfStrReadll(vendorSpan, &vendorId)) {
+                    tfStrClear(&tempLineMsg);
+                    tfstrcatfmt(&tempLineMsg, "Invalid GPU rejection rule '%S'.", line);
+                    LOGF(eDEBUG, tempLineMsg.buf);
+                    continue;
+                }
+                struct TFStrSplitIterable ruleIterable = { .buffer = ruleParametersSpan, .delim = tfToRef(","), .cursor = 0 };
+                while (ruleIterable.cursor < ruleIterable.buffer.len)
+                {
+                    struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
+                    
+                    if(rejection->mComparisonExprCount >= TF_ARRAY_COUNT(rejection->mComparisonExpr)) {
+                        isValid = false;
+                        tfStrClear(&tempLineMsg);
+                        tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(rejection->mComparisonExpr));
+                        LOGF(eDEBUG, tempLineMsg.buf);
+                        break;
+                    }
+                    
+
+                    if (!parseGPUExpression(&def->mAlloc, &rejection->mComparisonExpr[rejection->mComparisonExprCount], exprSpan)) {
+                        isValid = false;
+                        tfStrClear(&tempLineMsg);
+                        tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
+                        LOGF(eDEBUG, tempLineMsg.buf);
+                    }   
+                    else
+                    {
+                        rejection->mComparisonExprCount++;
+                    }
+                }
+
+                if (isValid)
+                {
+                    config->mGpuRejectionCount++;
+                }
+                else
+                {
+                    rejection->mVendorID = vendorId;
+                    rejection->mReasonStr.buf = (char*)tfScratchAllocMalloc(&config->mAlloc, reasonSpan.len);
+                    rejection->mReasonStr.len = reasonSpan.len;
+                    memcpy(rejection->mReasonStr.buf, reasonSpan.buf, reasonSpan.len);
+                }
+            }
+
         }
         else if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_SETTINGS;")) >= 0)
         {
@@ -233,13 +393,9 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
-                {
                     continue;
-                }
                 if (tfStrIndexOf(line, tfToRef("END_DEFAULT_CONFIGURATION;")) >= 0)
-                {
                     break;
-                }
                 struct TFStrSplitIterable tokenIterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
                 TStrSpan                  ruleNameSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 TStrSpan                  assignmentSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
@@ -273,13 +429,9 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
-                {
                     continue;
-                }
                 if (tfStrIndexOf(line, tfToRef("END_GPU_LIST;")) >= 0)
-                {
                     break;
-                }
                 struct GPUModelDefinition modelDef = { 0 };
                 struct TFStrSplitIterable iterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
                 TStrSpan                  vendorIdSpan = tfStrTrim(tfStrSplitIter(&iterable));
