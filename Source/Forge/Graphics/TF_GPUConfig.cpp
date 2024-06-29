@@ -5,7 +5,7 @@
 #define GPUCFG_VERSION_MINOR           2
 
 static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input);
-static bool parseGPUExpression(struct TFScratchAlloc* alloc,struct GPUConfigExpression* expr, TStrSpan input); 
+static bool parseGPUExpression(struct TFScratchAllocator* alloc,struct GPUConfigExpression* expr, TStrSpan input); 
 struct TFStrGpuConfigIterable {
   const struct TStrSpan buffer; // the buffer to iterrate over
   size_t cursor; // the current position in the buffer
@@ -51,11 +51,11 @@ void tfInitGPUConfiguration(struct GPUConfiguration* config) {
     struct TFScratchAllocDesc allocDesc = {
       .blockSize = 8192 
     };
-    tfInitScratchAlloc(&config->mAlloc, &allocDesc);
+    tfAddScratchAllocator(&config->mAlloc, &allocDesc);
 }
 
 void tfFreeGPUConfiguration(struct GPUConfiguration* config) {
-  tfFreeScratchAlloc(&config->mAlloc);
+  tfFreeScratchAllocator(&config->mAlloc);
   arrfree(config->mGpuModels);
 }
 
@@ -114,7 +114,7 @@ static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input) {
     return GPUConfigExprSymbol::GPUSymbolNone;
 }
 
-static bool parseGPUTerm(struct TFScratchAlloc* alloc, struct GPUConfigTerm* term, TStrSpan input) {
+static bool parseGPUTerm(struct TFScratchAllocator* alloc, struct GPUConfigTerm* term, TStrSpan input) {
     unsigned long long value = 0;
     memset(term, 0, sizeof(struct GPUConfigTerm));
     if (tfStrIndexOf(input, tfToRef(".")) > 0)
@@ -141,7 +141,7 @@ static bool parseGPUTerm(struct TFScratchAlloc* alloc, struct GPUConfigTerm* ter
     else
     {
         term->mSymbol = GPUConfigExprSymbol::GPUSymbolVariable;
-        term->mVariable.buf = (char*)tfScratchAllocMalloc(alloc, input.len);
+        term->mVariable.buf = (char*)tfScratchAlloc(alloc, input.len);
         term->mVariable.len = input.len;
         memcpy(term->mVariable.buf, input.buf, input.len);
     }
@@ -149,7 +149,7 @@ static bool parseGPUTerm(struct TFScratchAlloc* alloc, struct GPUConfigTerm* ter
 }
 
 
-static bool parseGPUExpression(struct TFScratchAlloc* alloc,struct GPUConfigExpression* expr, TStrSpan input) {
+static bool parseGPUExpression(struct TFScratchAllocator* alloc,struct GPUConfigExpression* expr, TStrSpan input) {
     TStrSpan leftParam = { 0 };
     TStrSpan rightParam = { 0 };
     TStrSpan op = { 0 };
@@ -343,7 +343,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* conf
                 }
                 config->mGpuRejectionCount++;
                 rejection->mVendorID = vendorId;
-                rejection->mReasonStr.buf = (char*)tfScratchAllocMalloc(&config->mAlloc, reasonSpan.len);
+                rejection->mReasonStr.buf = (char*)tfScratchAlloc(&config->mAlloc, reasonSpan.len);
                 rejection->mReasonStr.len = reasonSpan.len;
                 memcpy(rejection->mReasonStr.buf, reasonSpan.buf, reasonSpan.len);
             }
@@ -409,7 +409,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* conf
 
                 config->mGpuConfigurationSettingCount++;
                 setting->mAssignmentValue = assignmentValue;
-                setting->mUpdateProperty.buf = (char*)tfScratchAllocMalloc(&config->mAlloc, propertySpan.len);
+                setting->mUpdateProperty.buf = (char*)tfScratchAlloc(&config->mAlloc, propertySpan.len);
                 setting->mUpdateProperty.len = propertySpan.len;
                 memcpy(setting->mUpdateProperty.buf, propertySpan.buf, propertySpan.len);
             }
@@ -474,7 +474,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* def, struct GPUConfiguration* conf
 
                 config->mGpuConfigurationSettingCount++;
                 setting->mAssignmentValue = assignmentValue;
-                setting->mUpdateProperty.buf = (char*)tfScratchAllocMalloc(&config->mAlloc, propertySpan.len);
+                setting->mUpdateProperty.buf = (char*)tfScratchAlloc(&config->mAlloc, propertySpan.len);
                 setting->mUpdateProperty.len = propertySpan.len;
                 memcpy(setting->mUpdateProperty.buf, propertySpan.buf, propertySpan.len);
             }
@@ -577,7 +577,7 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
                 modelDef.mPreset = strToPresetLevel(presetSpan);
                 if (!tfStrEmpty(modelNameSpan))
                 {
-                    modelDef.mModelName.buf = (char*)tfScratchAllocMalloc(&config->mAlloc, modelNameSpan.len);
+                    modelDef.mModelName.buf = (char*)tfScratchAlloc(&config->mAlloc, modelNameSpan.len);
                     modelDef.mModelName.len = modelNameSpan.len;
                     memcpy(modelDef.mModelName.buf, modelNameSpan.buf, modelNameSpan.len);
                 }
@@ -634,7 +634,7 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
 
                 if (vendorDef->mIdentifierCount > 0 && !tfStrEmpty(tfStrTrim(vendorSpan)))
                 {
-                    vendorDef->mVendorName.buf = (char*)tfScratchAllocMalloc(&config->mAlloc, vendorSpan.len);
+                    vendorDef->mVendorName.buf = (char*)tfScratchAlloc(&config->mAlloc, vendorSpan.len);
                     vendorDef->mVendorName.len = vendorSpan.len;
                     memcpy(vendorDef->mVendorName.buf, vendorSpan.buf, vendorSpan.len);
                     config->mVendorCount++;

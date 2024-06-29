@@ -151,7 +151,7 @@ file(GLOB THE_FORGE_SOURCES
     
    Source/Forge/Core/TF_String.cpp
    Source/Forge/Core/TF_Core.cpp
-   Source/Forge/Core/Mem/TF_ScratchAllocator.cpp
+   Source/Forge/Core/Mem/TF_Allocators.cpp
    
    Source/Forge/Graphics/TF_GPUConfig.cpp
 )

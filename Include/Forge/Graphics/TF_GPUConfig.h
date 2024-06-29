@@ -3,7 +3,7 @@
 // intel use 3 identifiers 0x163C, 0x8086, 0x8087;
 
 #include "Forge/Core/TF_String.h"
-#include "Forge/Core/Mem/TF_ScratchAllocator.h"
+#include "Forge/Core/Mem/TF_Allocators.h"
 
 #include "Common_3/Graphics/Interfaces/IGraphics.h"
 
@@ -89,7 +89,7 @@ struct GPUModelDefinition
 };
 
 struct GPUConfiguration {
-  struct TFScratchAlloc mAlloc; // temporary scratch allocator for the lifetime of the configuration
+  struct TFScratchAllocator mAlloc; // temporary scratch allocator for the lifetime of the configuration
     
   GPUPresetLevel mDefaultPresetLevel;
 
