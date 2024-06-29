@@ -32,9 +32,9 @@
 
 #include "tinyimageformat/tinyimageformat_base.h"
 
-#include "../../OS/Interfaces/IOperatingSystem.h"
-#include "../../Utilities/Interfaces/ILog.h"
-#include "../../Utilities/Interfaces/IThread.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Common_3/Utilities/Interfaces/IThread.h"
 
 #ifdef __cplusplus
 #ifndef MAKE_ENUM_FLAG
