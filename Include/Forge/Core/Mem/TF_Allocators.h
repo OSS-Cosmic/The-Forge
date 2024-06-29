@@ -13,7 +13,7 @@ struct TFAllocator {
 
 struct TFScratchAllocator
 {
-    struct TFAllocScratchBlock* mFreeTail;
+    struct TFAllocScratchBlock* mFreeBlocks;
     struct TFAllocScratchBlock* mCurrent;
     size_t               pos;
     size_t               blockSize;
