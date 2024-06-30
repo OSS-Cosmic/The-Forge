@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef VULKAN
 
@@ -40,13 +40,13 @@
 #define strncpy_s     strncpy
 #endif
 
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IGraphics.h"
+#include "Common_3//Utilities/Interfaces/ILog.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
-#include "../../Utilities/Math/MathTypes.h"
+#include "Common_3/Utilities/Math/MathTypes.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -59,9 +59,9 @@
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
-#include "../ThirdParty/OpenSource/VulkanMemoryAllocator/VulkanMemoryAllocator.h"
-#include "../ThirdParty/OpenSource/ags/AgsHelper.h"
-#include "../ThirdParty/OpenSource/nvapi/NvApiHelper.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/VulkanMemoryAllocator/VulkanMemoryAllocator.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/ags/AgsHelper.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/nvapi/NvApiHelper.h"
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
@@ -71,18 +71,18 @@
 #include "tinyimageformat/tinyimageformat_base.h"
 #include "tinyimageformat/tinyimageformat_query.h"
 
-#include "../../Utilities/Math/AlgorithmsImpl.h"
-#include "../../Utilities/Threading/Atomics.h"
+#include "Common_3/Utilities/Math/AlgorithmsImpl.h"
+#include "Common_3/Utilities/Threading/Atomics.h"
 
-#include "VulkanCapsBuilder.h"
+#include "Common_3/Graphics/Vulkan/VulkanCapsBuilder.h"
 
 #if defined(VK_USE_DISPATCH_TABLES)
-#include "../../../Common_3/Graphics/ThirdParty/OpenSource/volk/volkForgeExt.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/volk/volkForgeExt.h"
 #endif
 
 #if defined(QUEST_VR)
-#include "../../OS/Quest/VrApi.h"
-#include "../Quest/VrApiHooks.h"
+#include "Common_3/OS/Quest/VrApi.h"
+#include "Common_3/Graphics/Quest/VrApiHooks.h"
 
 extern RenderTarget* pFragmentDensityMask;
 #endif
@@ -91,12 +91,12 @@ extern RenderTarget* pFragmentDensityMask;
 #include "swappy/swappyVk.h"
 #endif
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Common_3/Utilities/Interfaces/IMemory.h"
 
 #if defined(AUTOMATED_TESTING)
-#include "../../Application/Interfaces/IScreenshot.h"
+#include "Common_3/Application/Interfaces/IScreenshot.h"
 #endif
-#include "../ThirdParty/OpenSource/ags/AgsHelper.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/ags/AgsHelper.h"
 
 extern void vk_createShaderReflection(const uint8_t* shaderCode, uint32_t shaderSize, ShaderStage shaderStage,
                                       ShaderReflection* pOutReflection);
@@ -10066,8 +10066,8 @@ void exitVulkanRendererContext(RendererContext* pContext)
     vk_exitRendererContext(pContext);
 }
 
-#include "../ThirdParty/OpenSource/volk/volk.c"
+#include "Common_3/Graphics/ThirdParty/OpenSource/volk/volk.c"
 #if defined(VK_USE_DISPATCH_TABLES)
-#include "../ThirdParty/OpenSource/volk/volkForgeExt.c"
+#include "Common_3/Graphics/ThirdParty/OpenSource/volk/volkForgeExt.c"
 #endif
 #endif

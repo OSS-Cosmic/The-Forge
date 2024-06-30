@@ -22,24 +22,24 @@
  * under the License.
  */
 
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef VULKAN
 
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Common_3/Utilities/Interfaces/ILog.h"
 
-#include "../../Utilities/Math/MathTypes.h"
+#include "Common_3/Utilities/Math/MathTypes.h"
 
 // Renderer
 #include "tinyimageformat/tinyimageformat_apis.h"
 
-#include "../Interfaces/IGraphics.h"
-#include "../Interfaces/IRay.h"
+#include "Forge/Graphics/TF_Graphics.h"
+#include "Common_3/Graphics/Interfaces/IRay.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Common_3/Utilities/Interfaces/IMemory.h"
 
 extern VkAllocationCallbacks* GetAllocationCallbacks(VkObjectType objType);
 

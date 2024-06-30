@@ -154,6 +154,10 @@ file(GLOB THE_FORGE_SOURCES
    Source/Forge/Core/Mem/TF_Allocators.cpp
    
    Source/Forge/Graphics/TF_GPUConfig.cpp
+   Source/Forge/Graphics/TF_Graphics.cpp
+   Source/Forge/Graphics/Vulkan/Vulkan.cpp
+   Source/Forge/Graphics/Vulkan/VulkanRaytracing.cpp 
+   Source/Forge/Graphics/Vulkan/VulkanShaderReflection.cpp
 )
 add_library(TF STATIC ${THE_FORGE_SOURCES})
 

@@ -21,11 +21,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "../Utilities/Interfaces/ILog.h"
-#include "Interfaces/IGraphics.h"
-#include "Interfaces/IRay.h"
 
-#include "GraphicsConfig.h"
+
+#include "Forge/Graphics/TF_Graphics.h"
+
+#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Common_3/Graphics/Interfaces/IGraphics.h"
+#include "Common_3/Graphics/Interfaces/IRay.h"
+
+#include "Common_3/Graphics/GraphicsConfig.h"
+
 
 // API functions
 addFenceFn        addFence;
@@ -259,6 +264,29 @@ bool d3d12dll_init();
 #if defined(DIRECT3D11)
 bool d3d11dll_init();
 #endif
+
+RendererApiFlags FORGE_CALLCONV avaliableAPIs()
+{
+    RendererApiFlags flags = RENDERER_API_NONE_FLAG;
+#if defined(GLES)
+    flags |= RENDERER_API_GLES_FLAG;
+#endif
+#if defined(DIRECT3D12)
+    if (d3d12dll_init())
+        flags |= RENDERER_API_D3D12_FLAG;
+#endif
+#if defined(VULKAN)
+    flags |= RENDERER_API_VULKAN_FLAG;
+#endif
+#if defined(DIRECT3D11)
+    if (d3d11dll_init())
+        flags |= RENDERER_API_D3D11_FLAG;
+#endif
+#if defined(METAL)
+    flags |= RENDERER_API_METAL_FLAG;
+#endif
+    return flags;
+}
 
 static bool apiIsUnsupported(const RendererApi api)
 {

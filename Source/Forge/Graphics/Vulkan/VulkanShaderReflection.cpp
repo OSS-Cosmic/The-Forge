@@ -22,16 +22,16 @@
  * under the License.
  */
 
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef VULKAN
 
-#include "../ThirdParty/OpenSource/SPIRV_Cross/SpirvTools.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/SPIRV_Cross/SpirvTools.h"
 
-#include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IGraphics.h"
+#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Common_3/Graphics/Interfaces/IGraphics.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Common_3/Utilities/Interfaces/IMemory.h"
 
 static DescriptorType sSPIRV_TO_DESCRIPTOR[SPIRV_TYPE_COUNT] = {
     DESCRIPTOR_TYPE_UNDEFINED,
