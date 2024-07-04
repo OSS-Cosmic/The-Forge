@@ -3572,7 +3572,7 @@ FORGE_RENDERER_API void FORGE_CALLCONV exitRendererContext(RendererContext* pCon
 
 // allocates memory and initializes the renderer -> returns pRenderer
 //
-FORGE_RENDERER_API void FORGE_CALLCONV initRenderer(const char* appName, const RendererDesc* pSettings, Renderer* ppRenderer);
+FORGE_RENDERER_API void FORGE_CALLCONV initRenderer(const char* appName, const RendererDesc* pSettings, Renderer** ppRenderer);
 FORGE_RENDERER_API void FORGE_CALLCONV exitRenderer(Renderer* pRenderer);
 
 DECLARE_RENDERER_FUNCTION(void, addFence, Renderer* pRenderer, Fence** ppFence)

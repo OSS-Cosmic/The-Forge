@@ -1,6 +1,8 @@
 #include "Forge/Graphics/TF_GPUConfig.h"
 #include <cstdint>
 #include "Forge/Core/TF_String.h"
+#include "Forge/Config.h" 
+
 
 #define GPUCFG_VERSION_MAJOR           0
 #define GPUCFG_VERSION_MINOR           2
@@ -844,8 +846,15 @@ static inline bool tryUnpackUint64Term(GpuProperties* gpuProp, const GPUConfigTe
     if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
     {
         const GPUProperty* p1 = findGPUProperty(t1->mVariable);
-        (*value) = p1->getter(gpuProp);
-        return true;
+        if(p1) {
+            (*value) = p1->getter(gpuProp);
+            return true;
+        } else {
+            TStr str = {0};
+            tfstrcatfmt(&str, "failed to resolve variable: '%S'.", t1->mVariable);
+            LOGF(eINFO, str.buf);
+            tfStrFree(&str);
+        }
     }
     
     if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
@@ -993,6 +1002,7 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
     }
 
     tfStrFree(&tempLineMsg);
+    GpuSelection result = selections[selectionIndex];
     arrfree(selections);
-    return selections[selectionIndex];
+    return result ;
 }
