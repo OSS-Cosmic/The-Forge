@@ -262,7 +262,7 @@ typedef struct PlatformParameters
 } PlatformParameters;
 
 // Forward declarations
-typedef struct PhysicalDevice     PhysicalDevice;
+typedef struct DeviceAdapter      DeviceAdapter;
 typedef struct RendererContext    RendererContext;
 typedef struct Renderer           Renderer;
 typedef struct Queue              Queue;
@@ -275,6 +275,7 @@ typedef struct RootSignature      RootSignature;
 typedef struct DescriptorSet      DescriptorSet;
 typedef struct DescriptorIndexMap DescriptorIndexMap;
 typedef struct PipelineCache      PipelineCache;
+typedef struct GpuProperties      GpuProperties;
 
 // Raytracing
 typedef struct Raytracing            Raytracing;
@@ -2827,6 +2828,118 @@ typedef enum GpuMode
     GPU_MODE_UNLINKED,
 } GpuMode;
 
+
+typedef struct GPUVendorPreset
+{
+    uint32_t       mVendorId;
+    uint32_t       mModelId;
+    uint32_t       mRevisionId; // Optional as not all gpu's have that. Default is : 0x00
+    GPUPresetLevel mPresetLevel;
+    char           mVendorName[MAX_GPU_VENDOR_STRING_LENGTH];
+    char           mGpuName[MAX_GPU_VENDOR_STRING_LENGTH]; // If GPU Name is missing then value will be empty string
+    char           mGpuDriverVersion[MAX_GPU_VENDOR_STRING_LENGTH];
+    char           mGpuDriverDate[MAX_GPU_VENDOR_STRING_LENGTH];
+    uint32_t       mRTCoresCount;
+} GPUVendorPreset;
+
+typedef enum FormatCapability
+{
+    FORMAT_CAP_NONE = 0,
+    FORMAT_CAP_LINEAR_FILTER = 0x1,
+    FORMAT_CAP_READ = 0x2,
+    FORMAT_CAP_WRITE = 0x4,
+    FORMAT_CAP_READ_WRITE = 0x8,
+    FORMAT_CAP_RENDER_TARGET = 0x10,
+} FormatCapability;
+MAKE_ENUM_FLAG(uint32_t, FormatCapability);
+
+typedef struct GPUCapBits
+{
+    FormatCapability mFormatCaps[TinyImageFormat_Count];
+} GPUCapBits;
+
+typedef enum DefaultResourceAlignment
+{
+    RESOURCE_BUFFER_ALIGNMENT = 4U,
+} DefaultResourceAlignment;
+
+typedef enum WaveOpsSupportFlags
+{
+    WAVE_OPS_SUPPORT_FLAG_NONE = 0x0,
+    WAVE_OPS_SUPPORT_FLAG_BASIC_BIT = 0x00000001,
+    WAVE_OPS_SUPPORT_FLAG_VOTE_BIT = 0x00000002,
+    WAVE_OPS_SUPPORT_FLAG_ARITHMETIC_BIT = 0x00000004,
+    WAVE_OPS_SUPPORT_FLAG_BALLOT_BIT = 0x00000008,
+    WAVE_OPS_SUPPORT_FLAG_SHUFFLE_BIT = 0x00000010,
+    WAVE_OPS_SUPPORT_FLAG_SHUFFLE_RELATIVE_BIT = 0x00000020,
+    WAVE_OPS_SUPPORT_FLAG_CLUSTERED_BIT = 0x00000040,
+    WAVE_OPS_SUPPORT_FLAG_QUAD_BIT = 0x00000080,
+    WAVE_OPS_SUPPORT_FLAG_PARTITIONED_BIT_NV = 0x00000100,
+    WAVE_OPS_SUPPORT_FLAG_ALL = 0x7FFFFFFF
+} WaveOpsSupportFlags;
+MAKE_ENUM_FLAG(uint32_t, WaveOpsSupportFlags);
+
+
+typedef struct GpuProperties
+{
+    uint64_t mVRAM; // set to 0 on OpenGLES platform
+    uint32_t mUniformBufferAlignment;
+    uint32_t mUploadBufferTextureAlignment;
+    uint32_t mUploadBufferTextureRowAlignment;
+    uint32_t mMaxVertexInputBindings;
+#if defined(DIRECT3D12)
+    uint32_t mMaxRootSignatureDWORDS;
+#endif
+    uint32_t            mWaveLaneCount;
+    WaveOpsSupportFlags mWaveOpsSupportFlags;
+    GPUVendorPreset     mGpuVendorPreset;
+    ShaderStage         mWaveOpsSupportedStageFlags;
+
+    uint32_t mMaxTotalComputeThreads;
+    uint32_t mMaxComputeThreads[3];
+    uint32_t mMultiDrawIndirect : 1;
+    uint32_t mIndirectRootConstant : 1;
+    uint32_t mBuiltinDrawID : 1;
+    uint32_t mIndirectCommandBuffer : 1;
+    uint32_t mROVsSupported : 1;
+    uint32_t mTessellationSupported : 1;
+    uint32_t mGeometryShaderSupported : 1;
+    uint32_t mGpuMarkers : 1;
+    uint32_t mHDRSupported : 1;
+    uint32_t mTimestampQueries : 1;
+    uint32_t mOcclusionQueries : 1;
+    uint32_t mPipelineStatsQueries : 1;
+    uint32_t mAllowBufferTextureInSameHeap : 1;
+    uint32_t mRaytracingSupported : 1;
+    uint32_t mRayPipelineSupported : 1;
+    uint32_t mRayQuerySupported : 1;
+    uint32_t mSoftwareVRSSupported : 1;
+    uint32_t mPrimitiveIdSupported : 1;
+    uint32_t m64BitAtomicsSupported : 1;
+#if defined(DIRECT3D11) || defined(DIRECT3D12)
+    D3D_FEATURE_LEVEL mFeatureLevel;
+    uint32_t          mSuppressInvalidSubresourceStateAfterExit : 1;
+#endif
+#if defined(VULKAN)
+    uint32_t mDynamicRenderingSupported : 1;
+    uint32_t mXclipseTransferQueueWorkaround : 1;
+#endif
+    uint32_t mMaxBoundTextures;
+    uint32_t mSamplerAnisotropySupported : 1;
+    uint32_t mGraphicsQueueSupported : 1;
+#if defined(METAL)
+    uint32_t mHeaps : 1;
+    uint32_t mPlacementHeaps : 1;
+    uint32_t mTessellationIndirectDrawSupported : 1;
+    uint32_t mDrawIndexVertexOffsetSupported : 1;
+    uint32_t mCubeMapTextureArraySupported : 1;
+#if !defined(TARGET_IOS)
+    uint32_t mIsHeadLess : 1; // indicates whether a GPU device does not have a connection to a display.
+#endif
+#endif
+    uint32_t    mAmdAsicFamily;
+} GpuProperties;
+
 typedef struct RendererDesc
 {
 #if defined(USE_MULTIPLE_RENDER_APIS)
@@ -2885,9 +2998,9 @@ typedef struct RendererDesc
     /// Apps may want to query additional state for their applications. That information is transferred through here.
     ExtendedSettings* pExtendedSettings;
 
-    /// Required when creating unlinked multiple renderers. Optional otherwise, can be used for explicit GPU selection.
     RendererContext* pContext;
-    uint32_t         mGpuIndex;
+    DeviceAdapter*   pSelectedDevice;
+    GpuProperties    mProperties;
 
     /// This results in new validation not possible during API calls on the CPU, by creating patched shaders that have validation added
     /// directly to the shader. However, it can slow things down a lot, especially for applications with numerous PSOs. Time to see the
@@ -2897,64 +3010,9 @@ typedef struct RendererDesc
     bool mEnableShaderStats;
 #endif
 
-    bool mD3D11Supported;
-    bool mGLESSupported;
-#if defined(VULKAN) && defined(ANDROID)
-    bool mPreferVulkan;
-#endif
 } RendererDesc;
 
-typedef struct GPUVendorPreset
-{
-    uint32_t       mVendorId;
-    uint32_t       mModelId;
-    uint32_t       mRevisionId; // Optional as not all gpu's have that. Default is : 0x00
-    GPUPresetLevel mPresetLevel;
-    char           mVendorName[MAX_GPU_VENDOR_STRING_LENGTH];
-    char           mGpuName[MAX_GPU_VENDOR_STRING_LENGTH]; // If GPU Name is missing then value will be empty string
-    char           mGpuDriverVersion[MAX_GPU_VENDOR_STRING_LENGTH];
-    char           mGpuDriverDate[MAX_GPU_VENDOR_STRING_LENGTH];
-    uint32_t       mRTCoresCount;
-} GPUVendorPreset;
-
-typedef enum FormatCapability
-{
-    FORMAT_CAP_NONE = 0,
-    FORMAT_CAP_LINEAR_FILTER = 0x1,
-    FORMAT_CAP_READ = 0x2,
-    FORMAT_CAP_WRITE = 0x4,
-    FORMAT_CAP_READ_WRITE = 0x8,
-    FORMAT_CAP_RENDER_TARGET = 0x10,
-} FormatCapability;
-MAKE_ENUM_FLAG(uint32_t, FormatCapability);
-
-typedef struct GPUCapBits
-{
-    FormatCapability mFormatCaps[TinyImageFormat_Count];
-} GPUCapBits;
-
-typedef enum DefaultResourceAlignment
-{
-    RESOURCE_BUFFER_ALIGNMENT = 4U,
-} DefaultResourceAlignment;
-
-typedef enum WaveOpsSupportFlags
-{
-    WAVE_OPS_SUPPORT_FLAG_NONE = 0x0,
-    WAVE_OPS_SUPPORT_FLAG_BASIC_BIT = 0x00000001,
-    WAVE_OPS_SUPPORT_FLAG_VOTE_BIT = 0x00000002,
-    WAVE_OPS_SUPPORT_FLAG_ARITHMETIC_BIT = 0x00000004,
-    WAVE_OPS_SUPPORT_FLAG_BALLOT_BIT = 0x00000008,
-    WAVE_OPS_SUPPORT_FLAG_SHUFFLE_BIT = 0x00000010,
-    WAVE_OPS_SUPPORT_FLAG_SHUFFLE_RELATIVE_BIT = 0x00000020,
-    WAVE_OPS_SUPPORT_FLAG_CLUSTERED_BIT = 0x00000040,
-    WAVE_OPS_SUPPORT_FLAG_QUAD_BIT = 0x00000080,
-    WAVE_OPS_SUPPORT_FLAG_PARTITIONED_BIT_NV = 0x00000100,
-    WAVE_OPS_SUPPORT_FLAG_ALL = 0x7FFFFFFF
-} WaveOpsSupportFlags;
-MAKE_ENUM_FLAG(uint32_t, WaveOpsSupportFlags);
-
-typedef struct PhysicalDevice
+typedef struct DeviceAdapter
 {
 #if defined(USE_MULTIPLE_RENDER_APIS)
     union
@@ -3037,65 +3095,9 @@ typedef struct PhysicalDevice
     id<MTLCounterSet> pCounterSetTimestamp;
     uint32_t          mCounterTimestampEnabled : 1;
 #endif
-
-    uint64_t mVRAM; // set to 0 on OpenGLES platform
-    uint32_t mUniformBufferAlignment;
-    uint32_t mUploadBufferTextureAlignment;
-    uint32_t mUploadBufferTextureRowAlignment;
-    uint32_t mMaxVertexInputBindings;
-#if defined(DIRECT3D12)
-    uint32_t mMaxRootSignatureDWORDS;
-#endif
-    uint32_t            mWaveLaneCount;
-    WaveOpsSupportFlags mWaveOpsSupportFlags;
-    GPUVendorPreset     mGpuVendorPreset;
-    ShaderStage         mWaveOpsSupportedStageFlags;
-
-    uint32_t mMaxTotalComputeThreads;
-    uint32_t mMaxComputeThreads[3];
-    uint32_t mMultiDrawIndirect : 1;
-    uint32_t mIndirectRootConstant : 1;
-    uint32_t mBuiltinDrawID : 1;
-    uint32_t mIndirectCommandBuffer : 1;
-    uint32_t mROVsSupported : 1;
-    uint32_t mTessellationSupported : 1;
-    uint32_t mGeometryShaderSupported : 1;
-    uint32_t mGpuMarkers : 1;
-    uint32_t mHDRSupported : 1;
-    uint32_t mTimestampQueries : 1;
-    uint32_t mOcclusionQueries : 1;
-    uint32_t mPipelineStatsQueries : 1;
-    uint32_t mAllowBufferTextureInSameHeap : 1;
-    uint32_t mRaytracingSupported : 1;
-    uint32_t mRayPipelineSupported : 1;
-    uint32_t mRayQuerySupported : 1;
-    uint32_t mSoftwareVRSSupported : 1;
-    uint32_t mPrimitiveIdSupported : 1;
-    uint32_t m64BitAtomicsSupported : 1;
-#if defined(DIRECT3D11) || defined(DIRECT3D12)
-    D3D_FEATURE_LEVEL mFeatureLevel;
-    uint32_t          mSuppressInvalidSubresourceStateAfterExit : 1;
-#endif
-#if defined(VULKAN)
-    uint32_t mDynamicRenderingSupported : 1;
-    uint32_t mXclipseTransferQueueWorkaround : 1;
-#endif
-    uint32_t mMaxBoundTextures;
-    uint32_t mSamplerAnisotropySupported : 1;
-    uint32_t mGraphicsQueueSupported : 1;
-#if defined(METAL)
-    uint32_t mHeaps : 1;
-    uint32_t mPlacementHeaps : 1;
-    uint32_t mTessellationIndirectDrawSupported : 1;
-    uint32_t mDrawIndexVertexOffsetSupported : 1;
-    uint32_t mCubeMapTextureArraySupported : 1;
-#if !defined(TARGET_IOS)
-    uint32_t mIsHeadLess : 1; // indicates whether a GPU device does not have a connection to a display.
-#endif
-#endif
-    uint32_t    mAmdAsicFamily;
+    GpuProperties mDefaultProps;
     GPUCapBits  mCapBits;
-} PhysicalDevice;
+} DeviceAdapter;
 
 
 // update availableGpuProperties in GraphicsConfig.cpp if you made changes to this list
@@ -3249,16 +3251,17 @@ typedef struct DEFINE_ALIGNED(Renderer, 64)
     // GPU crash dump tracker using Nsight Aftermath instrumentation
     AftermathTracker mAftermathTracker;
 #endif
-    struct NullDescriptors* pNullDescriptors;
-    struct RendererContext* pContext;
-    const struct GpuInfo*   pGpu;
+    struct NullDescriptors*      pNullDescriptors;
+    struct RendererContext*      pContext;
+    const struct DeviceAdapter*  pAdapter;
+    GpuProperties*               pProperties;
+
     const char*             pName;
     RendererApi             mRendererApi;
     uint32_t                mLinkedNodeCount : 4;
     uint32_t                mUnlinkedRendererIndex : 4;
     uint32_t                mGpuMode : 3;
     uint32_t                mShaderTarget : 4;
-    uint32_t                mOwnsContext : 1;
 } Renderer;
 // 3 cache lines
 COMPILE_ASSERT(sizeof(Renderer) <= 24 * sizeof(uint64_t));
@@ -3302,15 +3305,9 @@ typedef struct RendererContextDesc
     };
 #endif
     RendererApi mApi;
-
     bool mEnableGpuBasedValidation;
 #if defined(SHADER_STATS_AVAILABLE)
     bool mEnableShaderStats;
-#endif
-    bool mD3D11Supported;
-    bool mGLESSupported;
-#if defined(VULKAN) && defined(ANDROID)
-    bool mPreferVulkan;
 #endif
 } RendererContextDesc;
 
@@ -3446,12 +3443,8 @@ typedef struct RendererContext
         uint32_t mExtendedEncoderDebugReport : 1;
     } mMtl;
 #endif
-    GpuInfo  mGpus[MAX_MULTIPLE_GPUS];
-    uint32_t mGpuCount;
-
-    uint32_t mNumPhysicalDevices;
-    struct PhysicalDevice mDevices[MAX_MULTIPLE_GPUS];
-
+    RendererApi mApi;
+    struct DeviceAdapter* pAdapters;
 } RendererContext;
 
 // Indirect command structure define
@@ -3579,7 +3572,7 @@ FORGE_RENDERER_API void FORGE_CALLCONV exitRendererContext(RendererContext* pCon
 
 // allocates memory and initializes the renderer -> returns pRenderer
 //
-FORGE_RENDERER_API void FORGE_CALLCONV initRenderer(const char* appName, const RendererDesc* pSettings, Renderer** ppRenderer);
+FORGE_RENDERER_API void FORGE_CALLCONV initRenderer(const char* appName, const RendererDesc* pSettings, Renderer* ppRenderer);
 FORGE_RENDERER_API void FORGE_CALLCONV exitRenderer(Renderer* pRenderer);
 
 DECLARE_RENDERER_FUNCTION(void, addFence, Renderer* pRenderer, Fence** ppFence)

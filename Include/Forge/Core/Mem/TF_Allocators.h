@@ -12,7 +12,6 @@ struct TFAllocator {
   TFAllocatorFree mFree;
 };
 
-
 struct TFFixedBufferAllocDesc
 {
     void* mBuffer;

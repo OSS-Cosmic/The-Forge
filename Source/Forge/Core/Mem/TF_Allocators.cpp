@@ -59,7 +59,7 @@ void* tfScratchAlloc(TFScratchAllocator* alloc, size_t size)
         return ((uint8_t*)block->mData) + offset;
     }
 
-    if (alloc->mCurrent && (alloc->pos + reqSize) > alloc->blockSize)
+    if (alloc->mCurrent == NULL || (alloc->pos + reqSize) > alloc->blockSize)
     {
         struct TFAllocScratchBlock* block =
             (struct TFAllocScratchBlock*)tf_malloc(sizeof(struct TFAllocScratchBlock) + alloc->blockSize + alloc->alignment);
@@ -205,6 +205,7 @@ void tfStackAllocCompaction(struct TFStackAllocator* alloc, size_t reserveSize)
     }
     alloc->mFreeBlocks = freeBlocks;
 }
+
 
 void tfStackAllocReset(struct TFStackAllocator* alloc)
 {

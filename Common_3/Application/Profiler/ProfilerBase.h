@@ -96,8 +96,11 @@
  */
 
 #include "../../Application/Interfaces/IProfiler.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #ifndef ENABLE_PROFILER
+
+struct PhysicalDevice;
 
 #define PROFILE_DECLARE(var)
 #define PROFILE_DEFINE(var, group, name, color)
@@ -870,7 +873,7 @@ struct Profile
     ProfileDumpType    eDumpType;
     uint32_t           nDumpFrames;
     const char*        DumpFile;
-    const GPUSettings* pGpuSettings;
+    const Renderer* pRenderer;
 
     int64_t nPauseTicks;
 

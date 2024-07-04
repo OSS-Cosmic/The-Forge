@@ -138,7 +138,7 @@ bool vk_initRaytracing(Renderer* pRenderer, Raytracing** ppRaytracing)
     ASSERT(pRenderer);
     ASSERT(ppRaytracing);
 
-    if (!pRenderer->pGpu->mSettings.mRaytracingSupported)
+    if (!pRenderer->pProperties->mRaytracingSupported)
     {
         return false;
     }
@@ -152,7 +152,7 @@ bool vk_initRaytracing(Renderer* pRenderer, Raytracing** ppRaytracing)
     };
     VkPhysicalDeviceProperties2KHR deviceProperties2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR,
                                                          &rayTracingPipelineProperties };
-    vkGetPhysicalDeviceProperties2KHR(pRenderer->pGpu->mVk.pGpu, &deviceProperties2);
+    vkGetPhysicalDeviceProperties2KHR(pRenderer->pAdapter->mVk.pGpu, &deviceProperties2);
 
     pRaytracing->pRenderer = pRenderer;
     pRaytracing->mRayTracingPipelineProperties = rayTracingPipelineProperties;
