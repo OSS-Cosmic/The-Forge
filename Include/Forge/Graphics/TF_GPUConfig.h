@@ -5,12 +5,18 @@
 #include "Forge/Core/TF_String.h"
 #include "Forge/Core/Mem/TF_Allocators.h"
 
-#include "Common_3/Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #define MAX_GPU_VENDOR_COUNT                 64
 #define MAX_GPU_VENDOR_IDENTIFIER_LENGTH     16
 #define MAX_INDENTIFIER_PER_GPU_VENDOR_COUNT 12
 #define MAX_GPU_COMPARISON_OP_COUNT          16
+
+struct GpuSelection
+{
+    DeviceAdapter* device;
+    GpuProperties   properties;
+};
 
 enum class GPUConfigExprSymbol : uint8_t
 {
@@ -117,3 +123,5 @@ void tfInitGPUConfiguration(struct GPUConfiguration* def);
 bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input);
 bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input);
 void tfFreeGPUConfiguration(struct GPUConfiguration* def);
+
+GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const struct RendererContext* context);

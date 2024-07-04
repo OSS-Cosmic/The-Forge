@@ -46,6 +46,8 @@
 #include "Common_3//Utilities/Interfaces/ILog.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
+#include "Forge/Core/Mem/TF_Allocators.h"
+
 #include "Common_3/Utilities/Math/MathTypes.h"
 
 #if defined(__clang__)
@@ -344,10 +346,6 @@ const char* gVkWantedDeviceExtensions[] =
 #if defined(GFX_DEVICE_MEMORY_TRACKING)
     VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME,
 #endif
-	/************************************************************************/
-	/************************************************************************/
-	// Debug marker extension in case debug utils is not supported. Should be last element in the array
-	VK_EXT_DEBUG_MARKER_EXTENSION_NAME,
 };
 // clang-format on
 
@@ -763,7 +761,7 @@ void OnVkDeviceLost(Renderer* pRenderer)
     ASSERT(pRenderer);
     ASSERT(pRenderer->mVk.pDevice);
 
-    if (!pRenderer->pGpu->mVk.mDeviceFaultSupported)
+    if (!pRenderer->pAdapter->mVk.mDeviceFaultSupported)
     {
         return;
     }
@@ -1650,7 +1648,7 @@ static inline VkPipelineRasterizationStateCreateInfo util_to_rasterizer_desc(Ren
     rs.depthClampEnable = pDesc->mDepthClampEnable ? VK_TRUE : VK_FALSE;
     rs.rasterizerDiscardEnable = VK_FALSE;
     rs.polygonMode = gVkFillModeTranslator[pDesc->mFillMode];
-    if (!pRenderer->pGpu->mVk.mFillModeNonSolid && VK_POLYGON_MODE_FILL != rs.polygonMode)
+    if (!pRenderer->pAdapter->mVk.mFillModeNonSolid && VK_POLYGON_MODE_FILL != rs.polygonMode)
     {
         LOGF(eWARNING,
              "VkPolygonMode %i not supported on this device. VK_POLYGON_MODE_FILL is the only supported polygon mode. Falling back to that",
@@ -2269,7 +2267,7 @@ VkPipelineStageFlags util_determine_pipeline_stage_flags(Renderer* pRenderer, Vk
 {
     VkPipelineStageFlags flags = 0;
 
-    if (pRenderer->pGpu->mSettings.mRaytracingSupported)
+    if (pRenderer->pProperties->mRaytracingSupported)
     {
         if (accessFlags & (VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR))
         {
@@ -2292,18 +2290,18 @@ VkPipelineStageFlags util_determine_pipeline_stage_flags(Renderer* pRenderer, Vk
         {
             flags |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
             flags |= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-            if (pRenderer->pGpu->mSettings.mGeometryShaderSupported)
+            if (pRenderer->pProperties->mGeometryShaderSupported)
             {
                 flags |= VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT;
             }
-            if (pRenderer->pGpu->mSettings.mTessellationSupported)
+            if (pRenderer->pProperties->mTessellationSupported)
             {
                 flags |= VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT;
                 flags |= VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT;
             }
             flags |= VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
 
-            if (pRenderer->pGpu->mSettings.mRayPipelineSupported)
+            if (pRenderer->pProperties->mRayPipelineSupported)
             {
                 flags |= VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR;
             }
@@ -2506,9 +2504,9 @@ void util_find_queue_family_index(const Renderer* pRenderer, uint32_t nodeIndex,
     // Get queue family properties
     uint32_t                 queueFamilyPropertyCount = 0;
     VkQueueFamilyProperties* queueFamilyProperties = NULL;
-    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pGpu->mVk.pGpu, &queueFamilyPropertyCount, NULL);
+    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pAdapter->mVk.pGpu, &queueFamilyPropertyCount, NULL);
     queueFamilyProperties = (VkQueueFamilyProperties*)alloca(queueFamilyPropertyCount * sizeof(VkQueueFamilyProperties));
-    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pGpu->mVk.pGpu, &queueFamilyPropertyCount, queueFamilyProperties);
+    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pAdapter->mVk.pGpu, &queueFamilyPropertyCount, queueFamilyProperties);
 
     uint32_t minQueueFlag = UINT32_MAX;
 
@@ -2531,7 +2529,7 @@ void util_find_queue_family_index(const Renderer* pRenderer, uint32_t nodeIndex,
         // But since Vulkan properties always provide 2.0.0 driver version for all Xclipse GPUs
         // We have to apply this workaround for Xclipse 920 in general
         // Expected to be fixed in Android OS V update
-        if (pRenderer->pGpu->mSettings.mXclipseTransferQueueWorkaround)
+        if (pRenderer->pPhysicalDevice->mSettings.mXclipseTransferQueueWorkaround)
         {
             if (queueType == QUEUE_TYPE_TRANSFER)
             {
@@ -2642,399 +2640,401 @@ void util_calculate_device_indices(Renderer* pRenderer, uint32_t nodeIndex, uint
         pIndices[pSharedNodeIndices[i]] = nodeIndex;
 }
 
-static bool QueryGpuSettings(const RendererContextDesc* pDesc, RendererContext* pContext, GpuInfo* pGpu)
-{
-    ASSERT(VK_NULL_HANDLE != pContext->mVk.pInstance);
 
-    uint32_t layerCount = 0;
-    uint32_t extCount = 0;
-    vkEnumerateDeviceLayerProperties(pGpu->mVk.pGpu, &layerCount, NULL);
-    vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, NULL, &extCount, NULL);
 
-    VkLayerProperties* layers = (VkLayerProperties*)alloca(sizeof(VkLayerProperties) * layerCount);
-    vkEnumerateDeviceLayerProperties(pGpu->mVk.pGpu, &layerCount, layers);
-
-    VkExtensionProperties* exts = (VkExtensionProperties*)alloca(sizeof(VkExtensionProperties) * extCount);
-    vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, NULL, &extCount, exts);
-
-#if VK_DEBUG_LOG_EXTENSIONS
-    for (uint32_t i = 0; i < layerCount; ++i)
-    {
-        internal_log(eINFO, layers[i].layerName, "vkdevice-layer");
-    }
-
-    for (uint32_t i = 0; i < extCount; ++i)
-    {
-        internal_log(eINFO, exts[i].extensionName, "vkdevice-ext");
-    }
-#endif
-
-    // Standalone extensions
-    {
-        const char* layer_name = NULL;
-        uint32_t    initialCount = TF_ARRAY_COUNT(gVkWantedDeviceExtensions);
-        // Dont need debug marker if we have debug utils
-        initialCount -= pContext->mVk.mDebugUtilsExtension ? 1 : 0;
-        const uint32_t userRequestedCount = (uint32_t)pDesc->mVk.mDeviceExtensionCount;
-        const char**   wantedDeviceExtensions = NULL;
-        arrsetlen(wantedDeviceExtensions, initialCount + userRequestedCount + 1);
-        uint32_t wantedExtensionCount = 0;
-        for (uint32_t i = 0; i < initialCount; ++i, ++wantedExtensionCount)
-        {
-            wantedDeviceExtensions[i] = gVkWantedDeviceExtensions[i];
-        }
-        for (uint32_t i = 0; i < userRequestedCount; ++i, ++wantedExtensionCount)
-        {
-            wantedDeviceExtensions[initialCount + i] = pDesc->mVk.ppDeviceExtensions[i];
-        }
-#if defined(SHADER_STATS_AVAILABLE)
-        if (pDesc->mEnableShaderStats)
-        {
-            wantedDeviceExtensions[wantedExtensionCount++] = VK_AMD_SHADER_INFO_EXTENSION_NAME;
-        }
-#endif
-        uint32_t count = 0;
-        vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, layer_name, &count, NULL);
-        if (count > 0)
-        {
-            VkExtensionProperties* properties = (VkExtensionProperties*)tf_calloc(count, sizeof(*properties));
-            ASSERT(properties != NULL);
-            vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, layer_name, &count, properties);
-            for (uint32_t j = 0; j < count; ++j)
-            {
-                for (uint32_t k = 0; k < wantedExtensionCount; ++k)
-                {
-                    if (strcmp(wantedDeviceExtensions[k], properties[j].extensionName) == 0)
-                    {
-                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_BUFFER_MARKER_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mAMDBufferMarkerExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mAMDDeviceCoherentMemoryExtension = true;
-#if defined(GFX_DEVICE_MEMORY_TRACKING)
-                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mDeviceMemoryReportExtension = gEnableDeviceMemoryTracking;
-#endif
-                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mASTCDecodeModeExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEBUG_MARKER_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mDebugMarkerExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mDedicatedAllocationExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mMemoryReq2Extension = true;
-#if defined(VK_USE_PLATFORM_WIN32_KHR)
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mExternalMemoryExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mExternalMemoryWin32Extension = true;
-#endif
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mDrawIndirectCountExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_DRAW_INDIRECT_COUNT_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mAMDDrawIndirectCountExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_GCN_SHADER_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mAMDGCNShaderExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_SHADER_INFO_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mAMDShaderInfoExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mDescriptorIndexingExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mBufferDeviceAddressExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mShaderFloatControlsExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mDeferredHostOperationsExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mAccelerationStructureExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_SPIRV_1_4_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mSpirv14Extension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mShaderAtomicInt64Extension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mRayTracingPipelineExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_RAY_QUERY_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mRayQueryExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mYCbCrExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mFragmentShaderInterlockExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mDynamicRenderingExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME) == 0)
-                            pGpu->mSettings.mSoftwareVRSSupported = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEVICE_FAULT_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mDeviceFaultExtension = true;
-#if defined(QUEST_VR)
-                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_MULTIVIEW_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mMultiviewExtension = true;
-#endif
-#if defined(ENABLE_NSIGHT_AFTERMATH)
-                        if (strcmp(wantedDeviceExtensions[k], VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mNVDeviceDiagnosticsCheckpointExtension = true;
-                        if (strcmp(wantedDeviceExtensions[k], VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME) == 0)
-                            pGpu->mVk.mNVDeviceDiagnosticsConfigExtension = true;
-#endif
-                        break;
-                    }
-                }
-            }
-            SAFE_FREE(properties);
-        }
-        arrfree(wantedDeviceExtensions);
-    }
-
-    //-V:ADD_TO_NEXT_CHAIN:506, 1027
-#define ADD_TO_NEXT_CHAIN(condition, next)        \
-    if ((condition))                              \
-    {                                             \
-        base->pNext = (VkBaseOutStructure*)&next; \
-        base = (VkBaseOutStructure*)base->pNext;  \
-    }
-
-    VkPhysicalDeviceFeatures2KHR gpuFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
-    VkBaseOutStructure*          base = (VkBaseOutStructure*)&gpuFeatures2; //-V1027
-
-    // Add more extensions here
-    VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT fragmentShaderInterlockFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mFragmentShaderInterlockExtension, fragmentShaderInterlockFeatures);
-    VkPhysicalDeviceDescriptorIndexingFeaturesEXT descriptorIndexingFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDescriptorIndexingExtension, descriptorIndexingFeatures);
-    VkPhysicalDeviceSamplerYcbcrConversionFeatures ycbcrFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mYCbCrExtension, ycbcrFeatures);
-#if defined(QUEST_VR)
-    VkPhysicalDeviceMultiviewFeatures multiviewFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mMultiviewExtension, multiviewFeatures);
-#endif
-
-    VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDynamicRenderingExtension, dynamicRenderingFeatures);
-
-    VkPhysicalDeviceShaderAtomicInt64Features shaderAtomicInt64Features = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mShaderAtomicInt64Extension, shaderAtomicInt64Features);
-
-    VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES
-    };
-    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR
-    };
-    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR
-    };
-    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mBufferDeviceAddressExtension, bufferDeviceAddressFeatures);
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mRayTracingPipelineExtension, rayTracingPipelineFeatures);
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mAccelerationStructureExtension, accelerationStructureFeatures);
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mRayQueryExtension, rayQueryFeatures);
-
-    VkPhysicalDeviceFaultFeaturesEXT deviceFaultFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FAULT_FEATURES_EXT };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDeviceFaultExtension, deviceFaultFeatures);
-
-    VkPhysicalDeviceDeviceMemoryReportFeaturesEXT memoryReportFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDeviceMemoryReportExtension, memoryReportFeatures);
-
-    VkPhysicalDeviceCoherentMemoryFeaturesAMD deviceCoherentFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mAMDDeviceCoherentMemoryExtension, deviceCoherentFeatures);
-
-    vkGetPhysicalDeviceFeatures2KHR(pGpu->mVk.pGpu, &gpuFeatures2);
-
-    // Get memory properties
-    VkPhysicalDeviceMemoryProperties gpuMemoryProperties = {};
-    vkGetPhysicalDeviceMemoryProperties(pGpu->mVk.pGpu, &gpuMemoryProperties);
-
-    // Get device properties
-    VkPhysicalDeviceSubgroupProperties subgroupProperties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES };
-    VkPhysicalDeviceProperties2KHR     gpuProperties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &subgroupProperties };
-    vkGetPhysicalDeviceProperties2KHR(pGpu->mVk.pGpu, &gpuProperties);
-
-#if defined(GFX_DEVICE_MEMORY_TRACKING)
-    gEnableDeviceMemoryTracking &= pGpu->mVk.mDeviceMemoryReportExtension;
-#endif
-    pGpu->mSettings.mDynamicRenderingSupported = dynamicRenderingFeatures.dynamicRendering;
-
-    const bool bufferDeviceAddressFeature = bufferDeviceAddressFeatures.bufferDeviceAddress;
-    pGpu->mVk.mBufferDeviceAddressSupported = bufferDeviceAddressFeature;
-
-    pGpu->mSettings.m64BitAtomicsSupported = shaderAtomicInt64Features.shaderBufferInt64Atomics;
-
-    const bool rayTracingPipelineFeature = rayTracingPipelineFeatures.rayTracingPipeline;
-    const bool accelerationStructureFeature = accelerationStructureFeatures.accelerationStructure;
-    const bool rayQueryFeature = rayQueryFeatures.rayQuery;
-
-    pGpu->mSettings.mRayPipelineSupported = bufferDeviceAddressFeature && rayTracingPipelineFeature &&
-                                            pGpu->mVk.mShaderFloatControlsExtension && pGpu->mVk.mSpirv14Extension &&
-                                            accelerationStructureFeature && pGpu->mVk.mDeferredHostOperationsExtension;
-    pGpu->mSettings.mRayQuerySupported = rayQueryFeature && accelerationStructureFeature && pGpu->mVk.mDeferredHostOperationsExtension;
-    pGpu->mSettings.mRaytracingSupported = pGpu->mSettings.mRayPipelineSupported || pGpu->mSettings.mRayQuerySupported;
-
-    pGpu->mVk.mDedicatedAllocationExtension = pGpu->mVk.mDedicatedAllocationExtension && pGpu->mVk.mMemoryReq2Extension;
-
-    const bool deviceFaultSupported = deviceFaultFeatures.deviceFault;
-    pGpu->mVk.mDeviceFaultSupported = deviceFaultSupported;
-
-#if defined(VK_USE_PLATFORM_WIN32_KHR)
-    pGpu->mVk.mExternalMemoryExtension = pGpu->mVk.mExternalMemoryExtension && pGpu->mVk.mExternalMemoryWin32Extension;
-#endif
-
-#if defined(ENABLE_NSIGHT_AFTERMATH)
-    pGpu->mVk.mAftermathSupport = pGpu->mVk.mNVDeviceDiagnosticsCheckpointExtension && pGpu->mVk.mNVDeviceDiagnosticsConfigExtension;
-#endif
-
-    pGpu->mSettings.mUniformBufferAlignment = (uint32_t)gpuProperties.properties.limits.minUniformBufferOffsetAlignment;
-    pGpu->mSettings.mUploadBufferTextureAlignment = (uint32_t)gpuProperties.properties.limits.optimalBufferCopyOffsetAlignment;
-    pGpu->mSettings.mUploadBufferTextureRowAlignment = (uint32_t)gpuProperties.properties.limits.optimalBufferCopyRowPitchAlignment;
-    pGpu->mSettings.mMaxVertexInputBindings = gpuProperties.properties.limits.maxVertexInputBindings;
-    pGpu->mSettings.mMultiDrawIndirect = gpuFeatures2.features.multiDrawIndirect;
-    pGpu->mSettings.mMaxBoundTextures = gpuProperties.properties.limits.maxPerStageDescriptorSampledImages;
-    pGpu->mSettings.mMaxTotalComputeThreads = gpuProperties.properties.limits.maxComputeWorkGroupInvocations;
-    COMPILE_ASSERT(sizeof(pGpu->mSettings.mMaxComputeThreads) == sizeof(gpuProperties.properties.limits.maxComputeWorkGroupSize));
-    memcpy(pGpu->mSettings.mMaxComputeThreads, gpuProperties.properties.limits.maxComputeWorkGroupSize,
-           sizeof(gpuProperties.properties.limits.maxComputeWorkGroupSize));
-    pGpu->mSettings.mIndirectRootConstant = false;
-    pGpu->mSettings.mBuiltinDrawID = true;
-    pGpu->mSettings.mTimestampQueries =
-        gpuProperties.properties.limits.timestampPeriod > 0 && gpuProperties.properties.limits.timestampComputeAndGraphics;
-    pGpu->mSettings.mOcclusionQueries = true;
-    pGpu->mSettings.mPipelineStatsQueries = gpuFeatures2.features.pipelineStatisticsQuery;
-#if !defined(NX64) && !defined(__ANDROID__)
-    pGpu->mSettings.mHDRSupported = true;
-#endif
-    pGpu->mSettings.mGpuMarkers = true;
-    pGpu->mVk.mAMDDeviceCoherentMemorySupported = deviceCoherentFeatures.deviceCoherentMemory;
-    /************************************************************************/
-    // To find VRAM in Vulkan, loop through all the heaps and find if the
-    // heap has the DEVICE_LOCAL_BIT flag set
-    /************************************************************************/
-    uint64_t totalTestVram = 0;
-    for (uint32_t i = 0; i < gpuMemoryProperties.memoryHeapCount; ++i)
-    {
-        if (VK_MEMORY_HEAP_DEVICE_LOCAL_BIT & gpuMemoryProperties.memoryHeaps[i].flags)
-            totalTestVram += gpuMemoryProperties.memoryHeaps[i].size;
-    }
-    pGpu->mSettings.mVRAM = totalTestVram;
-    pGpu->mSettings.mAllowBufferTextureInSameHeap = true;
-
-    pGpu->mSettings.mWaveLaneCount = subgroupProperties.subgroupSize;
-    pGpu->mSettings.mWaveOpsSupportFlags = WAVE_OPS_SUPPORT_FLAG_NONE;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_BASIC_BIT)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_BASIC_BIT;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_VOTE_BIT)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_VOTE_BIT;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_ARITHMETIC_BIT)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_ARITHMETIC_BIT;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_BALLOT_BIT)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_BALLOT_BIT;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_SHUFFLE_BIT)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_SHUFFLE_BIT;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_SHUFFLE_RELATIVE_BIT;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_CLUSTERED_BIT)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_CLUSTERED_BIT;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_QUAD_BIT)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_QUAD_BIT;
-    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV)
-        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_PARTITIONED_BIT_NV;
-
-    pGpu->mSettings.mWaveOpsSupportedStageFlags = SHADER_STAGE_NONE;
-    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_VERTEX_BIT)
-        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_VERT;
-    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT)
-        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_TESC;
-    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT)
-        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_TESE;
-    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_GEOMETRY_BIT)
-        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_GEOM;
-    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_FRAGMENT_BIT)
-        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_FRAG;
-    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_COMPUTE_BIT)
-        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_COMP;
-
-    pGpu->mSettings.mROVsSupported = (bool)fragmentShaderInterlockFeatures.fragmentShaderPixelInterlock;
-    pGpu->mSettings.mTessellationSupported = gpuFeatures2.features.tessellationShader;
-    pGpu->mSettings.mGeometryShaderSupported = gpuFeatures2.features.geometryShader;
-    pGpu->mSettings.mSamplerAnisotropySupported = gpuFeatures2.features.samplerAnisotropy;
-    pGpu->mVk.mShaderSampledImageArrayDynamicIndexingSupported = gpuFeatures2.features.shaderSampledImageArrayDynamicIndexing;
-    pGpu->mVk.mFillModeNonSolid = gpuFeatures2.features.fillModeNonSolid;
-#if defined(AMDAGS)
-    pGpu->mSettings.mAmdAsicFamily = agsGetAsicFamily(gpuProperties.properties.deviceID);
-#endif
-
-    // save vendor and model Id as string
-    pGpu->mSettings.mGpuVendorPreset.mModelId = gpuProperties.properties.deviceID;
-    pGpu->mSettings.mGpuVendorPreset.mVendorId = gpuProperties.properties.vendorID;
-    strncpy(pGpu->mSettings.mGpuVendorPreset.mGpuName, gpuProperties.properties.deviceName, MAX_GPU_VENDOR_STRING_LENGTH);
-
-    // Disable memory device report on Xclipse GPUs since it can cause crashes
-    if (gpuVendorEquals(pGpu->mSettings.mGpuVendorPreset.mVendorId, "samsung"))
-    {
-        pGpu->mVk.mDeviceMemoryReportExtension = 0;
-    }
-
-    // TODO: Fix once vulkan adds support for revision ID
-    GPUVendorPreset* preset = &pGpu->mSettings.mGpuVendorPreset;
-    preset->mRevisionId = 0;
-    preset->mPresetLevel = getGPUPresetLevel(preset->mVendorId, preset->mModelId, preset->mVendorName, preset->mGpuName);
-
-    // set default driver to be very high to not trigger driver rejection rules if NVAPI or AMDAGS fails
-    snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", 999999, 99);
-    if (gpuVendorEquals(pGpu->mSettings.mGpuVendorPreset.mVendorId, "nvidia"))
-    {
-#if defined(NVAPI)
-        if (NvAPI_Status::NVAPI_OK == gNvStatus)
-        {
-            snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%lu.%lu",
-                     gNvGpuInfo.driverVersion / 100, gNvGpuInfo.driverVersion % 100);
-        }
-#else
-        uint32_t major, minor, secondaryBranch, tertiaryBranch;
-        major = (gpuProperties.properties.driverVersion >> 22) & 0x3ff;
-        minor = (gpuProperties.properties.driverVersion >> 14) & 0x0ff;
-        secondaryBranch = (gpuProperties.properties.driverVersion >> 6) & 0x0ff;
-        tertiaryBranch = (gpuProperties.properties.driverVersion) & 0x003f;
-        snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u.%u.%u", major, minor,
-                 secondaryBranch, tertiaryBranch);
-#endif
-    }
-    else if (gpuVendorEquals(pGpu->mSettings.mGpuVendorPreset.mVendorId, "amd"))
-    {
-#if defined(AMDAGS)
-        if (AGSReturnCode::AGS_SUCCESS == gAgsStatus)
-        {
-            snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%s", gAgsGpuInfo.driverVersion);
-        }
-#else
-        VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion);
-        LOGF(eWARNING, "Parsing amd driver version without ags lib is unreliable, setting to default value: %s",
-             pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion);
-#endif
-    }
-    else if (gpuVendorEquals(pGpu->mSettings.mGpuVendorPreset.mVendorId, "intel"))
-    {
-        VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion);
-        uint32_t major = gpuProperties.properties.driverVersion >> 14;
-        uint32_t minor = gpuProperties.properties.driverVersion & 0x3fff;
-        snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", major, minor);
-    }
-    else
-    {
-        VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion);
-    }
-
-    gpuProperties.pNext = NULL;
-    pGpu->mVk.mGpuProperties = gpuProperties;
-
-    return true;
-}
+//static bool QueryGpuSettings(const RendererContextDesc* pDesc, RendererContext* pContext, GpuInfo* pGpu)
+//{
+//    ASSERT(VK_NULL_HANDLE != pContext->mVk.pInstance);
+//
+//    uint32_t layerCount = 0;
+//    uint32_t extCount = 0;
+//    vkEnumerateDeviceLayerProperties(pGpu->mVk.pGpu, &layerCount, NULL);
+//    vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, NULL, &extCount, NULL);
+//
+//    VkLayerProperties* layers = (VkLayerProperties*)alloca(sizeof(VkLayerProperties) * layerCount);
+//    vkEnumerateDeviceLayerProperties(pGpu->mVk.pGpu, &layerCount, layers);
+//
+//    VkExtensionProperties* exts = (VkExtensionProperties*)alloca(sizeof(VkExtensionProperties) * extCount);
+//    vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, NULL, &extCount, exts);
+//
+//#if VK_DEBUG_LOG_EXTENSIONS
+//    for (uint32_t i = 0; i < layerCount; ++i)
+//    {
+//        internal_log(eINFO, layers[i].layerName, "vkdevice-layer");
+//    }
+//
+//    for (uint32_t i = 0; i < extCount; ++i)
+//    {
+//        internal_log(eINFO, exts[i].extensionName, "vkdevice-ext");
+//    }
+//#endif
+//
+//    // Standalone extensions
+//    {
+//        const char* layer_name = NULL;
+//        uint32_t    initialCount = TF_ARRAY_COUNT(gVkWantedDeviceExtensions);
+//        // Dont need debug marker if we have debug utils
+//        initialCount -= pContext->mVk.mDebugUtilsExtension ? 1 : 0;
+//        const uint32_t userRequestedCount = (uint32_t)pDesc->mVk.mDeviceExtensionCount;
+//        const char**   wantedDeviceExtensions = NULL;
+//        arrsetlen(wantedDeviceExtensions, initialCount + userRequestedCount + 1);
+//        uint32_t wantedExtensionCount = 0;
+//        for (uint32_t i = 0; i < initialCount; ++i, ++wantedExtensionCount)
+//        {
+//            wantedDeviceExtensions[i] = gVkWantedDeviceExtensions[i];
+//        }
+//        for (uint32_t i = 0; i < userRequestedCount; ++i, ++wantedExtensionCount)
+//        {
+//            wantedDeviceExtensions[initialCount + i] = pDesc->mVk.ppDeviceExtensions[i];
+//        }
+//#if defined(SHADER_STATS_AVAILABLE)
+//        if (pDesc->mEnableShaderStats)
+//        {
+//            wantedDeviceExtensions[wantedExtensionCount++] = VK_AMD_SHADER_INFO_EXTENSION_NAME;
+//        }
+//#endif
+//        uint32_t count = 0;
+//        vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, layer_name, &count, NULL);
+//        if (count > 0)
+//        {
+//            VkExtensionProperties* properties = (VkExtensionProperties*)tf_calloc(count, sizeof(*properties));
+//            ASSERT(properties != NULL);
+//            vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, layer_name, &count, properties);
+//            for (uint32_t j = 0; j < count; ++j)
+//            {
+//                for (uint32_t k = 0; k < wantedExtensionCount; ++k)
+//                {
+//                    if (strcmp(wantedDeviceExtensions[k], properties[j].extensionName) == 0)
+//                    {
+//                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_BUFFER_MARKER_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mAMDBufferMarkerExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mAMDDeviceCoherentMemoryExtension = true;
+//#if defined(GFX_DEVICE_MEMORY_TRACKING)
+//                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mDeviceMemoryReportExtension = gEnableDeviceMemoryTracking;
+//#endif
+//                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mASTCDecodeModeExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEBUG_MARKER_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mDebugMarkerExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mDedicatedAllocationExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mMemoryReq2Extension = true;
+//#if defined(VK_USE_PLATFORM_WIN32_KHR)
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mExternalMemoryExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mExternalMemoryWin32Extension = true;
+//#endif
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mDrawIndirectCountExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_DRAW_INDIRECT_COUNT_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mAMDDrawIndirectCountExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_GCN_SHADER_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mAMDGCNShaderExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_AMD_SHADER_INFO_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mAMDShaderInfoExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mDescriptorIndexingExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mBufferDeviceAddressExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mShaderFloatControlsExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mDeferredHostOperationsExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mAccelerationStructureExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_SPIRV_1_4_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mSpirv14Extension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mShaderAtomicInt64Extension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mRayTracingPipelineExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_RAY_QUERY_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mRayQueryExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mYCbCrExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mFragmentShaderInterlockExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mDynamicRenderingExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME) == 0)
+//                            pGpu->mSettings.mSoftwareVRSSupported = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEVICE_FAULT_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mDeviceFaultExtension = true;
+//#if defined(QUEST_VR)
+//                        if (strcmp(wantedDeviceExtensions[k], VK_KHR_MULTIVIEW_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mMultiviewExtension = true;
+//#endif
+//#if defined(ENABLE_NSIGHT_AFTERMATH)
+//                        if (strcmp(wantedDeviceExtensions[k], VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mNVDeviceDiagnosticsCheckpointExtension = true;
+//                        if (strcmp(wantedDeviceExtensions[k], VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME) == 0)
+//                            pGpu->mVk.mNVDeviceDiagnosticsConfigExtension = true;
+//#endif
+//                        break;
+//                    }
+//                }
+//            }
+//            SAFE_FREE(properties);
+//        }
+//        arrfree(wantedDeviceExtensions);
+//    }
+//
+//    //-V:ADD_TO_NEXT_CHAIN:506, 1027
+//#define ADD_TO_NEXT_CHAIN(condition, next)        \
+//    if ((condition))                              \
+//    {                                             \
+//        base->pNext = (VkBaseOutStructure*)&next; \
+//        base = (VkBaseOutStructure*)base->pNext;  \
+//    }
+//
+//    VkPhysicalDeviceFeatures2KHR gpuFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
+//    VkBaseOutStructure*          base = (VkBaseOutStructure*)&gpuFeatures2; //-V1027
+//
+//    // Add more extensions here
+//    VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT fragmentShaderInterlockFeatures = {
+//        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT
+//    };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mFragmentShaderInterlockExtension, fragmentShaderInterlockFeatures);
+//    VkPhysicalDeviceDescriptorIndexingFeaturesEXT descriptorIndexingFeatures = {
+//        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT
+//    };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDescriptorIndexingExtension, descriptorIndexingFeatures);
+//    VkPhysicalDeviceSamplerYcbcrConversionFeatures ycbcrFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mYCbCrExtension, ycbcrFeatures);
+//#if defined(QUEST_VR)
+//    VkPhysicalDeviceMultiviewFeatures multiviewFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mMultiviewExtension, multiviewFeatures);
+//#endif
+//
+//    VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeatures = {
+//        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR
+//    };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDynamicRenderingExtension, dynamicRenderingFeatures);
+//
+//    VkPhysicalDeviceShaderAtomicInt64Features shaderAtomicInt64Features = {
+//        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR
+//    };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mShaderAtomicInt64Extension, shaderAtomicInt64Features);
+//
+//    VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures = {
+//        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES
+//    };
+//    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures = {
+//        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR
+//    };
+//    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {
+//        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR
+//    };
+//    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mBufferDeviceAddressExtension, bufferDeviceAddressFeatures);
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mRayTracingPipelineExtension, rayTracingPipelineFeatures);
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mAccelerationStructureExtension, accelerationStructureFeatures);
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mRayQueryExtension, rayQueryFeatures);
+//
+//    VkPhysicalDeviceFaultFeaturesEXT deviceFaultFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FAULT_FEATURES_EXT };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDeviceFaultExtension, deviceFaultFeatures);
+//
+//    VkPhysicalDeviceDeviceMemoryReportFeaturesEXT memoryReportFeatures = {
+//        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT
+//    };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDeviceMemoryReportExtension, memoryReportFeatures);
+//
+//    VkPhysicalDeviceCoherentMemoryFeaturesAMD deviceCoherentFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD };
+//    ADD_TO_NEXT_CHAIN(pGpu->mVk.mAMDDeviceCoherentMemoryExtension, deviceCoherentFeatures);
+//
+//    vkGetPhysicalDeviceFeatures2KHR(pGpu->mVk.pGpu, &gpuFeatures2);
+//
+//    // Get memory properties
+//    VkPhysicalDeviceMemoryProperties gpuMemoryProperties = {};
+//    vkGetPhysicalDeviceMemoryProperties(pGpu->mVk.pGpu, &gpuMemoryProperties);
+//
+//    // Get device properties
+//    VkPhysicalDeviceSubgroupProperties subgroupProperties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES };
+//    VkPhysicalDeviceProperties2KHR     gpuProperties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &subgroupProperties };
+//    vkGetPhysicalDeviceProperties2KHR(pGpu->mVk.pGpu, &gpuProperties);
+//
+//#if defined(GFX_DEVICE_MEMORY_TRACKING)
+//    gEnableDeviceMemoryTracking &= pGpu->mVk.mDeviceMemoryReportExtension;
+//#endif
+//    pGpu->mSettings.mDynamicRenderingSupported = dynamicRenderingFeatures.dynamicRendering;
+//
+//    const bool bufferDeviceAddressFeature = bufferDeviceAddressFeatures.bufferDeviceAddress;
+//    pGpu->mVk.mBufferDeviceAddressSupported = bufferDeviceAddressFeature;
+//
+//    pGpu->mSettings.m64BitAtomicsSupported = shaderAtomicInt64Features.shaderBufferInt64Atomics;
+//
+//    const bool rayTracingPipelineFeature = rayTracingPipelineFeatures.rayTracingPipeline;
+//    const bool accelerationStructureFeature = accelerationStructureFeatures.accelerationStructure;
+//    const bool rayQueryFeature = rayQueryFeatures.rayQuery;
+//
+//    pGpu->mSettings.mRayPipelineSupported = bufferDeviceAddressFeature && rayTracingPipelineFeature &&
+//                                            pGpu->mVk.mShaderFloatControlsExtension && pGpu->mVk.mSpirv14Extension &&
+//                                            accelerationStructureFeature && pGpu->mVk.mDeferredHostOperationsExtension;
+//    pGpu->mSettings.mRayQuerySupported = rayQueryFeature && accelerationStructureFeature && pGpu->mVk.mDeferredHostOperationsExtension;
+//    pGpu->mSettings.mRaytracingSupported = pGpu->mSettings.mRayPipelineSupported || pGpu->mSettings.mRayQuerySupported;
+//
+//    pGpu->mVk.mDedicatedAllocationExtension = pGpu->mVk.mDedicatedAllocationExtension && pGpu->mVk.mMemoryReq2Extension;
+//
+//    const bool deviceFaultSupported = deviceFaultFeatures.deviceFault;
+//    pGpu->mVk.mDeviceFaultSupported = deviceFaultSupported;
+//
+//#if defined(VK_USE_PLATFORM_WIN32_KHR)
+//    pGpu->mVk.mExternalMemoryExtension = pGpu->mVk.mExternalMemoryExtension && pGpu->mVk.mExternalMemoryWin32Extension;
+//#endif
+//
+//#if defined(ENABLE_NSIGHT_AFTERMATH)
+//    pGpu->mVk.mAftermathSupport = pGpu->mVk.mNVDeviceDiagnosticsCheckpointExtension && pGpu->mVk.mNVDeviceDiagnosticsConfigExtension;
+//#endif
+//
+//    pGpu->mSettings.mUniformBufferAlignment = (uint32_t)gpuProperties.properties.limits.minUniformBufferOffsetAlignment;
+//    pGpu->mSettings.mUploadBufferTextureAlignment = (uint32_t)gpuProperties.properties.limits.optimalBufferCopyOffsetAlignment;
+//    pGpu->mSettings.mUploadBufferTextureRowAlignment = (uint32_t)gpuProperties.properties.limits.optimalBufferCopyRowPitchAlignment;
+//    pGpu->mSettings.mMaxVertexInputBindings = gpuProperties.properties.limits.maxVertexInputBindings;
+//    pGpu->mSettings.mMultiDrawIndirect = gpuFeatures2.features.multiDrawIndirect;
+//    pGpu->mSettings.mMaxBoundTextures = gpuProperties.properties.limits.maxPerStageDescriptorSampledImages;
+//    pGpu->mSettings.mMaxTotalComputeThreads = gpuProperties.properties.limits.maxComputeWorkGroupInvocations;
+//    COMPILE_ASSERT(sizeof(pGpu->mSettings.mMaxComputeThreads) == sizeof(gpuProperties.properties.limits.maxComputeWorkGroupSize));
+//    memcpy(pGpu->mSettings.mMaxComputeThreads, gpuProperties.properties.limits.maxComputeWorkGroupSize,
+//           sizeof(gpuProperties.properties.limits.maxComputeWorkGroupSize));
+//    pGpu->mSettings.mIndirectRootConstant = false;
+//    pGpu->mSettings.mBuiltinDrawID = true;
+//    pGpu->mSettings.mTimestampQueries =
+//        gpuProperties.properties.limits.timestampPeriod > 0 && gpuProperties.properties.limits.timestampComputeAndGraphics;
+//    pGpu->mSettings.mOcclusionQueries = true;
+//    pGpu->mSettings.mPipelineStatsQueries = gpuFeatures2.features.pipelineStatisticsQuery;
+//#if !defined(NX64) && !defined(__ANDROID__)
+//    pGpu->mSettings.mHDRSupported = true;
+//#endif
+//    pGpu->mSettings.mGpuMarkers = true;
+//    pGpu->mVk.mAMDDeviceCoherentMemorySupported = deviceCoherentFeatures.deviceCoherentMemory;
+//    /************************************************************************/
+//    // To find VRAM in Vulkan, loop through all the heaps and find if the
+//    // heap has the DEVICE_LOCAL_BIT flag set
+//    /************************************************************************/
+//    uint64_t totalTestVram = 0;
+//    for (uint32_t i = 0; i < gpuMemoryProperties.memoryHeapCount; ++i)
+//    {
+//        if (VK_MEMORY_HEAP_DEVICE_LOCAL_BIT & gpuMemoryProperties.memoryHeaps[i].flags)
+//            totalTestVram += gpuMemoryProperties.memoryHeaps[i].size;
+//    }
+//    pGpu->mSettings.mVRAM = totalTestVram;
+//    pGpu->mSettings.mAllowBufferTextureInSameHeap = true;
+//
+//    pGpu->mSettings.mWaveLaneCount = subgroupProperties.subgroupSize;
+//    pGpu->mSettings.mWaveOpsSupportFlags = WAVE_OPS_SUPPORT_FLAG_NONE;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_BASIC_BIT)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_BASIC_BIT;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_VOTE_BIT)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_VOTE_BIT;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_ARITHMETIC_BIT)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_ARITHMETIC_BIT;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_BALLOT_BIT)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_BALLOT_BIT;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_SHUFFLE_BIT)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_SHUFFLE_BIT;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_SHUFFLE_RELATIVE_BIT;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_CLUSTERED_BIT)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_CLUSTERED_BIT;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_QUAD_BIT)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_QUAD_BIT;
+//    if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV)
+//        pGpu->mSettings.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_PARTITIONED_BIT_NV;
+//
+//    pGpu->mSettings.mWaveOpsSupportedStageFlags = SHADER_STAGE_NONE;
+//    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_VERTEX_BIT)
+//        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_VERT;
+//    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT)
+//        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_TESC;
+//    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT)
+//        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_TESE;
+//    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_GEOMETRY_BIT)
+//        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_GEOM;
+//    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_FRAGMENT_BIT)
+//        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_FRAG;
+//    if (subgroupProperties.supportedStages & VK_SHADER_STAGE_COMPUTE_BIT)
+//        pGpu->mSettings.mWaveOpsSupportedStageFlags |= SHADER_STAGE_COMP;
+//
+//    pGpu->mSettings.mROVsSupported = (bool)fragmentShaderInterlockFeatures.fragmentShaderPixelInterlock;
+//    pGpu->mSettings.mTessellationSupported = gpuFeatures2.features.tessellationShader;
+//    pGpu->mSettings.mGeometryShaderSupported = gpuFeatures2.features.geometryShader;
+//    pGpu->mSettings.mSamplerAnisotropySupported = gpuFeatures2.features.samplerAnisotropy;
+//    pGpu->mVk.mShaderSampledImageArrayDynamicIndexingSupported = gpuFeatures2.features.shaderSampledImageArrayDynamicIndexing;
+//    pGpu->mVk.mFillModeNonSolid = gpuFeatures2.features.fillModeNonSolid;
+//#if defined(AMDAGS)
+//    pGpu->mSettings.mAmdAsicFamily = agsGetAsicFamily(gpuProperties.properties.deviceID);
+//#endif
+//
+//    // save vendor and model Id as string
+//    pGpu->mSettings.mGpuVendorPreset.mModelId = gpuProperties.properties.deviceID;
+//    pGpu->mSettings.mGpuVendorPreset.mVendorId = gpuProperties.properties.vendorID;
+//    strncpy(pGpu->mSettings.mGpuVendorPreset.mGpuName, gpuProperties.properties.deviceName, MAX_GPU_VENDOR_STRING_LENGTH);
+//
+//    // Disable memory device report on Xclipse GPUs since it can cause crashes
+//    if (gpuVendorEquals(pGpu->mSettings.mGpuVendorPreset.mVendorId, "samsung"))
+//    {
+//        pGpu->mVk.mDeviceMemoryReportExtension = 0;
+//    }
+//
+//    // TODO: Fix once vulkan adds support for revision ID
+//    GPUVendorPreset* preset = &pGpu->mSettings.mGpuVendorPreset;
+//    preset->mRevisionId = 0;
+//    preset->mPresetLevel = getGPUPresetLevel(preset->mVendorId, preset->mModelId, preset->mVendorName, preset->mGpuName);
+//
+//    // set default driver to be very high to not trigger driver rejection rules if NVAPI or AMDAGS fails
+//    snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", 999999, 99);
+//    if (gpuVendorEquals(pGpu->mSettings.mGpuVendorPreset.mVendorId, "nvidia"))
+//    {
+//#if defined(NVAPI)
+//        if (NvAPI_Status::NVAPI_OK == gNvStatus)
+//        {
+//            snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%lu.%lu",
+//                     gNvGpuInfo.driverVersion / 100, gNvGpuInfo.driverVersion % 100);
+//        }
+//#else
+//        uint32_t major, minor, secondaryBranch, tertiaryBranch;
+//        major = (gpuProperties.properties.driverVersion >> 22) & 0x3ff;
+//        minor = (gpuProperties.properties.driverVersion >> 14) & 0x0ff;
+//        secondaryBranch = (gpuProperties.properties.driverVersion >> 6) & 0x0ff;
+//        tertiaryBranch = (gpuProperties.properties.driverVersion) & 0x003f;
+//        snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u.%u.%u", major, minor,
+//                 secondaryBranch, tertiaryBranch);
+//#endif
+//    }
+//    else if (gpuVendorEquals(pGpu->mSettings.mGpuVendorPreset.mVendorId, "amd"))
+//    {
+//#if defined(AMDAGS)
+//        if (AGSReturnCode::AGS_SUCCESS == gAgsStatus)
+//        {
+//            snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%s", gAgsGpuInfo.driverVersion);
+//        }
+//#else
+//        VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion);
+//        LOGF(eWARNING, "Parsing amd driver version without ags lib is unreliable, setting to default value: %s",
+//             pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion);
+//#endif
+//    }
+//    else if (gpuVendorEquals(pGpu->mSettings.mGpuVendorPreset.mVendorId, "intel"))
+//    {
+//        VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion);
+//        uint32_t major = gpuProperties.properties.driverVersion >> 14;
+//        uint32_t minor = gpuProperties.properties.driverVersion & 0x3fff;
+//        snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", major, minor);
+//    }
+//    else
+//    {
+//        VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion);
+//    }
+//
+//    gpuProperties.pNext = NULL;
+//    pGpu->mVk.mGpuProperties = gpuProperties;
+//
+//    return true;
+//}
 
 #if defined(GFX_ENABLE_SWAPPY)
 bool     gSwappyEnabled = true;
@@ -3051,7 +3051,7 @@ void InitializeBufferCreateInfo(Renderer* pRenderer, const BufferDesc* pDesc, Vk
     // Align the buffer size to multiples of the dynamic uniform buffer minimum size
     if (pDesc->mDescriptors & DESCRIPTOR_TYPE_UNIFORM_BUFFER)
     {
-        uint64_t minAlignment = pRenderer->pGpu->mSettings.mUniformBufferAlignment;
+        uint64_t minAlignment = pRenderer->pProperties->mUniformBufferAlignment;
         allocationSize = round_up_64(allocationSize, minAlignment);
     }
 
@@ -3146,10 +3146,10 @@ void InitializeImageCreateInfo(Renderer* pRenderer, const TextureDesc* pDesc, Vk
         add_info.usage |= (VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
     }
 
-    ASSERT((pRenderer->pGpu->mCapBits.mFormatCaps[pDesc->mFormat] & FORMAT_CAP_READ) && "GPU shader can't' read from this format");
+    ASSERT((pRenderer->pAdapter->mCapBits.mFormatCaps[pDesc->mFormat] & FORMAT_CAP_READ) && "GPU shader can't' read from this format");
 
     DECLARE_ZERO(VkFormatProperties, format_props);
-    vkGetPhysicalDeviceFormatProperties(pRenderer->pGpu->mVk.pGpu, add_info.format, &format_props);
+    vkGetPhysicalDeviceFormatProperties(pRenderer->pAdapter->mVk.pGpu, add_info.format, &format_props);
 
     // Verify that GPU supports this format
     VkFormatFeatureFlags format_features = util_vk_image_usage_to_format_features(add_info.usage);
@@ -3166,7 +3166,7 @@ void InitializeImageCreateInfo(Renderer* pRenderer, const TextureDesc* pDesc, Vk
     mem_reqs.usage = (VmaMemoryUsage)VMA_MEMORY_USAGE_GPU_ONLY;
 
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-    if (pRenderer->pGpu->mVk.mExternalMemoryExtension && pDesc->mFlags & TEXTURE_CREATION_FLAG_IMPORT_BIT)
+    if (pRenderer->pPhysicalDevice->mVk.mExternalMemoryExtension && pDesc->mFlags & TEXTURE_CREATION_FLAG_IMPORT_BIT)
     {
         struct ImportHandleInfo
         {
@@ -3188,7 +3188,7 @@ void InitializeImageCreateInfo(Renderer* pRenderer, const TextureDesc* pDesc, Vk
         // Memory Allocator
         mem_reqs.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
     }
-    else if (pRenderer->pGpu->mVk.mExternalMemoryExtension && pDesc->mFlags & TEXTURE_CREATION_FLAG_EXPORT_BIT)
+    else if (pRenderer->pPhysicalDevice->mVk.mExternalMemoryExtension && pDesc->mFlags & TEXTURE_CREATION_FLAG_EXPORT_BIT)
     {
         pExtras->mExportMemoryInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
         pExtras->mExportMemoryInfo.pNext = NULL;
@@ -3503,480 +3503,6 @@ static void RemoveInstance(RendererContext* pContext)
     vkDestroyInstance(pContext->mVk.pInstance, GetAllocationCallbacks(VK_OBJECT_TYPE_INSTANCE));
 }
 
-static bool SelectBestGpu(Renderer* pRenderer)
-{
-    ASSERT(VK_NULL_HANDLE != pRenderer->pContext->mVk.pInstance);
-
-    uint32_t gpuCount = 0;
-
-    CHECK_VKRESULT_INSTANCE(vkEnumeratePhysicalDevices(pRenderer->pContext->mVk.pInstance, &gpuCount, NULL));
-
-    if (gpuCount < 1)
-    {
-        LOGF(LogLevel::eERROR, "Failed to enumerate any physical Vulkan devices");
-        ASSERT(gpuCount);
-        return false;
-    }
-
-    // update renderer gpu settings
-
-    GPUSettings gpuSettings[MAX_MULTIPLE_GPUS] = {};
-
-    for (uint32_t i = 0; i < pRenderer->pContext->mGpuCount; ++i)
-    {
-        gpuSettings[i] = pRenderer->pContext->mGpus[i].mSettings;
-    }
-
-    uint32_t gpuIndex = util_select_best_gpu(gpuSettings, pRenderer->pContext->mGpuCount);
-    //  driver rejection rules from gpu.cfg
-    bool     driverValid = checkDriverRejectionSettings(&gpuSettings[gpuIndex]);
-    if (!driverValid)
-    {
-        setRendererInitializationError("Driver rejection return invalid result.\nPlease, update your driver to the latest version.");
-        return false;
-    }
-
-    // If we don't own the instance or device, then we need to set the gpuIndex to the correct physical device
-#if defined(VK_USE_DISPATCH_TABLES)
-    gpuIndex = UINT32_MAX;
-    for (uint32_t i = 0; i < gpuCount; i++)
-    {
-        if (gpus[i] == pRenderer->pGpu->mVk.pGpu)
-        {
-            gpuIndex = i;
-        }
-    }
-#endif
-    ASSERT(gpuIndex < pRenderer->pContext->mGpuCount);
-    ASSERT(gpuIndex != UINT32_MAX);
-    pRenderer->pGpu = &pRenderer->pContext->mGpus[gpuIndex];
-    ASSERT(pRenderer->pGpu);
-
-    if (VK_PHYSICAL_DEVICE_TYPE_CPU == pRenderer->pGpu->mVk.mGpuProperties.properties.deviceType)
-    {
-        LOGF(eERROR, "The only available GPU is of type VK_PHYSICAL_DEVICE_TYPE_CPU. Early exiting");
-        ASSERT(false);
-        return false;
-    }
-
-    LOGF(LogLevel::eINFO, "GPU[%u] is selected as default GPU", gpuIndex);
-    LOGF(LogLevel::eINFO, "Name of selected gpu: %s", pRenderer->pGpu->mSettings.mGpuVendorPreset.mGpuName);
-    LOGF(LogLevel::eINFO, "Vendor id of selected gpu: %#x", pRenderer->pGpu->mSettings.mGpuVendorPreset.mVendorId);
-    LOGF(LogLevel::eINFO, "Model id of selected gpu: %#x", pRenderer->pGpu->mSettings.mGpuVendorPreset.mModelId);
-    LOGF(LogLevel::eINFO, "Preset of selected gpu: %s", presetLevelToString(pRenderer->pGpu->mSettings.mGpuVendorPreset.mPresetLevel));
-
-    return true;
-}
-
-static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
-{
-    ASSERT(VK_NULL_HANDLE != pRenderer->pContext->mVk.pInstance);
-
-    // These are the extensions that we have loaded
-    const char* deviceExtensionCache[MAX_DEVICE_EXTENSIONS] = {};
-    uint32_t    extension_count = 0;
-
-    VkDeviceGroupDeviceCreateInfoKHR   deviceGroupInfo = { VK_STRUCTURE_TYPE_DEVICE_GROUP_DEVICE_CREATE_INFO_KHR };
-    VkPhysicalDeviceGroupPropertiesKHR props[MAX_LINKED_GPUS] = {};
-
-    pRenderer->mLinkedNodeCount = 1;
-    if (pRenderer->mGpuMode == GPU_MODE_LINKED && pRenderer->pContext->mVk.mDeviceGroupCreationExtension)
-    {
-        // (not shown) fill out devCreateInfo as usual.
-        uint32_t deviceGroupCount = 0;
-
-        // Query the number of device groups
-        vkEnumeratePhysicalDeviceGroupsKHR(pRenderer->pContext->mVk.pInstance, &deviceGroupCount, NULL);
-
-        // Allocate and initialize structures to query the device groups
-        for (uint32_t i = 0; i < deviceGroupCount; ++i)
-        {
-            props[i].sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GROUP_PROPERTIES_KHR;
-            props[i].pNext = NULL;
-        }
-        CHECK_VKRESULT_INSTANCE(vkEnumeratePhysicalDeviceGroupsKHR(pRenderer->pContext->mVk.pInstance, &deviceGroupCount, props));
-
-        // If the first device group has more than one physical device. create
-        // a logical device using all of the physical devices.
-        for (uint32_t i = 0; i < deviceGroupCount; ++i)
-        {
-            if (props[i].physicalDeviceCount > 1)
-            {
-                deviceGroupInfo.physicalDeviceCount = props[i].physicalDeviceCount;
-                deviceGroupInfo.pPhysicalDevices = props[i].physicalDevices;
-                pRenderer->mLinkedNodeCount = deviceGroupInfo.physicalDeviceCount;
-                break;
-            }
-        }
-    }
-
-    if (pRenderer->mLinkedNodeCount < 2 && pRenderer->mGpuMode == GPU_MODE_LINKED)
-    {
-        pRenderer->mGpuMode = GPU_MODE_SINGLE;
-    }
-
-    if (!pDesc->pContext)
-    {
-        if (!SelectBestGpu(pRenderer))
-        {
-            return false;
-        }
-    }
-    else
-    {
-        ASSERT(pDesc->mGpuIndex < pDesc->pContext->mGpuCount);
-        pRenderer->pGpu = &pDesc->pContext->mGpus[pDesc->mGpuIndex];
-    }
-
-    const GpuInfo* pGpu = pRenderer->pGpu;
-
-    uint32_t layerCount = 0;
-    uint32_t extCount = 0;
-    vkEnumerateDeviceLayerProperties(pGpu->mVk.pGpu, &layerCount, NULL);
-    vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, NULL, &extCount, NULL);
-
-    VkLayerProperties* layers = (VkLayerProperties*)alloca(sizeof(VkLayerProperties) * layerCount);
-    vkEnumerateDeviceLayerProperties(pGpu->mVk.pGpu, &layerCount, layers);
-
-    VkExtensionProperties* exts = (VkExtensionProperties*)alloca(sizeof(VkExtensionProperties) * extCount);
-    vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, NULL, &extCount, exts);
-
-#if defined(GFX_ENABLE_SWAPPY)
-    // Swappy could require some extensions to work, so find and enable them
-    uint32_t swappyExtensionCount = 0;
-    char**   pSwappyExtensions = NULL;
-    char*    pSwappyExtensionsData = NULL;
-
-    if (gSwappyEnabled)
-    {
-        // Determine the number of required extensions.
-        SwappyVk_determineDeviceExtensions(pGpu->mVk.pGpu, extCount, exts, &swappyExtensionCount, nullptr);
-
-        // Determine the required extensions.
-        pSwappyExtensions = (char**)tf_malloc(swappyExtensionCount * sizeof(char*));
-        pSwappyExtensionsData = (char*)tf_malloc(swappyExtensionCount * (VK_MAX_EXTENSION_NAME_SIZE + 1));
-        for (uint32_t i = 0; i < swappyExtensionCount; i++)
-        {
-            pSwappyExtensions[i] = &pSwappyExtensionsData[i * (VK_MAX_EXTENSION_NAME_SIZE + 1)];
-        }
-        SwappyVk_determineDeviceExtensions(pGpu->mVk.pGpu, extCount, exts, &swappyExtensionCount, pSwappyExtensions);
-
-        for (uint32_t i = 0; i < swappyExtensionCount; i++)
-        {
-            deviceExtensionCache[extension_count++] = pSwappyExtensions[i];
-        }
-    }
-#endif
-
-#if VK_DEBUG_LOG_EXTENSIONS
-    for (uint32_t i = 0; i < layerCount; ++i)
-    {
-        internal_log(eINFO, layers[i].layerName, "vkdevice-layer");
-    }
-
-    for (uint32_t i = 0; i < extCount; ++i)
-    {
-        internal_log(eINFO, exts[i].extensionName, "vkdevice-ext");
-    }
-#endif
-
-    // Standalone extensions
-    {
-        const char* layer_name = NULL;
-        uint32_t    initialCount = TF_ARRAY_COUNT(gVkWantedDeviceExtensions);
-        // Dont need debug marker if we have debug utils
-        initialCount -= pRenderer->pContext->mVk.mDebugUtilsExtension ? 1 : 0;
-        const uint32_t userRequestedCount = (uint32_t)pDesc->mVk.mDeviceExtensionCount;
-        const char**   wantedDeviceExtensions = NULL;
-        arrsetlen(wantedDeviceExtensions, initialCount + userRequestedCount + 1);
-        uint32_t wantedExtensionCount = 0;
-        for (uint32_t i = 0; i < initialCount; ++i, ++wantedExtensionCount)
-        {
-            wantedDeviceExtensions[i] = gVkWantedDeviceExtensions[i];
-        }
-        for (uint32_t i = 0; i < userRequestedCount; ++i, ++wantedExtensionCount)
-        {
-            wantedDeviceExtensions[initialCount + i] = pDesc->mVk.ppDeviceExtensions[i];
-        }
-#if defined(SHADER_STATS_AVAILABLE)
-        if (pDesc->mEnableShaderStats)
-        {
-            wantedDeviceExtensions[wantedExtensionCount++] = VK_AMD_SHADER_INFO_EXTENSION_NAME;
-        }
-#endif
-        uint32_t count = 0;
-        vkEnumerateDeviceExtensionProperties(pRenderer->pGpu->mVk.pGpu, layer_name, &count, NULL);
-        if (count > 0)
-        {
-            VkExtensionProperties* properties = (VkExtensionProperties*)tf_calloc(count, sizeof(*properties));
-            ASSERT(properties != NULL);
-            vkEnumerateDeviceExtensionProperties(pRenderer->pGpu->mVk.pGpu, layer_name, &count, properties);
-            for (uint32_t j = 0; j < count; ++j)
-            {
-                for (uint32_t k = 0; k < wantedExtensionCount; ++k)
-                {
-                    if (strcmp(wantedDeviceExtensions[k], properties[j].extensionName) == 0)
-                    {
-                        deviceExtensionCache[extension_count++] = wantedDeviceExtensions[k];
-                        break;
-                    }
-                }
-            }
-            SAFE_FREE(properties);
-        }
-        arrfree(wantedDeviceExtensions);
-    }
-
-#if !defined(VK_USE_DISPATCH_TABLES)
-    //-V:ADD_TO_NEXT_CHAIN:506, 1027
-#define ADD_TO_NEXT_CHAIN(condition, next)        \
-    if ((condition))                              \
-    {                                             \
-        base->pNext = (VkBaseOutStructure*)&next; \
-        base = (VkBaseOutStructure*)base->pNext;  \
-    }
-
-    VkPhysicalDeviceFeatures2KHR gpuFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
-    VkBaseOutStructure*          base = (VkBaseOutStructure*)&gpuFeatures2; //-V1027
-
-    // Add more extensions here
-    VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT fragmentShaderInterlockFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mFragmentShaderInterlockExtension, fragmentShaderInterlockFeatures);
-    VkPhysicalDeviceDescriptorIndexingFeaturesEXT descriptorIndexingFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDescriptorIndexingExtension, descriptorIndexingFeatures);
-    VkPhysicalDeviceSamplerYcbcrConversionFeatures ycbcrFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mYCbCrExtension, ycbcrFeatures);
-#if defined(QUEST_VR)
-    VkPhysicalDeviceMultiviewFeatures multiviewFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mMultiviewExtension, multiviewFeatures);
-#endif
-    VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDynamicRenderingExtension, dynamicRenderingFeatures);
-
-    VkPhysicalDeviceShaderAtomicInt64Features shaderAtomicInt64Features = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mShaderAtomicInt64Extension, shaderAtomicInt64Features);
-
-    VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES
-    };
-    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR
-    };
-    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR
-    };
-    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR };
-
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mBufferDeviceAddressExtension, bufferDeviceAddressFeatures);
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mRayTracingPipelineExtension, rayTracingPipelineFeatures);
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mAccelerationStructureExtension, accelerationStructureFeatures);
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mRayQueryExtension, rayQueryFeatures);
-
-    VkPhysicalDeviceFaultFeaturesEXT deviceFaultFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FAULT_FEATURES_EXT };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDeviceFaultExtension, deviceFaultFeatures);
-
-    VkPhysicalDeviceDeviceMemoryReportFeaturesEXT memoryReportFeatures = {
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT
-    };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mDeviceMemoryReportExtension, memoryReportFeatures);
-
-    VkPhysicalDeviceCoherentMemoryFeaturesAMD deviceCoherentFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD };
-    ADD_TO_NEXT_CHAIN(pGpu->mVk.mAMDDeviceCoherentMemoryExtension, deviceCoherentFeatures);
-
-    vkGetPhysicalDeviceFeatures2KHR(pRenderer->pGpu->mVk.pGpu, &gpuFeatures2);
-
-#if defined(GFX_DEVICE_MEMORY_TRACKING)
-    VkDeviceDeviceMemoryReportCreateInfoEXT memoryReport = {};
-    memoryReport.flags = 0;
-    memoryReport.pfnUserCallback = MemoryReportCallback;
-    memoryReport.pUserData = (void*)&gDeviceMemStats.mMemoryAllocCount;
-    memoryReport.sType = VK_STRUCTURE_TYPE_DEVICE_DEVICE_MEMORY_REPORT_CREATE_INFO_EXT;
-    ADD_TO_NEXT_CHAIN(gEnableDeviceMemoryTracking, memoryReport);
-#endif
-
-    // Get queue family properties
-    uint32_t queueFamiliesCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pGpu->mVk.pGpu, &queueFamiliesCount, NULL);
-    VkQueueFamilyProperties* queueFamiliesProperties =
-        (VkQueueFamilyProperties*)alloca(queueFamiliesCount * sizeof(VkQueueFamilyProperties));
-    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pGpu->mVk.pGpu, &queueFamiliesCount, queueFamiliesProperties);
-
-    // need a queue_priority for each queue in the queue family we create
-    constexpr uint32_t       kMaxQueueFamilies = 16;
-    constexpr uint32_t       kMaxQueueCount = 64;
-    float                    queueFamilyPriorities[kMaxQueueFamilies][kMaxQueueCount] = {};
-    uint32_t                 queue_create_infos_count = 0;
-    VkDeviceQueueCreateInfo* queue_create_infos = (VkDeviceQueueCreateInfo*)alloca(queueFamiliesCount * sizeof(VkDeviceQueueCreateInfo));
-
-    pRenderer->mVk.pAvailableQueueCount = (uint32_t**)tf_malloc(pRenderer->mLinkedNodeCount * sizeof(uint32_t*));
-    pRenderer->mVk.pUsedQueueCount = (uint32_t**)tf_malloc(pRenderer->mLinkedNodeCount * sizeof(uint32_t*));
-    for (uint32_t i = 0; i < pRenderer->mLinkedNodeCount; ++i)
-    {
-        pRenderer->mVk.pAvailableQueueCount[i] = (uint32_t*)tf_calloc(queueFamiliesCount, sizeof(uint32_t));
-        pRenderer->mVk.pUsedQueueCount[i] = (uint32_t*)tf_calloc(queueFamiliesCount, sizeof(uint32_t));
-    }
-
-    for (uint32_t i = 0; i < queueFamiliesCount; i++)
-    {
-        uint32_t queueCount = queueFamiliesProperties[i].queueCount;
-        if (queueCount > 0)
-        {
-            // Request only one queue of each type if mRequestAllAvailableQueues is not set to true
-            if (queueCount > 1 && !pDesc->mVk.mRequestAllAvailableQueues)
-            {
-                queueCount = 1;
-            }
-
-            ASSERT(queueCount <= kMaxQueueCount);
-            queueCount = min(queueCount, kMaxQueueCount);
-
-            queue_create_infos[queue_create_infos_count] = {};
-            queue_create_infos[queue_create_infos_count].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-            queue_create_infos[queue_create_infos_count].pNext = NULL;
-            queue_create_infos[queue_create_infos_count].flags = 0;
-            queue_create_infos[queue_create_infos_count].queueFamilyIndex = i;
-            queue_create_infos[queue_create_infos_count].queueCount = queueCount;
-            queue_create_infos[queue_create_infos_count].pQueuePriorities = queueFamilyPriorities[i];
-            queue_create_infos_count++;
-
-            for (uint32_t n = 0; n < pRenderer->mLinkedNodeCount; ++n)
-            {
-                pRenderer->mVk.pAvailableQueueCount[n][i] = queueCount;
-            }
-        }
-    }
-
-#if defined(QUEST_VR)
-    char oculusVRDeviceExtensionBuffer[4096];
-    hook_add_vk_device_extensions(deviceExtensionCache, &extension_count, MAX_DEVICE_EXTENSIONS, oculusVRDeviceExtensionBuffer,
-                                  sizeof(oculusVRDeviceExtensionBuffer));
-#endif
-
-    VkDeviceCreateInfo create_info = {};
-    create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    create_info.pNext = &gpuFeatures2;
-    create_info.flags = 0;
-    create_info.queueCreateInfoCount = queue_create_infos_count;
-    create_info.pQueueCreateInfos = queue_create_infos;
-    create_info.enabledLayerCount = 0;
-    create_info.ppEnabledLayerNames = NULL;
-    create_info.enabledExtensionCount = extension_count;
-    create_info.ppEnabledExtensionNames = deviceExtensionCache;
-    create_info.pEnabledFeatures = NULL;
-
-#if defined(ENABLE_NSIGHT_AFTERMATH)
-    VkDeviceDiagnosticsConfigCreateInfoNV diagnosticsNV = { VK_STRUCTURE_TYPE_DEVICE_DIAGNOSTICS_CONFIG_CREATE_INFO_NV };
-    if (pRenderer->pGpu->mVk.mAftermathSupport)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded Aftermath extensions");
-        diagnosticsNV.flags = VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_SHADER_DEBUG_INFO_BIT_NV |
-                              VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_RESOURCE_TRACKING_BIT_NV |
-                              VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_AUTOMATIC_CHECKPOINTS_BIT_NV;
-        ADD_TO_NEXT_CHAIN(true, diagnosticsNV);
-        // Enable Nsight Aftermath GPU crash dump creation.
-        // This needs to be done before the Vulkan device is created.
-        CreateAftermathTracker(pRenderer->pName, &pRenderer->mAftermathTracker);
-    }
-#endif
-
-    /************************************************************************/
-    // Add Device Group Extension if requested and available
-    /************************************************************************/
-    ADD_TO_NEXT_CHAIN(pRenderer->mGpuMode == GPU_MODE_LINKED, deviceGroupInfo);
-    CHECK_VKRESULT_INSTANCE(
-        vkCreateDevice(pGpu->mVk.pGpu, &create_info, GetAllocationCallbacks(VK_OBJECT_TYPE_DEVICE), &pRenderer->mVk.pDevice));
-
-    // Load Vulkan device functions to bypass loader
-    if (pRenderer->mGpuMode != GPU_MODE_UNLINKED)
-    {
-        volkLoadDevice(pRenderer->mVk.pDevice);
-    }
-#endif
-
-    if (pGpu->mVk.mDedicatedAllocationExtension)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded Dedicated Allocation extension");
-    }
-
-#if defined(VK_USE_PLATFORM_WIN32_KHR)
-    if (pGpu->mVk.mExternalMemoryExtension)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded External Memory extension");
-    }
-#endif
-
-    if (pGpu->mVk.mDrawIndirectCountExtension)
-    {
-        pfnVkCmdDrawIndirectCountKHR = vkCmdDrawIndirectCountKHR;
-        pfnVkCmdDrawIndexedIndirectCountKHR = vkCmdDrawIndexedIndirectCountKHR;
-        LOGF(LogLevel::eINFO, "Successfully loaded Draw Indirect extension");
-    }
-    else if (pGpu->mVk.mAMDDrawIndirectCountExtension)
-    {
-        pfnVkCmdDrawIndirectCountKHR = vkCmdDrawIndirectCountAMD;
-        pfnVkCmdDrawIndexedIndirectCountKHR = vkCmdDrawIndexedIndirectCountAMD;
-        LOGF(LogLevel::eINFO, "Successfully loaded AMD Draw Indirect extension");
-    }
-
-    if (pGpu->mVk.mAMDGCNShaderExtension)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded AMD GCN Shader extension");
-    }
-
-    if (pGpu->mVk.mAMDShaderInfoExtension)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded AMD Shader Info extension");
-    }
-
-    if (pGpu->mVk.mDescriptorIndexingExtension)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded Descriptor Indexing extension");
-    }
-
-    if (pGpu->mSettings.mRayPipelineSupported)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded Khronos Ray Pipeline extensions");
-    }
-
-    if (pGpu->mSettings.mRayQuerySupported)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded Khronos Ray Query extensions");
-    }
-
-    if (pGpu->mSettings.m64BitAtomicsSupported)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded 64 bit Shader Atomic extension");
-    }
-
-    if (pGpu->mSettings.mDynamicRenderingSupported)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded Dynamic Rendering extension");
-    }
-
-    if (pGpu->mVk.mDeviceFaultExtension)
-    {
-        LOGF(LogLevel::eINFO, "Successfully loaded Device Fault extension");
-    }
-
-#if defined(GFX_ENABLE_SWAPPY)
-    if (gSwappyEnabled)
-    {
-        tf_free(pSwappyExtensions);
-        tf_free(pSwappyExtensionsData);
-    }
-#endif
-
-    return true;
-}
-
 static void RemoveDevice(Renderer* pRenderer)
 {
     vkDestroyDescriptorSetLayout(pRenderer->mVk.pDevice, pRenderer->mVk.pEmptyDescriptorSetLayout,
@@ -3986,7 +3512,7 @@ static void RemoveDevice(Renderer* pRenderer)
     vkDestroyDevice(pRenderer->mVk.pDevice, GetAllocationCallbacks(VK_OBJECT_TYPE_DEVICE));
 
 #if defined(ENABLE_NSIGHT_AFTERMATH)
-    if (pRenderer->pGpu->mVk.mAftermathSupport)
+    if (pRenderer->pPhysicalDevice->mVk.mAftermathSupport)
     {
         ASSERT(pRenderer->mOwnsContext);
         DestroyAftermathTracker(&pRenderer->mAftermathTracker);
@@ -4011,132 +3537,6 @@ uint64_t get_vk_device_memory_offset(Renderer* pRenderer, Buffer* pBuffer)
 // Renderer Context Init Exit (multi GPU)
 /************************************************************************/
 static uint32_t gRendererCount = 0;
-
-void vk_initRendererContext(const char* appName, const RendererContextDesc* pDesc, RendererContext** ppContext)
-{
-    ASSERT(appName);
-    ASSERT(pDesc);
-    ASSERT(ppContext);
-    ASSERT(gRendererCount == 0);
-
-    RendererContext* pContext = (RendererContext*)tf_calloc_memalign(1, alignof(RendererContext), sizeof(RendererContext));
-
-    for (uint32_t i = 0; i < TF_ARRAY_COUNT(pContext->mGpus); ++i)
-    {
-        setDefaultGPUSettings(&pContext->mGpus[i].mSettings);
-    }
-
-    AGSReturnCode agsRet = agsInit();
-    if (AGSReturnCode::AGS_SUCCESS == agsRet)
-    {
-        agsPrintDriverInfo();
-    }
-
-    NvAPI_Status nvStatus = nvapiInit();
-    if (NvAPI_Status::NVAPI_OK == nvStatus)
-    {
-        nvapiPrintDriverInfo();
-    }
-
-#if defined(VK_USE_DISPATCH_TABLES)
-    VkResult vkRes = volkInitializeWithDispatchTables(pRenderer);
-    if (vkRes != VK_SUCCESS)
-    {
-        LOGF(LogLevel::eERROR, "Failed to initialize Vulkan");
-        return false;
-    }
-#else
-    const char** instanceLayers = (const char**)alloca((2 + pDesc->mVk.mInstanceLayerCount) * sizeof(char*));
-    uint32_t instanceLayerCount = 0;
-
-#if defined(ENABLE_GRAPHICS_DEBUG)
-    // this turns on all validation layers
-    instanceLayers[instanceLayerCount++] = "VK_LAYER_KHRONOS_validation";
-#endif
-
-    // Add user specified instance layers for instance creation
-    for (uint32_t i = 0; i < (uint32_t)pDesc->mVk.mInstanceLayerCount; ++i)
-        instanceLayers[instanceLayerCount++] = pDesc->mVk.ppInstanceLayers[i];
-
-    VkResult vkRes = volkInitialize();
-    if (vkRes != VK_SUCCESS)
-    {
-        LOGF(LogLevel::eERROR, "Failed to initialize Vulkan");
-        return;
-    }
-
-    CreateInstance(appName, pDesc, instanceLayerCount, instanceLayers, pContext);
-#endif
-
-    uint32_t gpuCount = 0;
-    CHECK_VKRESULT_INSTANCE(vkEnumeratePhysicalDevices(pContext->mVk.pInstance, &gpuCount, NULL));
-    gpuCount = min((uint32_t)MAX_MULTIPLE_GPUS, gpuCount);
-
-    VkPhysicalDevice gpus[MAX_MULTIPLE_GPUS] = {};
-    CHECK_VKRESULT_INSTANCE(vkEnumeratePhysicalDevices(pContext->mVk.pInstance, &gpuCount, gpus));
-
-    bool     gpuValid[MAX_MULTIPLE_GPUS] = {};
-    uint32_t realGpuCount = 0;
-
-    for (uint32_t i = 0; i < gpuCount; ++i)
-    {
-        // Get queue family properties
-        uint32_t queueFamilyPropertyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(gpus[i], &queueFamilyPropertyCount, NULL);
-        VkQueueFamilyProperties* queueFamilyProperties =
-            (VkQueueFamilyProperties*)tf_calloc(queueFamilyPropertyCount, sizeof(VkQueueFamilyProperties));
-        vkGetPhysicalDeviceQueueFamilyProperties(gpus[i], &queueFamilyPropertyCount, queueFamilyProperties);
-
-        // Filter GPUs that don't meet requirements
-        bool isGraphicsQueueAvailable = false;
-        for (uint32_t j = 0; j < queueFamilyPropertyCount; j++)
-        {
-            // get graphics queue family
-            if (queueFamilyProperties[j].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-            {
-                isGraphicsQueueAvailable = true;
-                break;
-            }
-        }
-
-        VkPhysicalDeviceProperties gpuProperties = {};
-        vkGetPhysicalDeviceProperties(gpus[i], &gpuProperties);
-        gpuValid[i] = isGraphicsQueueAvailable && (VK_PHYSICAL_DEVICE_TYPE_CPU != gpuProperties.deviceType);
-        if (gpuValid[i])
-        {
-            ++realGpuCount;
-        }
-
-        SAFE_FREE(queueFamilyProperties);
-    }
-
-    pContext->mGpuCount = realGpuCount;
-
-    for (uint32_t i = 0, realGpu = 0; i < gpuCount; ++i)
-    {
-        if (!gpuValid[i])
-        {
-            continue;
-        }
-
-        pContext->mGpus[realGpu].mVk.pGpu = gpus[i];
-        QueryGpuSettings(pDesc, pContext, &pContext->mGpus[realGpu]);
-        vkCapsBuilder(&pContext->mGpus[realGpu]);
-        applyGPUConfigurationRules(&pContext->mGpus[i].mSettings, &pContext->mGpus[i].mCapBits);
-
-        // ----- update vulkan features based on gpu.cfg
-        pContext->mGpus[realGpu].mSettings.mDynamicRenderingSupported &= gEnableDynamicRenderingExtension;
-
-        LOGF(LogLevel::eINFO, "GPU[%u] detected. Vendor ID: %#x, Model ID: %#x, Preset: %s, GPU Name: %s", realGpu,
-             pContext->mGpus[realGpu].mSettings.mGpuVendorPreset.mVendorId, pContext->mGpus[realGpu].mSettings.mGpuVendorPreset.mModelId,
-             presetLevelToString(pContext->mGpus[realGpu].mSettings.mGpuVendorPreset.mPresetLevel),
-             pContext->mGpus[realGpu].mSettings.mGpuVendorPreset.mGpuName);
-
-        ++realGpu;
-    }
-
-    *ppContext = pContext;
-}
 
 void vk_exitRendererContext(RendererContext* pContext)
 {
@@ -4167,109 +3567,450 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
 {
     ASSERT(appName);
     ASSERT(pDesc);
+    ASSERT(*ppRenderer == NULL);
     ASSERT(ppRenderer);
 
-    uint8_t* mem = (uint8_t*)tf_calloc_memalign(1, alignof(Renderer), sizeof(Renderer) + sizeof(NullDescriptors));
+    uint8_t* mem = (uint8_t*)tf_calloc_memalign(1, alignof(Renderer), sizeof(Renderer) + sizeof(NullDescriptors) + sizeof(GpuProperties));
     ASSERT(mem);
-
+    
     Renderer* pRenderer = (Renderer*)mem;
     pRenderer->mRendererApi = RENDERER_API_VULKAN;
     pRenderer->mGpuMode = pDesc->mGpuMode;
     pRenderer->mShaderTarget = pDesc->mShaderTarget;
     pRenderer->pNullDescriptors = (NullDescriptors*)(mem + sizeof(Renderer));
     pRenderer->pName = appName;
+    pRenderer->pProperties = (GpuProperties*)(mem + sizeof(Renderer) + sizeof(NullDescriptors));
+    pRenderer->pContext = pDesc->pContext;
+    pRenderer->mUnlinkedRendererIndex = gRendererCount;
+    pRenderer->pAdapter = pDesc->pSelectedDevice; 
+    memcpy(pRenderer->pProperties, &pDesc->mProperties, sizeof(GpuProperties));
 
     // Initialize the Vulkan internal bits
     {
         ASSERT(pDesc->mGpuMode != GPU_MODE_UNLINKED || pDesc->pContext); // context required in unlinked mode
-        if (pDesc->pContext)
         {
-            ASSERT(pDesc->mGpuIndex < pDesc->pContext->mGpuCount);
-            pRenderer->mOwnsContext = false;
-            pRenderer->pContext = pDesc->pContext;
-            pRenderer->mUnlinkedRendererIndex = gRendererCount;
+            ASSERT(VK_NULL_HANDLE != pRenderer->pContext->mVk.pInstance);
 
-            if (pDesc->pContext->mGpuCount > 1 && pDesc->mGpuMode == GPU_MODE_UNLINKED)
+            // These are the extensions that we have loaded
+            const char* deviceExtensionCache[MAX_DEVICE_EXTENSIONS] = {};
+            uint32_t    extension_count = 0;
+
+            VkDeviceGroupDeviceCreateInfoKHR   deviceGroupInfo = { VK_STRUCTURE_TYPE_DEVICE_GROUP_DEVICE_CREATE_INFO_KHR };
+            VkPhysicalDeviceGroupPropertiesKHR props[MAX_LINKED_GPUS] = {};
+
+            pRenderer->mLinkedNodeCount = 1;
+            if (pRenderer->mGpuMode == GPU_MODE_LINKED && pRenderer->pContext->mVk.mDeviceGroupCreationExtension)
             {
-                bool           dynamicRenderingSupportMismatch = false;
-                const GpuInfo* firstGpuInfo = &pDesc->pContext->mGpus[0];
-                for (uint32_t gpuIndex = 1; gpuIndex < pDesc->pContext->mGpuCount; ++gpuIndex)
+                // (not shown) fill out devCreateInfo as usual.
+                uint32_t deviceGroupCount = 0;
+
+                // Query the number of device groups
+                vkEnumeratePhysicalDeviceGroupsKHR(pRenderer->pContext->mVk.pInstance, &deviceGroupCount, NULL);
+
+                // Allocate and initialize structures to query the device groups
+                for (uint32_t i = 0; i < deviceGroupCount; ++i)
                 {
-                    const GpuInfo* gpuInfo = &pDesc->pContext->mGpus[gpuIndex];
-                    if (gpuInfo->mSettings.mDynamicRenderingSupported != firstGpuInfo->mSettings.mDynamicRenderingSupported)
+                    props[i].sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GROUP_PROPERTIES_KHR;
+                    props[i].pNext = NULL;
+                }
+                CHECK_VKRESULT_INSTANCE(vkEnumeratePhysicalDeviceGroupsKHR(pRenderer->pContext->mVk.pInstance, &deviceGroupCount, props));
+
+                // If the first device group has more than one physical device. create
+                // a logical device using all of the physical devices.
+                for (uint32_t i = 0; i < deviceGroupCount; ++i)
+                {
+                    if (props[i].physicalDeviceCount > 1)
                     {
-                        dynamicRenderingSupportMismatch = true;
+                        deviceGroupInfo.physicalDeviceCount = props[i].physicalDeviceCount;
+                        deviceGroupInfo.pPhysicalDevices = props[i].physicalDevices;
+                        pRenderer->mLinkedNodeCount = deviceGroupInfo.physicalDeviceCount;
                         break;
                     }
                 }
+            }
 
-                if (dynamicRenderingSupportMismatch)
+            if (pRenderer->mLinkedNodeCount < 2 && pRenderer->mGpuMode == GPU_MODE_LINKED)
+            {
+                pRenderer->mGpuMode = GPU_MODE_SINGLE;
+            }
+
+            // ASSERT(pDesc->mGpuIndex < arrlen(pDesc->pContext->mDevices));
+            //  if (!SelectBestGpu(pRenderer))
+            //  {
+            //      return false;
+            //  }
+
+            const DeviceAdapter* pGpu = pRenderer->pAdapter;
+
+            uint32_t layerCount = 0;
+            uint32_t extCount = 0;
+            vkEnumerateDeviceLayerProperties(pGpu->mVk.pGpu, &layerCount, NULL);
+            vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, NULL, &extCount, NULL);
+
+            VkLayerProperties* layers = (VkLayerProperties*)alloca(sizeof(VkLayerProperties) * layerCount);
+            vkEnumerateDeviceLayerProperties(pGpu->mVk.pGpu, &layerCount, layers);
+
+            VkExtensionProperties* exts = (VkExtensionProperties*)alloca(sizeof(VkExtensionProperties) * extCount);
+            vkEnumerateDeviceExtensionProperties(pGpu->mVk.pGpu, NULL, &extCount, exts);
+
+#if defined(GFX_ENABLE_SWAPPY)
+            // Swappy could require some extensions to work, so find and enable them
+            uint32_t swappyExtensionCount = 0;
+            char**   pSwappyExtensions = NULL;
+            char*    pSwappyExtensionsData = NULL;
+
+            if (gSwappyEnabled)
+            {
+                // Determine the number of required extensions.
+                SwappyVk_determineDeviceExtensions(pGpu->mVk.pGpu, extCount, exts, &swappyExtensionCount, nullptr);
+
+                // Determine the required extensions.
+                pSwappyExtensions = (char**)tf_malloc(swappyExtensionCount * sizeof(char*));
+                pSwappyExtensionsData = (char*)tf_malloc(swappyExtensionCount * (VK_MAX_EXTENSION_NAME_SIZE + 1));
+                for (uint32_t i = 0; i < swappyExtensionCount; i++)
                 {
-                    for (uint32_t gpuIndex = 0; gpuIndex < pDesc->pContext->mGpuCount; ++gpuIndex)
+                    pSwappyExtensions[i] = &pSwappyExtensionsData[i * (VK_MAX_EXTENSION_NAME_SIZE + 1)];
+                }
+                SwappyVk_determineDeviceExtensions(pGpu->mVk.pGpu, extCount, exts, &swappyExtensionCount, pSwappyExtensions);
+
+                for (uint32_t i = 0; i < swappyExtensionCount; i++)
+                {
+                    deviceExtensionCache[extension_count++] = pSwappyExtensions[i];
+                }
+            }
+#endif
+
+#if VK_DEBUG_LOG_EXTENSIONS
+            for (uint32_t i = 0; i < layerCount; ++i)
+            {
+                internal_log(eINFO, layers[i].layerName, "vkdevice-layer");
+            }
+
+            for (uint32_t i = 0; i < extCount; ++i)
+            {
+                internal_log(eINFO, exts[i].extensionName, "vkdevice-ext");
+            }
+#endif
+
+            // Standalone extensions
+            {
+                const char* layer_name = NULL;
+                uint32_t    initialCount = TF_ARRAY_COUNT(gVkWantedDeviceExtensions);
+                // Dont need debug marker if we have debug utils
+                initialCount -= pRenderer->pContext->mVk.mDebugUtilsExtension ? 1 : 0;
+                const uint32_t userRequestedCount = (uint32_t)pDesc->mVk.mDeviceExtensionCount;
+                const char**   wantedDeviceExtensions = NULL;
+                arrsetlen(wantedDeviceExtensions, initialCount + userRequestedCount + 1);
+                uint32_t wantedExtensionCount = 0;
+                for (uint32_t i = 0; i < initialCount; ++i, ++wantedExtensionCount)
+                {
+                    wantedDeviceExtensions[i] = gVkWantedDeviceExtensions[i];
+                }
+                for (uint32_t i = 0; i < userRequestedCount; ++i, ++wantedExtensionCount)
+                {
+                    wantedDeviceExtensions[initialCount + i] = pDesc->mVk.ppDeviceExtensions[i];
+                }
+#if defined(SHADER_STATS_AVAILABLE)
+                if (pDesc->mEnableShaderStats)
+                {
+                    wantedDeviceExtensions[wantedExtensionCount++] = VK_AMD_SHADER_INFO_EXTENSION_NAME;
+                }
+#endif
+                uint32_t count = 0;
+                vkEnumerateDeviceExtensionProperties(pRenderer->pAdapter->mVk.pGpu, layer_name, &count, NULL);
+                if (count > 0)
+                {
+                    VkExtensionProperties* properties = (VkExtensionProperties*)tf_calloc(count, sizeof(*properties));
+                    ASSERT(properties != NULL);
+                    vkEnumerateDeviceExtensionProperties(pRenderer->pAdapter->mVk.pGpu, layer_name, &count, properties);
+                    for (uint32_t j = 0; j < count; ++j)
                     {
-                        GpuInfo* gpuInfo = &pDesc->pContext->mGpus[gpuIndex];
-                        if (gpuInfo->mSettings.mDynamicRenderingSupported)
+                        for (uint32_t k = 0; k < wantedExtensionCount; ++k)
                         {
-                            gpuInfo->mSettings.mDynamicRenderingSupported = 0;
-                            LOGF(LogLevel::eWARNING, "Dynamic rendering feature was disabled for gpu: %u: %s.", gpuIndex,
-                                 gpuInfo->mVk.mGpuProperties.properties.deviceName);
+                            if (strcmp(wantedDeviceExtensions[k], properties[j].extensionName) == 0)
+                            {
+                                deviceExtensionCache[extension_count++] = wantedDeviceExtensions[k];
+                                break;
+                            }
                         }
+                    }
+                    SAFE_FREE(properties);
+                }
+                arrfree(wantedDeviceExtensions);
+            }
+
+#if !defined(VK_USE_DISPATCH_TABLES)
+            //-V:ADD_TO_NEXT_CHAIN:506, 1027
+#define ADD_TO_NEXT_CHAIN(condition, next)        \
+    if ((condition))                              \
+    {                                             \
+        base->pNext = (VkBaseOutStructure*)&next; \
+        base = (VkBaseOutStructure*)base->pNext;  \
+    }
+
+            VkPhysicalDeviceFeatures2KHR gpuFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
+            VkBaseOutStructure*          base = (VkBaseOutStructure*)&gpuFeatures2; //-V1027
+
+            // Add more extensions here
+            VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT fragmentShaderInterlockFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT
+            };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mFragmentShaderInterlockExtension, fragmentShaderInterlockFeatures);
+            VkPhysicalDeviceDescriptorIndexingFeaturesEXT descriptorIndexingFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT
+            };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mDescriptorIndexingExtension, descriptorIndexingFeatures);
+            VkPhysicalDeviceSamplerYcbcrConversionFeatures ycbcrFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES
+            };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mYCbCrExtension, ycbcrFeatures);
+#if defined(QUEST_VR)
+            VkPhysicalDeviceMultiviewFeatures multiviewFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mMultiviewExtension, multiviewFeatures);
+#endif
+            VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR
+            };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mDynamicRenderingExtension, dynamicRenderingFeatures);
+
+            VkPhysicalDeviceShaderAtomicInt64Features shaderAtomicInt64Features = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR
+            };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mShaderAtomicInt64Extension, shaderAtomicInt64Features);
+
+            VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES
+            };
+            VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR
+            };
+            VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR
+            };
+            VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR };
+
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mBufferDeviceAddressExtension, bufferDeviceAddressFeatures);
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mRayTracingPipelineExtension, rayTracingPipelineFeatures);
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mAccelerationStructureExtension, accelerationStructureFeatures);
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mRayQueryExtension, rayQueryFeatures);
+
+            VkPhysicalDeviceFaultFeaturesEXT deviceFaultFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FAULT_FEATURES_EXT };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mDeviceFaultExtension, deviceFaultFeatures);
+
+            VkPhysicalDeviceDeviceMemoryReportFeaturesEXT memoryReportFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT
+            };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mDeviceMemoryReportExtension, memoryReportFeatures);
+
+            VkPhysicalDeviceCoherentMemoryFeaturesAMD deviceCoherentFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD
+            };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mAMDDeviceCoherentMemoryExtension, deviceCoherentFeatures);
+
+            vkGetPhysicalDeviceFeatures2KHR(pRenderer->pAdapter->mVk.pGpu, &gpuFeatures2);
+
+#if defined(GFX_DEVICE_MEMORY_TRACKING)
+            VkDeviceDeviceMemoryReportCreateInfoEXT memoryReport = {};
+            memoryReport.flags = 0;
+            memoryReport.pfnUserCallback = MemoryReportCallback;
+            memoryReport.pUserData = (void*)&gDeviceMemStats.mMemoryAllocCount;
+            memoryReport.sType = VK_STRUCTURE_TYPE_DEVICE_DEVICE_MEMORY_REPORT_CREATE_INFO_EXT;
+            ADD_TO_NEXT_CHAIN(gEnableDeviceMemoryTracking, memoryReport);
+#endif
+
+            // Get queue family properties
+            uint32_t queueFamiliesCount = 0;
+            vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pAdapter->mVk.pGpu, &queueFamiliesCount, NULL);
+            VkQueueFamilyProperties* queueFamiliesProperties =
+                (VkQueueFamilyProperties*)alloca(queueFamiliesCount * sizeof(VkQueueFamilyProperties));
+            vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pAdapter->mVk.pGpu, &queueFamiliesCount, queueFamiliesProperties);
+
+            // need a queue_priority for each queue in the queue family we create
+            constexpr uint32_t       kMaxQueueFamilies = 16;
+            constexpr uint32_t       kMaxQueueCount = 64;
+            float                    queueFamilyPriorities[kMaxQueueFamilies][kMaxQueueCount] = {};
+            uint32_t                 queue_create_infos_count = 0;
+            VkDeviceQueueCreateInfo* queue_create_infos =
+                (VkDeviceQueueCreateInfo*)alloca(queueFamiliesCount * sizeof(VkDeviceQueueCreateInfo));
+
+            pRenderer->mVk.pAvailableQueueCount = (uint32_t**)tf_malloc(pRenderer->mLinkedNodeCount * sizeof(uint32_t*));
+            pRenderer->mVk.pUsedQueueCount = (uint32_t**)tf_malloc(pRenderer->mLinkedNodeCount * sizeof(uint32_t*));
+            for (uint32_t i = 0; i < pRenderer->mLinkedNodeCount; ++i)
+            {
+                pRenderer->mVk.pAvailableQueueCount[i] = (uint32_t*)tf_calloc(queueFamiliesCount, sizeof(uint32_t));
+                pRenderer->mVk.pUsedQueueCount[i] = (uint32_t*)tf_calloc(queueFamiliesCount, sizeof(uint32_t));
+            }
+
+            for (uint32_t i = 0; i < queueFamiliesCount; i++)
+            {
+                uint32_t queueCount = queueFamiliesProperties[i].queueCount;
+                if (queueCount > 0)
+                {
+                    // Request only one queue of each type if mRequestAllAvailableQueues is not set to true
+                    if (queueCount > 1 && !pDesc->mVk.mRequestAllAvailableQueues)
+                    {
+                        queueCount = 1;
+                    }
+
+                    ASSERT(queueCount <= kMaxQueueCount);
+                    queueCount = min(queueCount, kMaxQueueCount);
+
+                    queue_create_infos[queue_create_infos_count] = {};
+                    queue_create_infos[queue_create_infos_count].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+                    queue_create_infos[queue_create_infos_count].pNext = NULL;
+                    queue_create_infos[queue_create_infos_count].flags = 0;
+                    queue_create_infos[queue_create_infos_count].queueFamilyIndex = i;
+                    queue_create_infos[queue_create_infos_count].queueCount = queueCount;
+                    queue_create_infos[queue_create_infos_count].pQueuePriorities = queueFamilyPriorities[i];
+                    queue_create_infos_count++;
+
+                    for (uint32_t n = 0; n < pRenderer->mLinkedNodeCount; ++n)
+                    {
+                        pRenderer->mVk.pAvailableQueueCount[n][i] = queueCount;
                     }
                 }
             }
-        }
-        else
-        {
-            RendererContextDesc contextDesc = {};
-            contextDesc.mEnableGpuBasedValidation = pDesc->mEnableGpuBasedValidation;
-#if defined(SHADER_STATS_AVAILABLE)
-            contextDesc.mEnableShaderStats = pDesc->mEnableShaderStats;
-#endif
-            contextDesc.mD3D11Supported = pDesc->mD3D11Supported;
-            contextDesc.mGLESSupported = pDesc->mGLESSupported;
-#if defined(ANDROID)
-            contextDesc.mPreferVulkan = pDesc->mPreferVulkan;
-#endif
-            COMPILE_ASSERT(sizeof(contextDesc.mVk) == sizeof(pDesc->mVk));
-            memcpy(&contextDesc.mVk, &pDesc->mVk, sizeof(pDesc->mVk));
-            vk_initRendererContext(appName, &contextDesc, &pRenderer->pContext);
-            pRenderer->mOwnsContext = true;
-            if (!pRenderer->pContext)
-            {
-                SAFE_FREE(pRenderer);
-                return;
-            }
-        }
 
-        if (!AddDevice(pDesc, pRenderer))
-        {
-            if (pRenderer->mOwnsContext)
+#if defined(QUEST_VR)
+            char oculusVRDeviceExtensionBuffer[4096];
+            hook_add_vk_device_extensions(deviceExtensionCache, &extension_count, MAX_DEVICE_EXTENSIONS, oculusVRDeviceExtensionBuffer,
+                                          sizeof(oculusVRDeviceExtensionBuffer));
+#endif
+
+            VkDeviceCreateInfo create_info = {};
+            create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+            create_info.pNext = &gpuFeatures2;
+            create_info.flags = 0;
+            create_info.queueCreateInfoCount = queue_create_infos_count;
+            create_info.pQueueCreateInfos = queue_create_infos;
+            create_info.enabledLayerCount = 0;
+            create_info.ppEnabledLayerNames = NULL;
+            create_info.enabledExtensionCount = extension_count;
+            create_info.ppEnabledExtensionNames = deviceExtensionCache;
+            create_info.pEnabledFeatures = NULL;
+
+#if defined(ENABLE_NSIGHT_AFTERMATH)
+            VkDeviceDiagnosticsConfigCreateInfoNV diagnosticsNV = { VK_STRUCTURE_TYPE_DEVICE_DIAGNOSTICS_CONFIG_CREATE_INFO_NV };
+            if (pRenderer->pPhysicalDevice->mVk.mAftermathSupport)
             {
-                vk_exitRendererContext(pRenderer->pContext);
+                LOGF(LogLevel::eINFO, "Successfully loaded Aftermath extensions");
+                diagnosticsNV.flags = VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_SHADER_DEBUG_INFO_BIT_NV |
+                                      VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_RESOURCE_TRACKING_BIT_NV |
+                                      VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_AUTOMATIC_CHECKPOINTS_BIT_NV;
+                ADD_TO_NEXT_CHAIN(true, diagnosticsNV);
+                // Enable Nsight Aftermath GPU crash dump creation.
+                // This needs to be done before the Vulkan device is created.
+                CreateAftermathTracker(pRenderer->pName, &pRenderer->mAftermathTracker);
             }
-            SAFE_FREE(pRenderer);
-            return;
+#endif
+
+            /************************************************************************/
+            // Add Device Group Extension if requested and available
+            /************************************************************************/
+            ADD_TO_NEXT_CHAIN(pRenderer->mGpuMode == GPU_MODE_LINKED, deviceGroupInfo);
+            CHECK_VKRESULT_INSTANCE(
+                vkCreateDevice(pGpu->mVk.pGpu, &create_info, GetAllocationCallbacks(VK_OBJECT_TYPE_DEVICE), &pRenderer->mVk.pDevice));
+
+            // Load Vulkan device functions to bypass loader
+            if (pRenderer->mGpuMode != GPU_MODE_UNLINKED)
+            {
+                volkLoadDevice(pRenderer->mVk.pDevice);
+            }
+#endif
+
+            if (pGpu->mVk.mDedicatedAllocationExtension)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded Dedicated Allocation extension");
+            }
+
+#if defined(VK_USE_PLATFORM_WIN32_KHR)
+            if (pGpu->mVk.mExternalMemoryExtension)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded External Memory extension");
+            }
+#endif
+
+            if (pGpu->mVk.mDrawIndirectCountExtension)
+            {
+                pfnVkCmdDrawIndirectCountKHR = vkCmdDrawIndirectCountKHR;
+                pfnVkCmdDrawIndexedIndirectCountKHR = vkCmdDrawIndexedIndirectCountKHR;
+                LOGF(LogLevel::eINFO, "Successfully loaded Draw Indirect extension");
+            }
+            else if (pGpu->mVk.mAMDDrawIndirectCountExtension)
+            {
+                pfnVkCmdDrawIndirectCountKHR = vkCmdDrawIndirectCountAMD;
+                pfnVkCmdDrawIndexedIndirectCountKHR = vkCmdDrawIndexedIndirectCountAMD;
+                LOGF(LogLevel::eINFO, "Successfully loaded AMD Draw Indirect extension");
+            }
+
+            if (pGpu->mVk.mAMDGCNShaderExtension)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded AMD GCN Shader extension");
+            }
+
+            if (pGpu->mVk.mAMDShaderInfoExtension)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded AMD Shader Info extension");
+            }
+
+            if (pGpu->mVk.mDescriptorIndexingExtension)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded Descriptor Indexing extension");
+            }
+
+            if (pGpu->mDefaultProps.mRayPipelineSupported)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded Khronos Ray Pipeline extensions");
+            }
+
+            if (pGpu->mDefaultProps.mRayQuerySupported)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded Khronos Ray Query extensions");
+            }
+
+            if (pGpu->mDefaultProps.m64BitAtomicsSupported)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded 64 bit Shader Atomic extension");
+            }
+
+            if (pGpu->mDefaultProps.mDynamicRenderingSupported)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded Dynamic Rendering extension");
+            }
+
+            if (pGpu->mVk.mDeviceFaultExtension)
+            {
+                LOGF(LogLevel::eINFO, "Successfully loaded Device Fault extension");
+            }
+
+#if defined(GFX_ENABLE_SWAPPY)
+            if (gSwappyEnabled)
+            {
+                tf_free(pSwappyExtensions);
+                tf_free(pSwappyExtensionsData);
+            }
+#endif
         }
 
         // anything below LOW preset is not supported and we will exit
-        if (pRenderer->pGpu->mSettings.mGpuVendorPreset.mPresetLevel < GPU_PRESET_VERYLOW)
+        if (pRenderer->pProperties->mGpuVendorPreset.mPresetLevel < GPU_PRESET_VERYLOW)
         {
             // remove device and any memory we allocated in just above as this is the first function called
             // when initializing the forge
             RemoveDevice(pRenderer);
-            if (pRenderer->mOwnsContext)
-            {
-                vk_exitRendererContext(pRenderer->pContext);
-            }
+            // if (pRenderer->mOwnsContext)
+            // {
+            //     vk_exitRendererContext(pRenderer->pContext);
+            // }
             SAFE_FREE(pRenderer);
             LOGF(LogLevel::eERROR, "Selected GPU has an Office Preset in gpu.cfg.");
             LOGF(LogLevel::eERROR, "Office preset is not supported by The Forge.");
 
             // have the condition in the assert as well so its cleared when the assert message box appears
-            ASSERT(pRenderer->pGpu->mSettings.mGpuVendorPreset.mPresetLevel >= GPU_PRESET_VERYLOW); //-V547
+            ASSERT(pRenderer->pProperties->mGpuVendorPreset.mPresetLevel >= GPU_PRESET_VERYLOW); //-V547
 
             // return NULL pRenderer so that client can gracefully handle exit
-            // This is better than exiting from here in case client has allocated memory or has fallbacks
+            // This is better than exiting from here in case client has allocated memory or has fallbacks   // Renderer is good!
             *ppRenderer = NULL;
             return;
         }
@@ -4278,20 +4019,20 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
         /************************************************************************/
         VmaAllocatorCreateInfo createInfo = { 0 };
         createInfo.device = pRenderer->mVk.pDevice;
-        createInfo.physicalDevice = pRenderer->pGpu->mVk.pGpu;
+        createInfo.physicalDevice = pRenderer->pAdapter->mVk.pGpu;
         createInfo.instance = pRenderer->pContext->mVk.pInstance;
 
-        if (pRenderer->pGpu->mVk.mDedicatedAllocationExtension)
+        if (pRenderer->pAdapter->mVk.mDedicatedAllocationExtension)
         {
             createInfo.flags |= VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT;
         }
 
-        if (pRenderer->pGpu->mVk.mBufferDeviceAddressSupported)
+        if (pRenderer->pAdapter->mVk.mBufferDeviceAddressSupported)
         {
             createInfo.flags |= VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
         }
 
-        if (pRenderer->pGpu->mVk.mAMDDeviceCoherentMemorySupported)
+        if (pRenderer->pAdapter->mVk.mAMDDeviceCoherentMemorySupported)
         {
             createInfo.flags |= VMA_ALLOCATOR_CREATE_AMD_DEVICE_COHERENT_MEMORY_BIT;
         }
@@ -4354,7 +4095,7 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
                                                &pRenderer->mVk.pEmptyDescriptorSetLayout));
     consume_descriptor_sets(pRenderer, pRenderer->mVk.pEmptyDescriptorPool, &pRenderer->mVk.pEmptyDescriptorSetLayout, 1, emptySets);
 
-    if (!pRenderer->pGpu->mSettings.mDynamicRenderingSupported)
+    if (!pRenderer->pProperties->mDynamicRenderingSupported)
     {
         initMutex(&gRenderPassMutex[pRenderer->mUnlinkedRendererIndex]);
         gRenderPassMap[pRenderer->mUnlinkedRendererIndex] = NULL;
@@ -4364,9 +4105,9 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
     }
 
     VkPhysicalDeviceFeatures2KHR gpuFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
-    vkGetPhysicalDeviceFeatures2KHR(pRenderer->pGpu->mVk.pGpu, &gpuFeatures);
+    vkGetPhysicalDeviceFeatures2KHR(pRenderer->pAdapter->mVk.pGpu, &gpuFeatures);
 
-    if (pRenderer->pGpu->mVk.mShaderSampledImageArrayDynamicIndexingSupported)
+    if (pRenderer->pAdapter->mVk.mShaderSampledImageArrayDynamicIndexingSupported)
     {
         LOGF(LogLevel::eINFO, "GPU supports texture array dynamic indexing");
     }
@@ -4378,7 +4119,7 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
     add_default_resources(pRenderer);
 
 #if defined(QUEST_VR)
-    if (!hook_post_init_renderer(pRenderer->pContext->mVk.pInstance, pRenderer->pGpu->mVk.pGpu, pRenderer->mVk.pDevice))
+    if (!hook_post_init_renderer(pRenderer->pContext->mVk.pInstance, pRenderer->pPhysicalDevice->mVk.pGpu, pRenderer->mVk.pDevice))
     {
         vmaDestroyAllocator(pRenderer->mVk.pVmaAllocator);
         SAFE_FREE(pRenderer->pName);
@@ -4396,7 +4137,6 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
 
     ++gRendererCount;
     ASSERT(gRendererCount <= MAX_UNLINKED_GPUS);
-
     // Renderer is good!
     *ppRenderer = pRenderer;
 }
@@ -4408,7 +4148,7 @@ void vk_exitRenderer(Renderer* pRenderer)
 
     remove_default_resources(pRenderer);
 
-    if (!pRenderer->pGpu->mSettings.mDynamicRenderingSupported)
+    if (!pRenderer->pProperties->mDynamicRenderingSupported)
     {
         destroyMutex(&gRenderPassMutex[pRenderer->mUnlinkedRendererIndex]);
 
@@ -4454,10 +4194,10 @@ void vk_exitRenderer(Renderer* pRenderer)
 #else
     RemoveDevice(pRenderer);
 #endif
-    if (pRenderer->mOwnsContext)
-    {
-        vk_exitRendererContext(pRenderer->pContext);
-    }
+    // if (pRenderer->mOwnsContext)
+    // {
+    //     vk_exitRendererContext(pRenderer->pContext);
+    // }
 
     for (uint32_t i = 0; i < pRenderer->mLinkedNodeCount; ++i)
     {
@@ -4556,7 +4296,7 @@ void vk_addQueue(Renderer* pRenderer, QueueDesc* pDesc, Queue** ppQueue)
     pQueue->mType = pDesc->mType;
     pQueue->mVk.mQueueIndex = queueIndex;
     pQueue->mVk.mGpuMode = pRenderer->mGpuMode;
-    pQueue->mVk.mTimestampPeriod = pRenderer->pGpu->mVk.mGpuProperties.properties.limits.timestampPeriod;
+    pQueue->mVk.mTimestampPeriod = pRenderer->pAdapter->mVk.mGpuProperties.properties.limits.timestampPeriod;
     pQueue->mVk.pRenderer = pRenderer;
     pQueue->mVk.pSubmitMutex = &pRenderer->pNullDescriptors->mSubmitMutex;
     // override node index
@@ -4858,7 +4598,7 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
     /************************************************************************/
     // Create swap chain
     /************************************************************************/
-    ASSERT(VK_NULL_HANDLE != pRenderer->pGpu->mVk.pGpu);
+    ASSERT(VK_NULL_HANDLE != pRenderer->pAdapter->mVk.pGpu);
 
     // Image count
     if (0 == pDesc->mImageCount)
@@ -4867,7 +4607,7 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
     }
 
     DECLARE_ZERO(VkSurfaceCapabilitiesKHR, caps);
-    CHECK_VKRESULT_INSTANCE(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pRenderer->pGpu->mVk.pGpu, vkSurface, &caps));
+    CHECK_VKRESULT_INSTANCE(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pRenderer->pAdapter->mVk.pGpu, vkSurface, &caps));
 
     if ((caps.maxImageCount > 0) && (pDesc->mImageCount > caps.maxImageCount))
     {
@@ -4891,11 +4631,13 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
     VkSurfaceFormatKHR* formats = NULL;
 
     // Get surface formats count
-    CHECK_VKRESULT_INSTANCE(vkGetPhysicalDeviceSurfaceFormatsKHR(pRenderer->pGpu->mVk.pGpu, vkSurface, &surfaceFormatCount, NULL));
+    CHECK_VKRESULT_INSTANCE(
+        vkGetPhysicalDeviceSurfaceFormatsKHR(pRenderer->pAdapter->mVk.pGpu, vkSurface, &surfaceFormatCount, NULL));
 
     // Allocate and get surface formats
     formats = (VkSurfaceFormatKHR*)tf_calloc(surfaceFormatCount, sizeof(*formats));
-    CHECK_VKRESULT_INSTANCE(vkGetPhysicalDeviceSurfaceFormatsKHR(pRenderer->pGpu->mVk.pGpu, vkSurface, &surfaceFormatCount, formats));
+    CHECK_VKRESULT_INSTANCE(
+        vkGetPhysicalDeviceSurfaceFormatsKHR(pRenderer->pAdapter->mVk.pGpu, vkSurface, &surfaceFormatCount, formats));
 
     if ((1 == surfaceFormatCount) && (VK_FORMAT_UNDEFINED == formats[0].format))
     {
@@ -4937,11 +4679,13 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
     uint32_t          presentModeCount = 0;
     VkPresentModeKHR* modes = NULL;
     // Get present mode count
-    CHECK_VKRESULT_INSTANCE(vkGetPhysicalDeviceSurfacePresentModesKHR(pRenderer->pGpu->mVk.pGpu, vkSurface, &presentModeCount, NULL));
+    CHECK_VKRESULT_INSTANCE(
+        vkGetPhysicalDeviceSurfacePresentModesKHR(pRenderer->pAdapter->mVk.pGpu, vkSurface, &presentModeCount, NULL));
 
     // Allocate and get present modes
     modes = (VkPresentModeKHR*)alloca(presentModeCount * sizeof(*modes));
-    CHECK_VKRESULT_INSTANCE(vkGetPhysicalDeviceSurfacePresentModesKHR(pRenderer->pGpu->mVk.pGpu, vkSurface, &presentModeCount, modes));
+    CHECK_VKRESULT_INSTANCE(
+        vkGetPhysicalDeviceSurfacePresentModesKHR(pRenderer->pAdapter->mVk.pGpu, vkSurface, &presentModeCount, modes));
 
     VkPresentModeKHR preferredModeList[] = {
         VK_PRESENT_MODE_IMMEDIATE_KHR,
@@ -4982,9 +4726,9 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
     // Get queue family properties
     uint32_t                 queueFamilyPropertyCount = 0;
     VkQueueFamilyProperties* queueFamilyProperties = NULL;
-    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pGpu->mVk.pGpu, &queueFamilyPropertyCount, NULL);
+    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pAdapter->mVk.pGpu, &queueFamilyPropertyCount, NULL);
     queueFamilyProperties = (VkQueueFamilyProperties*)alloca(queueFamilyPropertyCount * sizeof(VkQueueFamilyProperties));
-    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pGpu->mVk.pGpu, &queueFamilyPropertyCount, queueFamilyProperties);
+    vkGetPhysicalDeviceQueueFamilyProperties(pRenderer->pAdapter->mVk.pGpu, &queueFamilyPropertyCount, queueFamilyProperties);
 
     uint32_t presentQueueFamilyIndex = UINT32_MAX;
     uint32_t presentQueueIndex = UINT32_MAX;
@@ -4994,7 +4738,8 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
         const uint32_t queueFamilyIndex = pDesc->ppPresentQueues[index]->mVk.mQueueFamilyIndex;
 
         VkBool32 supportsPresent = VK_FALSE;
-        VkResult res = vkGetPhysicalDeviceSurfaceSupportKHR(pRenderer->pGpu->mVk.pGpu, queueFamilyIndex, vkSurface, &supportsPresent);
+        VkResult res =
+            vkGetPhysicalDeviceSurfaceSupportKHR(pRenderer->pAdapter->mVk.pGpu, queueFamilyIndex, vkSurface, &supportsPresent);
         if ((VK_SUCCESS == res) && supportsPresent)
         {
             presentQueueFamilyIndex = queueFamilyIndex;
@@ -5009,7 +4754,7 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
         for (uint32_t index = 0; index < queueFamilyPropertyCount; ++index)
         {
             VkBool32 supportsPresent = VK_FALSE;
-            VkResult res = vkGetPhysicalDeviceSurfaceSupportKHR(pRenderer->pGpu->mVk.pGpu, index, vkSurface, &supportsPresent);
+            VkResult res = vkGetPhysicalDeviceSurfaceSupportKHR(pRenderer->pAdapter->mVk.pGpu, index, vkSurface, &supportsPresent);
             if ((VK_SUCCESS == res) && supportsPresent)
             {
                 presentQueueFamilyIndex = index;
@@ -5093,8 +4838,8 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
         JNIEnv* pJavaEnv = NULL;
         gWindow.handle.activity->vm->AttachCurrentThread(&pJavaEnv, NULL);
 
-        SwappyVk_initAndGetRefreshCycleDuration(pJavaEnv, gWindow.handle.activity->clazz, pRenderer->pGpu->mVk.pGpu, pRenderer->mVk.pDevice,
-                                                vkSwapchain, &refreshDuration);
+        SwappyVk_initAndGetRefreshCycleDuration(pJavaEnv, gWindow.handle.activity->clazz, pRenderer->pPhysicalDevice->mVk.pGpu,
+                                                pRenderer->mVk.pDevice, vkSwapchain, &refreshDuration);
         SwappyVk_setAutoSwapInterval(false);
         // Don't swap faster than the monitor refresh rate
         SwappyVk_setSwapIntervalNS(pRenderer->mVk.pDevice, vkSwapchain, max(refreshDuration, gSwapIntervalNS));
@@ -5290,9 +5035,9 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
         vma_mem_reqs.requiredFlags |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
     if (pDesc->mFlags & BUFFER_CREATION_FLAG_HOST_COHERENT)
         vma_mem_reqs.requiredFlags |= VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-    if (pRenderer->pGpu->mVk.mAMDDeviceCoherentMemorySupported && (pDesc->mFlags & BUFFER_CREATION_FLAG_MARKER))
+    if (pRenderer->pAdapter->mVk.mAMDDeviceCoherentMemorySupported && (pDesc->mFlags & BUFFER_CREATION_FLAG_MARKER))
         vma_mem_reqs.preferredFlags |= VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD | VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD;
-    if (!pRenderer->pGpu->mVk.mAMDDeviceCoherentMemorySupported && (pDesc->mFlags & BUFFER_CREATION_FLAG_MARKER))
+    if (!pRenderer->pAdapter->mVk.mAMDDeviceCoherentMemorySupported && (pDesc->mFlags & BUFFER_CREATION_FLAG_MARKER))
         vma_mem_reqs.preferredFlags |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
 #if defined(ANDROID) || defined(NX64)
@@ -5378,7 +5123,7 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
         viewInfo.offset = pDesc->mFirstElement * pDesc->mStructStride;
         viewInfo.range = pDesc->mElementCount * pDesc->mStructStride;
         VkFormatProperties formatProps = {};
-        vkGetPhysicalDeviceFormatProperties(pRenderer->pGpu->mVk.pGpu, viewInfo.format, &formatProps);
+        vkGetPhysicalDeviceFormatProperties(pRenderer->pAdapter->mVk.pGpu, viewInfo.format, &formatProps);
         if (!(formatProps.bufferFeatures & VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT))
         {
             LOGF(LogLevel::eWARNING, "Failed to create uniform texel buffer view for format %u", (uint32_t)pDesc->mFormat);
@@ -5398,7 +5143,7 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
         viewInfo.offset = pDesc->mFirstElement * pDesc->mStructStride;
         viewInfo.range = pDesc->mElementCount * pDesc->mStructStride;
         VkFormatProperties formatProps = {};
-        vkGetPhysicalDeviceFormatProperties(pRenderer->pGpu->mVk.pGpu, viewInfo.format, &formatProps);
+        vkGetPhysicalDeviceFormatProperties(pRenderer->pAdapter->mVk.pGpu, viewInfo.format, &formatProps);
         if (!(formatProps.bufferFeatures & VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT))
         {
             LOGF(LogLevel::eWARNING, "Failed to create storage texel buffer view for format %u", (uint32_t)pDesc->mFormat);
@@ -5630,7 +5375,7 @@ void vk_addTexture(Renderer* pRenderer, const TextureDesc* pDesc, Texture** ppTe
     // ASTC decode mode extension
     VkImageViewASTCDecodeModeEXT astcDecodeMode = { VK_STRUCTURE_TYPE_IMAGE_VIEW_ASTC_DECODE_MODE_EXT };
     astcDecodeMode.decodeMode = VK_FORMAT_R8G8B8A8_UNORM;
-    if (pRenderer->pGpu->mVk.mASTCDecodeModeExtension && TinyImageFormat_IsCompressedASTC(pDesc->mFormat))
+    if (pRenderer->pAdapter->mVk.mASTCDecodeModeExtension && TinyImageFormat_IsCompressedASTC(pDesc->mFormat))
     {
         srvDesc.pNext = &astcDecodeMode;
     }
@@ -5795,9 +5540,9 @@ void vk_addRenderTarget(Renderer* pRenderer, const RenderTargetDesc* pDesc, Rend
         if (VK_FORMAT_UNDEFINED != vk_depth_stencil_format)
         {
             DECLARE_ZERO(VkImageFormatProperties, properties);
-            VkResult vk_res = vkGetPhysicalDeviceImageFormatProperties(pRenderer->pGpu->mVk.pGpu, vk_depth_stencil_format, VK_IMAGE_TYPE_2D,
-                                                                       VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                                                                       0, &properties);
+            VkResult vk_res = vkGetPhysicalDeviceImageFormatProperties(pRenderer->pAdapter->mVk.pGpu, vk_depth_stencil_format,
+                                                                       VK_IMAGE_TYPE_2D, VK_IMAGE_TILING_OPTIMAL,
+                                                                       VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, 0, &properties);
             // Fall back to something that's guaranteed to work
             if (VK_SUCCESS != vk_res)
             {
@@ -5963,8 +5708,7 @@ void vk_addSampler(Renderer* pRenderer, const SamplerDesc* pDesc, Sampler** ppSa
     add_info.addressModeV = util_to_vk_address_mode(pDesc->mAddressV);
     add_info.addressModeW = util_to_vk_address_mode(pDesc->mAddressW);
     add_info.mipLodBias = pDesc->mMipLodBias;
-    add_info.anisotropyEnable =
-        pRenderer->pGpu->mSettings.mSamplerAnisotropySupported && (pDesc->mMaxAnisotropy > 0.0f) ? VK_TRUE : VK_FALSE;
+    add_info.anisotropyEnable = pRenderer->pProperties->mSamplerAnisotropySupported && (pDesc->mMaxAnisotropy > 0.0f) ? VK_TRUE : VK_FALSE;
     add_info.maxAnisotropy = pDesc->mMaxAnisotropy;
     add_info.compareEnable = (gVkComparisonFuncTranslator[pDesc->mCompareFunc] != VK_COMPARE_OP_NEVER) ? VK_TRUE : VK_FALSE;
     add_info.compareOp = gVkComparisonFuncTranslator[pDesc->mCompareFunc];
@@ -5980,10 +5724,10 @@ void vk_addSampler(Renderer* pRenderer, const SamplerDesc* pDesc, Sampler** ppSa
 
         // Check format props
         {
-            ASSERT((uint32_t)pRenderer->pGpu->mVk.mYCbCrExtension);
+            ASSERT((uint32_t)pRenderer->pAdapter->mVk.mYCbCrExtension);
 
             DECLARE_ZERO(VkFormatProperties, format_props);
-            vkGetPhysicalDeviceFormatProperties(pRenderer->pGpu->mVk.pGpu, format, &format_props);
+            vkGetPhysicalDeviceFormatProperties(pRenderer->pAdapter->mVk.pGpu, format, &format_props);
             if (conversionDesc.mChromaOffsetX == SAMPLE_LOCATION_MIDPOINT)
             {
                 ASSERT(format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_MIDPOINT_CHROMA_SAMPLES_BIT);
@@ -6492,8 +6236,8 @@ void vk_updateDescriptorSet(Renderer* pRenderer, uint32_t index, DescriptorSet* 
                     DescriptorDataRange range = pParam->pRanges[arr];
 #if defined(ENABLE_GRAPHICS_DEBUG)
                     uint32_t maxRange = DESCRIPTOR_TYPE_UNIFORM_BUFFER == type
-                                            ? pRenderer->pGpu->mVk.mGpuProperties.properties.limits.maxUniformBufferRange
-                                            : pRenderer->pGpu->mVk.mGpuProperties.properties.limits.maxStorageBufferRange;
+                                            ? pRenderer->pAdapter->mVk.mGpuProperties.properties.limits.maxUniformBufferRange
+                                            : pRenderer->pAdapter->mVk.mGpuProperties.properties.limits.maxStorageBufferRange;
 #endif
 
                     VALIDATE_DESCRIPTOR(range.mSize, "Descriptor (%s) - pRanges[%u].mSize is zero", pDesc->pName, arr);
@@ -6635,8 +6379,8 @@ void vk_cmdBindDescriptorSetWithRootCbvs(Cmd* pCmd, uint32_t index, DescriptorSe
 #if defined(ENABLE_GRAPHICS_DEBUG)
         const uint32_t maxRange = DESCRIPTOR_TYPE_UNIFORM_BUFFER == pDesc->mType
                                       ? //-V522
-                                      pCmd->pRenderer->pGpu->mVk.mGpuProperties.properties.limits.maxUniformBufferRange
-                                      : pCmd->pRenderer->pGpu->mVk.mGpuProperties.properties.limits.maxStorageBufferRange;
+                                      pCmd->pRenderer->pAdapter->mVk.mGpuProperties.properties.limits.maxUniformBufferRange
+                                      : pCmd->pRenderer->pAdapter->mVk.mGpuProperties.properties.limits.maxStorageBufferRange;
 #endif
 
         VALIDATE_DESCRIPTOR(pDesc->mRootDescriptor, "Descriptor (%s) - must be a root cbv", pDesc->pName);
@@ -7171,7 +6915,7 @@ void vk_addRootSignature(Renderer* pRenderer, const RootSignatureDesc* pRootSign
                 binding.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER)
             {
                 perStageDescriptorSampledImages += binding.descriptorCount;
-                ASSERT(perStageDescriptorSampledImages <= pRenderer->pGpu->mSettings.mMaxBoundTextures);
+                ASSERT(perStageDescriptorSampledImages <= pRenderer->pProperties->mMaxBoundTextures);
             }
 
             // If a user specified a uniform buffer to be used as a dynamic uniform buffer change its type to
@@ -7461,7 +7205,7 @@ static void addGraphicsPipeline(Renderer* pRenderer, const PipelineDesc* pMainDe
     VkPipelineRenderingCreateInfoKHR rc = { VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR };
     VkFormat                         rcColorFormats[MAX_RENDER_TARGET_ATTACHMENTS] = {};
 
-    if (pRenderer->pGpu->mSettings.mDynamicRenderingSupported)
+    if (pRenderer->pProperties->mDynamicRenderingSupported)
     {
         for (uint32_t i = 0; i < pDesc->mRenderTargetCount; ++i)
         {
@@ -7753,7 +7497,7 @@ static void addGraphicsPipeline(Renderer* pRenderer, const PipelineDesc* pMainDe
         add_info.pColorBlendState = &cb;
         add_info.pDynamicState = &dy;
         add_info.layout = pDesc->pRootSignature->mVk.pPipelineLayout;
-        if (pRenderer->pGpu->mSettings.mDynamicRenderingSupported)
+        if (pRenderer->pProperties->mDynamicRenderingSupported)
         {
             add_info.pNext = &rc;
             add_info.renderPass = VK_NULL_HANDLE;
@@ -7913,7 +7657,7 @@ void vk_getPipelineCacheData(Renderer* pRenderer, PipelineCache* pPipelineCache,
 void vk_addPipelineStats(Renderer* pRenderer, Pipeline* pPipeline, bool generateDisassembly, PipelineStats* pOutStats)
 {
     *pOutStats = {};
-    if (!pRenderer->pGpu->mVk.mAMDShaderInfoExtension)
+    if (!pRenderer->pAdapter->mVk.mAMDShaderInfoExtension)
     {
         return;
     }
@@ -7966,7 +7710,7 @@ void vk_addPipelineStats(Renderer* pRenderer, Pipeline* pPipeline, bool generate
 
 void vk_removePipelineStats(Renderer* pRenderer, PipelineStats* pStats)
 {
-    if (!pRenderer->pGpu->mVk.mAMDShaderInfoExtension)
+    if (!pRenderer->pAdapter->mVk.mAMDShaderInfoExtension)
     {
         return;
     }
@@ -8588,7 +8332,7 @@ void vk_cmdBindVertexBuffer(Cmd* pCmd, uint32_t bufferCount, Buffer** ppBuffers,
     ASSERT(VK_NULL_HANDLE != pCmd->mVk.pCmdBuf);
     ASSERT(pStrides);
 
-    const uint32_t max_buffers = pCmd->pRenderer->pGpu->mVk.mGpuProperties.properties.limits.maxVertexInputBindings;
+    const uint32_t max_buffers = pCmd->pRenderer->pAdapter->mVk.mGpuProperties.properties.limits.maxVertexInputBindings;
     uint32_t       capped_buffer_count = bufferCount > max_buffers ? max_buffers : bufferCount;
 
     // No upper bound for this, so use 64 for now
@@ -8986,7 +8730,6 @@ void vk_acquireNextImage(Renderer* pRenderer, SwapChain* pSwapChain, Semaphore* 
 
     if (pFence != NULL)
     {
-        
         vk_res = vkAcquireNextImageKHR(pRenderer->mVk.pDevice, pSwapChain->mVk.pSwapChain, UINT64_MAX, VK_NULL_HANDLE, pFence->mVk.pFence,
                                        pImageIndex);
 
@@ -9259,7 +9002,7 @@ void vk_waitForFences(Renderer* pRenderer, uint32_t fenceCount, Fence** ppFences
     {
 #if defined(ENABLE_NSIGHT_AFTERMATH)
         VkResult result = vkWaitForFences(pRenderer->mVk.pDevice, numValidFences, fences, VK_TRUE, UINT64_MAX);
-        if (pRenderer->pGpu->mVk.mAftermathSupport)
+        if (pRenderer->pPhysicalDevice->mVk.mAftermathSupport)
         {
             if (VK_ERROR_DEVICE_LOST == result)
             {
@@ -9357,9 +9100,11 @@ TinyImageFormat vk_getSupportedSwapchainFormat(Renderer* pRenderer, const SwapCh
     // Get surface formats
     VkSurfaceFormatKHR* formats = NULL;
     uint32_t            surfaceFormatCount = 0;
-    CHECK_VKRESULT_INSTANCE(vkGetPhysicalDeviceSurfaceFormatsKHR(pRenderer->pGpu->mVk.pGpu, vkSurface, &surfaceFormatCount, NULL));
+    CHECK_VKRESULT_INSTANCE(
+        vkGetPhysicalDeviceSurfaceFormatsKHR(pRenderer->pAdapter->mVk.pGpu, vkSurface, &surfaceFormatCount, NULL));
     formats = (VkSurfaceFormatKHR*)alloca(surfaceFormatCount * sizeof(*formats));
-    CHECK_VKRESULT_INSTANCE(vkGetPhysicalDeviceSurfaceFormatsKHR(pRenderer->pGpu->mVk.pGpu, vkSurface, &surfaceFormatCount, formats));
+    CHECK_VKRESULT_INSTANCE(
+        vkGetPhysicalDeviceSurfaceFormatsKHR(pRenderer->pAdapter->mVk.pGpu, vkSurface, &surfaceFormatCount, formats));
 
     VkColorSpaceKHR requested_color_space = util_to_vk_colorspace(colorSpace);
     TinyImageFormat format = TinyImageFormat_UNDEFINED;
@@ -9388,7 +9133,7 @@ uint32_t vk_getRecommendedSwapchainImageCount(Renderer* pRenderer, const WindowH
     VkSurfaceKHR surface;
     CreateSurface(pRenderer, *hwnd, &surface);
     VkSurfaceCapabilitiesKHR surfaceCaps = {};
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pRenderer->pGpu->mVk.pGpu, surface, &surfaceCaps);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pRenderer->pAdapter->mVk.pGpu, surface, &surfaceCaps);
     uint32_t imageCount = min(surfaceCaps.minImageCount + 1, (uint32_t)MAX_SWAPCHAIN_IMAGES);
     imageCount = min(surfaceCaps.maxImageCount ? surfaceCaps.maxImageCount : UINT32_MAX, imageCount);
     vkDestroySurfaceKHR(pRenderer->pContext->mVk.pInstance, surface, GetAllocationCallbacks(VK_OBJECT_TYPE_SURFACE_KHR));
@@ -9448,7 +9193,7 @@ void vk_cmdExecuteIndirect(Cmd* pCmd, CommandSignature* pCommandSignature, uint 
 
     if (pCommandSignature->mDrawType == INDIRECT_DRAW || pCommandSignature->mDrawType == INDIRECT_DRAW_INDEX)
     {
-        if (pCmd->pRenderer->pGpu->mSettings.mMultiDrawIndirect)
+        if (pCmd->pRenderer->pProperties->mMultiDrawIndirect)
         {
             if (pCounterBuffer && drawIndirectCount)
             {
@@ -9545,7 +9290,7 @@ void vk_addQueryPool(Renderer* pRenderer, const QueryPoolDesc* pDesc, QueryPool*
     pQueryPool->mVk.mNodeIndex = pDesc->mNodeIndex;
 
     VkQueryPipelineStatisticFlags pipelineStatsFlags = gPipelineStatsFlags;
-    if (QUERY_TYPE_PIPELINE_STATISTICS == pDesc->mType && !pRenderer->pGpu->mSettings.mTessellationSupported)
+    if (QUERY_TYPE_PIPELINE_STATISTICS == pDesc->mType && !pRenderer->pProperties->mTessellationSupported)
     {
         pipelineStatsFlags &= ~VK_QUERY_PIPELINE_STATISTIC_TESSELLATION_CONTROL_SHADER_PATCHES_BIT;
         pipelineStatsFlags &= ~VK_QUERY_PIPELINE_STATISTIC_TESSELLATION_EVALUATION_SHADER_INVOCATIONS_BIT;
@@ -9671,7 +9416,7 @@ void vk_getQueryData(Renderer* pRenderer, QueryPool* pQueryPool, uint32_t queryI
         vkGetQueryPoolResults(pRenderer->mVk.pDevice, pQueryPool->mVk.pQueryPool, queryIndex, 1, pQueryPool->mStride, data,
                               pQueryPool->mStride, VK_QUERY_RESULT_64_BIT);
         memcpy(&pOutData->mPipelineStats, data, pQueryPool->mStride);
-        if (!pRenderer->pGpu->mSettings.mTessellationSupported)
+        if (!pRenderer->pProperties->mTessellationSupported)
         {
             COMPILE_ASSERT(VK_QUERY_PIPELINE_STATISTIC_FRAGMENT_SHADER_INVOCATIONS_BIT == 0x00000080);
             COMPILE_ASSERT(VK_QUERY_PIPELINE_STATISTIC_TESSELLATION_CONTROL_SHADER_PATCHES_BIT == 0x00000100);
@@ -9714,7 +9459,7 @@ void vk_cmdBeginDebugMarker(Cmd* pCmd, float r, float g, float b, const char* pN
         markerInfo.pLabelName = pName;
         vkCmdBeginDebugUtilsLabelEXT(pCmd->mVk.pCmdBuf, &markerInfo);
     }
-    else if (pCmd->pRenderer->pGpu->mVk.mDebugMarkerExtension)
+    else if (pCmd->pRenderer->pAdapter->mVk.mDebugMarkerExtension)
     {
         VkDebugMarkerMarkerInfoEXT markerInfo = {};
         markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
@@ -9733,7 +9478,7 @@ void vk_cmdEndDebugMarker(Cmd* pCmd)
     {
         vkCmdEndDebugUtilsLabelEXT(pCmd->mVk.pCmdBuf);
     }
-    else if (pCmd->pRenderer->pGpu->mVk.mDebugMarkerExtension)
+    else if (pCmd->pRenderer->pAdapter->mVk.mDebugMarkerExtension)
     {
         vkCmdDebugMarkerEndEXT(pCmd->mVk.pCmdBuf);
     }
@@ -9752,7 +9497,7 @@ void vk_cmdAddDebugMarker(Cmd* pCmd, float r, float g, float b, const char* pNam
         markerInfo.pLabelName = pName;
         vkCmdInsertDebugUtilsLabelEXT(pCmd->mVk.pCmdBuf, &markerInfo);
     }
-    else if (pCmd->pRenderer->pGpu->mVk.mDebugMarkerExtension)
+    else if (pCmd->pRenderer->pAdapter->mVk.mDebugMarkerExtension)
     {
         VkDebugMarkerMarkerInfoEXT markerInfo = {};
         markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
@@ -9765,7 +9510,7 @@ void vk_cmdAddDebugMarker(Cmd* pCmd, float r, float g, float b, const char* pNam
     }
 
 #if defined(ENABLE_NSIGHT_AFTERMATH)
-    if (pCmd->pRenderer->pGpu->mVk.mAftermathSupport)
+    if (pCmd->pRenderer->pPhysicalDevice->mVk.mAftermathSupport)
     {
         vkCmdSetCheckpointNV(pCmd->mVk.pCmdBuf, pName);
     }
@@ -9778,7 +9523,7 @@ void vk_cmdWriteMarker(Cmd* pCmd, const MarkerDesc* pDesc)
     ASSERT(pDesc);
     ASSERT(pDesc->pBuffer);
 
-    if (pCmd->pRenderer->pGpu->mVk.mAMDBufferMarkerExtension)
+    if (pCmd->pRenderer->pAdapter->mVk.mAMDBufferMarkerExtension)
     {
         VkPipelineStageFlagBits pipeStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
         if (pDesc->mFlags & MARKER_FLAG_WAIT_FOR_WRITE)
@@ -9825,7 +9570,7 @@ static void SetVkObjectName(Renderer* pRenderer, uint64_t handle, VkObjectType t
         nameInfo.pObjectName = pName;
         vkSetDebugUtilsObjectNameEXT(pRenderer->mVk.pDevice, &nameInfo);
     }
-    else if (pRenderer->pGpu->mVk.mDebugMarkerExtension)
+    else if (pRenderer->pAdapter->mVk.mDebugMarkerExtension)
     {
         VkDebugMarkerObjectNameInfoEXT nameInfo = {};
         nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
@@ -9901,7 +9646,7 @@ void vk_setPipelineName(Renderer* pRenderer, Pipeline* pPipeline, const char* pN
                     pName);
 }
 
-void initVulkanRenderer(const char* appName, const RendererDesc* pSettings, Renderer** ppRenderer)
+void initVulkanRenderer(const char* appName, const RendererDesc* pSettings, Renderer** pRenderer)
 {
     // API functions
     addFence = vk_addFence;
@@ -9970,6 +9715,7 @@ void initVulkanRenderer(const char* appName, const RendererDesc* pSettings, Rend
     beginCmd = vk_beginCmd;
     endCmd = vk_endCmd;
     cmdBindRenderTargets = vk_cmdBindRenderTargets;
+
     cmdSetSampleLocations = vk_cmdSetSampleLocations;
     cmdSetViewport = vk_cmdSetViewport;
     cmdSetScissor = vk_cmdSetScissor;
@@ -10038,9 +9784,8 @@ void initVulkanRenderer(const char* appName, const RendererDesc* pSettings, Rend
     setRenderTargetName = vk_setRenderTargetName;
     setPipelineName = vk_setPipelineName;
 
-    vk_initRenderer(appName, pSettings, ppRenderer);
-
-    if ((*ppRenderer) && (*ppRenderer)->pGpu->mSettings.mDynamicRenderingSupported)
+    vk_initRenderer(appName, pSettings, pRenderer);
+    if (pRenderer && (*pRenderer)->pProperties->mDynamicRenderingSupported)
     {
         cmdBindRenderTargets = vk_cmdBindRenderTargetsDynamic;
     }
@@ -10049,21 +9794,557 @@ void initVulkanRenderer(const char* appName, const RendererDesc* pSettings, Rend
 void exitVulkanRenderer(Renderer* pRenderer)
 {
     ASSERT(pRenderer);
-
     vk_exitRenderer(pRenderer);
 }
 
 void initVulkanRendererContext(const char* appName, const RendererContextDesc* pSettings, RendererContext** ppContext)
 {
-    // No need to initialize API function pointers, initRenderer MUST be called before using anything else anyway.
-    vk_initRendererContext(appName, pSettings, ppContext);
+    ASSERT(appName);
+    ASSERT(pSettings);
+    ASSERT(ppContext);
+
+    AGSReturnCode agsRet = agsInit();
+    if (AGSReturnCode::AGS_SUCCESS == agsRet)
+    {
+        agsPrintDriverInfo();
+    }
+
+    NvAPI_Status nvStatus = nvapiInit();
+    if (NvAPI_Status::NVAPI_OK == nvStatus)
+    {
+        nvapiPrintDriverInfo();
+    }
+#if defined(VK_USE_DISPATCH_TABLES)
+    VkResult vkRes = volkInitializeWithDispatchTables(pRenderer);
+    if (vkRes != VK_SUCCESS)
+    {
+        LOGF(LogLevel::eERROR, "Failed to initialize Vulkan");
+        return false;
+    }
+#else
+
+    const char** instanceLayers = NULL;
+    arrsetlen(instanceLayers, (2 + pSettings->mVk.mInstanceLayerCount));
+    // = (const char**)tfStackAlloc(&alloc, (2 + pSettings->mVk.mInstanceLayerCount) * sizeof(char*));
+    uint32_t instanceLayerCount = 0;
+
+#if defined(ENABLE_GRAPHICS_DEBUG)
+    // this turns on all validation layers
+    instanceLayers[instanceLayerCount++] = "VK_LAYER_KHRONOS_validation";
+#endif
+
+    // Add user specified instance layers for instance creation
+    for (uint32_t i = 0; i < (uint32_t)pSettings->mVk.mInstanceLayerCount; ++i)
+        instanceLayers[instanceLayerCount++] = pSettings->mVk.ppInstanceLayers[i];
+
+    VkResult vkRes = volkInitialize();
+    if (vkRes != VK_SUCCESS)
+    {
+        LOGF(LogLevel::eERROR, "Failed to initialize Vulkan");
+        return;
+    }
+
+    RendererContext* pContext = (RendererContext*)tf_calloc_memalign(1, alignof(RendererContext), sizeof(RendererContext));
+    pContext->mApi = pSettings->mApi;
+
+    CreateInstance(appName, pSettings, instanceLayerCount, instanceLayers, pContext);
+#endif
+    arrfree(instanceLayers);
+
+    // tfStackAllocReset(&alloc);
+    VkPhysicalDevice*        gpus = NULL;
+    VkQueueFamilyProperties* queueFamilyProperties = NULL;
+    VkLayerProperties*       layers = NULL;
+    VkExtensionProperties*   exts = NULL;
+    const char**             wantedDeviceExtensions = NULL;
+    VkExtensionProperties*   properties = NULL;
+
+    uint32_t gpuCount = 0;
+    CHECK_VKRESULT_INSTANCE(vkEnumeratePhysicalDevices(pContext->mVk.pInstance, &gpuCount, NULL));
+    arrsetlen(gpus, gpuCount);
+    CHECK_VKRESULT_INSTANCE(vkEnumeratePhysicalDevices(pContext->mVk.pInstance, &gpuCount, gpus));
+
+    for (uint32_t i = 0; i < gpuCount; ++i)
+    {
+        // Get queue family properties
+        uint32_t queueFamilyPropertyCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(gpus[i], &queueFamilyPropertyCount, NULL);
+        arrsetlen(queueFamilyProperties, queueFamilyPropertyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(gpus[i], &queueFamilyPropertyCount, queueFamilyProperties);
+
+        // Filter GPUs that don't meet requirements
+        bool isGraphicsQueueAvailable = false;
+        for (uint32_t j = 0; j < queueFamilyPropertyCount; j++)
+        {
+            // get graphics queue family
+            if (queueFamilyProperties[j].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            {
+                isGraphicsQueueAvailable = true;
+                break;
+            }
+        }
+
+        VkPhysicalDeviceProperties gpuProperties = {};
+        vkGetPhysicalDeviceProperties(gpus[i], &gpuProperties);
+        if (isGraphicsQueueAvailable && (VK_PHYSICAL_DEVICE_TYPE_CPU != gpuProperties.deviceType))
+        {
+            struct DeviceAdapter device = { 0 };
+
+            device.mDefaultProps.mSamplerAnisotropySupported = 1;
+            device.mDefaultProps.mGraphicsQueueSupported = 1;
+            device.mDefaultProps.mPrimitiveIdSupported = 1;
+
+            device.mVk.pGpu = gpus[i];
+            ASSERT(VK_NULL_HANDLE != pContext->mVk.pInstance);
+
+            uint32_t layerCount = 0;
+            uint32_t extCount = 0;
+            vkEnumerateDeviceLayerProperties(device.mVk.pGpu, &layerCount, NULL);
+            vkEnumerateDeviceExtensionProperties(device.mVk.pGpu, NULL, &extCount, NULL);
+
+            arrsetlen(layers, layerCount);
+            vkEnumerateDeviceLayerProperties(device.mVk.pGpu, &layerCount, layers);
+
+            arrsetlen(exts, extCount);
+            vkEnumerateDeviceExtensionProperties(device.mVk.pGpu, NULL, &extCount, exts);
+#if VK_DEBUG_LOG_EXTENSIONS
+            for (uint32_t i = 0; i < layerCount; ++i)
+            {
+                internal_log(eINFO, layers[i].layerName, "vkdevice-layer");
+            }
+
+            for (uint32_t i = 0; i < extCount; ++i)
+            {
+                internal_log(eINFO, exts[i].extensionName, "vkdevice-ext");
+            }
+#endif
+            {
+                const char*    layer_name = NULL;
+                // const uint32_t initialCount = TF_ARRAY_COUNT(gVkWantedDeviceExtensions) - (pContext->mVk.mDebugUtilsExtension ? 1 : 0);
+                const uint32_t userRequestedCount = (uint32_t)pSettings->mVk.mDeviceExtensionCount;
+                arrsetlen(wantedDeviceExtensions, (TF_ARRAY_COUNT(gVkWantedDeviceExtensions) + userRequestedCount + 1));
+                uint32_t wantedExtensionCount = 0;
+                for (uint32_t i = 0; i < TF_ARRAY_COUNT(gVkWantedDeviceExtensions); ++i, ++wantedExtensionCount)
+                {
+                    wantedDeviceExtensions[wantedExtensionCount] = gVkWantedDeviceExtensions[i];
+                }
+                for (uint32_t i = 0; i < userRequestedCount; ++i, ++wantedExtensionCount)
+                {
+                    wantedDeviceExtensions[wantedExtensionCount] = pSettings->mVk.ppDeviceExtensions[i];
+                }
+                if (pContext->mVk.mDebugUtilsExtension)
+                {
+                    wantedDeviceExtensions[wantedExtensionCount++] = VK_EXT_DEBUG_MARKER_EXTENSION_NAME;
+                }
+#if defined(SHADER_STATS_AVAILABLE)
+                if (pSettings->mEnableShaderStats)
+                {
+                    wantedDeviceExtensions[wantedExtensionCount++] = VK_AMD_SHADER_INFO_EXTENSION_NAME;
+                }
+#endif
+
+                uint32_t count = 0;
+                vkEnumerateDeviceExtensionProperties(device.mVk.pGpu, layer_name, &count, NULL);
+                if (count > 0)
+                {
+                    arrsetlen(properties, count);
+                    ASSERT(properties != NULL);
+                    vkEnumerateDeviceExtensionProperties(device.mVk.pGpu, layer_name, &count, properties);
+                    for (uint32_t j = 0; j < count; ++j)
+                    {
+                        for (uint32_t k = 0; k < wantedExtensionCount; ++k)
+                        {
+                            if (strcmp(wantedDeviceExtensions[k], properties[j].extensionName) == 0)
+                            {
+                                if (strcmp(wantedDeviceExtensions[k], VK_AMD_BUFFER_MARKER_EXTENSION_NAME) == 0)
+                                    device.mVk.mAMDBufferMarkerExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_AMD_DEVICE_COHERENT_MEMORY_EXTENSION_NAME) == 0)
+                                    device.mVk.mAMDDeviceCoherentMemoryExtension = true;
+#if defined(GFX_DEVICE_MEMORY_TRACKING)
+                                if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEVICE_MEMORY_REPORT_EXTENSION_NAME) == 0)
+                                    device.mVk.mDeviceMemoryReportExtension = gEnableDeviceMemoryTracking;
+#endif
+                                if (strcmp(wantedDeviceExtensions[k], VK_EXT_ASTC_DECODE_MODE_EXTENSION_NAME) == 0)
+                                    device.mVk.mASTCDecodeModeExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEBUG_MARKER_EXTENSION_NAME) == 0)
+                                    device.mVk.mDebugMarkerExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME) == 0)
+                                    device.mVk.mDedicatedAllocationExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME) == 0)
+                                    device.mVk.mMemoryReq2Extension = true;
+#if defined(VK_USE_PLATFORM_WIN32_KHR)
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME) == 0)
+                                    device.mVk.mExternalMemoryExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME) == 0)
+                                    device.mVk.mExternalMemoryWin32Extension = true;
+#endif
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_DRAW_INDIRECT_COUNT_EXTENSION_NAME) == 0)
+                                    device.mVk.mDrawIndirectCountExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_AMD_DRAW_INDIRECT_COUNT_EXTENSION_NAME) == 0)
+                                    device.mVk.mAMDDrawIndirectCountExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_AMD_GCN_SHADER_EXTENSION_NAME) == 0)
+                                    device.mVk.mAMDGCNShaderExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_AMD_SHADER_INFO_EXTENSION_NAME) == 0)
+                                    device.mVk.mAMDShaderInfoExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) == 0)
+                                    device.mVk.mDescriptorIndexingExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) == 0)
+                                    device.mVk.mBufferDeviceAddressExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME) == 0)
+                                    device.mVk.mShaderFloatControlsExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) == 0)
+                                    device.mVk.mDeferredHostOperationsExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) == 0)
+                                    device.mVk.mAccelerationStructureExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_SPIRV_1_4_EXTENSION_NAME) == 0)
+                                    device.mVk.mSpirv14Extension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME) == 0)
+                                    device.mVk.mShaderAtomicInt64Extension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) == 0)
+                                    device.mVk.mRayTracingPipelineExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_RAY_QUERY_EXTENSION_NAME) == 0)
+                                    device.mVk.mRayQueryExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME) == 0)
+                                    device.mVk.mYCbCrExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME) == 0)
+                                    device.mVk.mFragmentShaderInterlockExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME) == 0)
+                                    device.mVk.mDynamicRenderingExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_EXT_SAMPLE_LOCATIONS_EXTENSION_NAME) == 0)
+                                    device.mDefaultProps.mSoftwareVRSSupported = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_EXT_DEVICE_FAULT_EXTENSION_NAME) == 0)
+                                    device.mVk.mDeviceFaultExtension = true;
+#if defined(QUEST_VR)
+                                if (strcmp(wantedDeviceExtensions[k], VK_KHR_MULTIVIEW_EXTENSION_NAME) == 0)
+                                    device.mVk.mMultiviewExtension = true;
+#endif
+#if defined(ENABLE_NSIGHT_AFTERMATH)
+                                if (strcmp(wantedDeviceExtensions[k], VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME) == 0)
+                                    device.mVk.mNVDeviceDiagnosticsCheckpointExtension = true;
+                                if (strcmp(wantedDeviceExtensions[k], VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME) == 0)
+                                    device.mVk.mNVDeviceDiagnosticsConfigExtension = true;
+#endif
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+//-V:ADD_TO_NEXT_CHAIN:506, 1027
+#define ADD_TO_NEXT_CHAIN(condition, next)        \
+    if ((condition))                              \
+    {                                             \
+        base->pNext = (VkBaseOutStructure*)&next; \
+        base = (VkBaseOutStructure*)base->pNext;  \
+    }
+
+            VkPhysicalDeviceFeatures2KHR gpuFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR };
+            VkBaseOutStructure*          base = (VkBaseOutStructure*)&gpuFeatures2; //-V1027
+
+            // Add more extensions here
+            VkPhysicalDeviceFragmentShaderInterlockFeaturesEXT fragmentShaderInterlockFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT
+            };
+            ADD_TO_NEXT_CHAIN(device.mVk.mFragmentShaderInterlockExtension, fragmentShaderInterlockFeatures);
+            VkPhysicalDeviceDescriptorIndexingFeaturesEXT descriptorIndexingFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT
+            };
+            ADD_TO_NEXT_CHAIN(device.mVk.mDescriptorIndexingExtension, descriptorIndexingFeatures);
+            VkPhysicalDeviceSamplerYcbcrConversionFeatures ycbcrFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES
+            };
+            ADD_TO_NEXT_CHAIN(device.mVk.mYCbCrExtension, ycbcrFeatures);
+#if defined(QUEST_VR)
+            VkPhysicalDeviceMultiviewFeatures multiviewFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
+            ADD_TO_NEXT_CHAIN(pGpu->mVk.mMultiviewExtension, multiviewFeatures);
+#endif
+
+            VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR
+            };
+            ADD_TO_NEXT_CHAIN(device.mVk.mDynamicRenderingExtension, dynamicRenderingFeatures);
+
+            VkPhysicalDeviceShaderAtomicInt64Features shaderAtomicInt64Features = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES_KHR
+            };
+            ADD_TO_NEXT_CHAIN(device.mVk.mShaderAtomicInt64Extension, shaderAtomicInt64Features);
+
+            VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES
+            };
+            VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR
+            };
+            VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR
+            };
+            VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR };
+            ADD_TO_NEXT_CHAIN(device.mVk.mBufferDeviceAddressExtension, bufferDeviceAddressFeatures);
+            ADD_TO_NEXT_CHAIN(device.mVk.mRayTracingPipelineExtension, rayTracingPipelineFeatures);
+            ADD_TO_NEXT_CHAIN(device.mVk.mAccelerationStructureExtension, accelerationStructureFeatures);
+            ADD_TO_NEXT_CHAIN(device.mVk.mRayQueryExtension, rayQueryFeatures);
+
+            VkPhysicalDeviceFaultFeaturesEXT deviceFaultFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FAULT_FEATURES_EXT };
+            ADD_TO_NEXT_CHAIN(device.mVk.mDeviceFaultExtension, deviceFaultFeatures);
+
+            VkPhysicalDeviceDeviceMemoryReportFeaturesEXT memoryReportFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_MEMORY_REPORT_FEATURES_EXT
+            };
+            ADD_TO_NEXT_CHAIN(device.mVk.mDeviceMemoryReportExtension, memoryReportFeatures);
+
+            VkPhysicalDeviceCoherentMemoryFeaturesAMD deviceCoherentFeatures = {
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COHERENT_MEMORY_FEATURES_AMD
+            };
+            ADD_TO_NEXT_CHAIN(device.mVk.mAMDDeviceCoherentMemoryExtension, deviceCoherentFeatures);
+
+            vkGetPhysicalDeviceFeatures2KHR(device.mVk.pGpu, &gpuFeatures2);
+
+            // Get memory properties
+            VkPhysicalDeviceMemoryProperties gpuMemoryProperties = {};
+            vkGetPhysicalDeviceMemoryProperties(device.mVk.pGpu, &gpuMemoryProperties);
+
+            // Get device properties
+            VkPhysicalDeviceSubgroupProperties subgroupProperties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES };
+            VkPhysicalDeviceProperties2KHR     gpuProperties = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, &subgroupProperties };
+            vkGetPhysicalDeviceProperties2KHR(device.mVk.pGpu, &gpuProperties);
+
+#if defined(GFX_DEVICE_MEMORY_TRACKING)
+            gEnableDeviceMemoryTracking &= device.mVk.mDeviceMemoryReportExtension;
+#endif
+            device.mDefaultProps.mDynamicRenderingSupported = dynamicRenderingFeatures.dynamicRendering;
+
+            const bool bufferDeviceAddressFeature = bufferDeviceAddressFeatures.bufferDeviceAddress;
+            device.mVk.mBufferDeviceAddressSupported = bufferDeviceAddressFeature;
+
+            device.mDefaultProps.m64BitAtomicsSupported = shaderAtomicInt64Features.shaderBufferInt64Atomics;
+
+            const bool rayTracingPipelineFeature = rayTracingPipelineFeatures.rayTracingPipeline;
+            const bool accelerationStructureFeature = accelerationStructureFeatures.accelerationStructure;
+            const bool rayQueryFeature = rayQueryFeatures.rayQuery;
+
+            device.mDefaultProps.mRayPipelineSupported = bufferDeviceAddressFeature && rayTracingPipelineFeature &&
+                                                         device.mVk.mShaderFloatControlsExtension && device.mVk.mSpirv14Extension &&
+                                                         accelerationStructureFeature && device.mVk.mDeferredHostOperationsExtension;
+            device.mDefaultProps.mRayQuerySupported =
+                rayQueryFeature && accelerationStructureFeature && device.mVk.mDeferredHostOperationsExtension;
+            device.mDefaultProps.mRaytracingSupported =
+                device.mDefaultProps.mRayPipelineSupported || device.mDefaultProps.mRayQuerySupported;
+
+            device.mVk.mDedicatedAllocationExtension = device.mVk.mDedicatedAllocationExtension && device.mVk.mMemoryReq2Extension;
+
+            const bool deviceFaultSupported = deviceFaultFeatures.deviceFault;
+            device.mVk.mDeviceFaultSupported = deviceFaultSupported;
+
+#if defined(VK_USE_PLATFORM_WIN32_KHR)
+            pGpu->mVk.mExternalMemoryExtension = pGpu->mVk.mExternalMemoryExtension && pGpu->mVk.mExternalMemoryWin32Extension;
+#endif
+
+#if defined(ENABLE_NSIGHT_AFTERMATH)
+            pGpu->mVk.mAftermathSupport =
+                pGpu->mVk.mNVDeviceDiagnosticsCheckpointExtension && pGpu->mVk.mNVDeviceDiagnosticsConfigExtension;
+#endif
+
+            device.mDefaultProps.mUniformBufferAlignment = (uint32_t)gpuProperties.properties.limits.minUniformBufferOffsetAlignment;
+            device.mDefaultProps.mUploadBufferTextureAlignment = (uint32_t)gpuProperties.properties.limits.optimalBufferCopyOffsetAlignment;
+            device.mDefaultProps.mUploadBufferTextureRowAlignment =
+                (uint32_t)gpuProperties.properties.limits.optimalBufferCopyRowPitchAlignment;
+            device.mDefaultProps.mMaxVertexInputBindings = gpuProperties.properties.limits.maxVertexInputBindings;
+            device.mDefaultProps.mMultiDrawIndirect = gpuFeatures2.features.multiDrawIndirect;
+            device.mDefaultProps.mMaxBoundTextures = gpuProperties.properties.limits.maxPerStageDescriptorSampledImages;
+            device.mDefaultProps.mMaxTotalComputeThreads = gpuProperties.properties.limits.maxComputeWorkGroupInvocations;
+            COMPILE_ASSERT(sizeof(device.mDefaultProps.mMaxComputeThreads) ==
+                           sizeof(gpuProperties.properties.limits.maxComputeWorkGroupSize));
+            memcpy(device.mDefaultProps.mMaxComputeThreads, gpuProperties.properties.limits.maxComputeWorkGroupSize,
+                   sizeof(gpuProperties.properties.limits.maxComputeWorkGroupSize));
+            device.mDefaultProps.mIndirectRootConstant = false;
+            device.mDefaultProps.mBuiltinDrawID = true;
+            device.mDefaultProps.mTimestampQueries =
+                gpuProperties.properties.limits.timestampPeriod > 0 && gpuProperties.properties.limits.timestampComputeAndGraphics;
+            device.mDefaultProps.mOcclusionQueries = true;
+            device.mDefaultProps.mPipelineStatsQueries = gpuFeatures2.features.pipelineStatisticsQuery;
+#if !defined(NX64) && !defined(__ANDROID__)
+            device.mDefaultProps.mHDRSupported = true;
+#endif
+            device.mDefaultProps.mGpuMarkers = true;
+            device.mVk.mAMDDeviceCoherentMemorySupported = deviceCoherentFeatures.deviceCoherentMemory;
+            /************************************************************************/
+            // To find VRAM in Vulkan, loop through all the heaps and find if the
+            // heap has the DEVICE_LOCAL_BIT flag set
+            /************************************************************************/
+            uint64_t totalTestVram = 0;
+            for (uint32_t i = 0; i < gpuMemoryProperties.memoryHeapCount; ++i)
+            {
+                if (VK_MEMORY_HEAP_DEVICE_LOCAL_BIT & gpuMemoryProperties.memoryHeaps[i].flags)
+                    totalTestVram += gpuMemoryProperties.memoryHeaps[i].size;
+            }
+            device.mDefaultProps.mVRAM = totalTestVram;
+            device.mDefaultProps.mAllowBufferTextureInSameHeap = true;
+
+            device.mDefaultProps.mWaveLaneCount = subgroupProperties.subgroupSize;
+            device.mDefaultProps.mWaveOpsSupportFlags = WAVE_OPS_SUPPORT_FLAG_NONE;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_BASIC_BIT)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_BASIC_BIT;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_VOTE_BIT)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_VOTE_BIT;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_ARITHMETIC_BIT)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_ARITHMETIC_BIT;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_BALLOT_BIT)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_BALLOT_BIT;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_SHUFFLE_BIT)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_SHUFFLE_BIT;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_SHUFFLE_RELATIVE_BIT;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_CLUSTERED_BIT)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_CLUSTERED_BIT;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_QUAD_BIT)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_QUAD_BIT;
+            if (subgroupProperties.supportedOperations & VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV)
+                device.mDefaultProps.mWaveOpsSupportFlags |= WAVE_OPS_SUPPORT_FLAG_PARTITIONED_BIT_NV;
+
+            device.mDefaultProps.mWaveOpsSupportedStageFlags = SHADER_STAGE_NONE;
+            if (subgroupProperties.supportedStages & VK_SHADER_STAGE_VERTEX_BIT)
+                device.mDefaultProps.mWaveOpsSupportedStageFlags |= SHADER_STAGE_VERT;
+            if (subgroupProperties.supportedStages & VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT)
+                device.mDefaultProps.mWaveOpsSupportedStageFlags |= SHADER_STAGE_TESC;
+            if (subgroupProperties.supportedStages & VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT)
+                device.mDefaultProps.mWaveOpsSupportedStageFlags |= SHADER_STAGE_TESE;
+            if (subgroupProperties.supportedStages & VK_SHADER_STAGE_GEOMETRY_BIT)
+                device.mDefaultProps.mWaveOpsSupportedStageFlags |= SHADER_STAGE_GEOM;
+            if (subgroupProperties.supportedStages & VK_SHADER_STAGE_FRAGMENT_BIT)
+                device.mDefaultProps.mWaveOpsSupportedStageFlags |= SHADER_STAGE_FRAG;
+            if (subgroupProperties.supportedStages & VK_SHADER_STAGE_COMPUTE_BIT)
+                device.mDefaultProps.mWaveOpsSupportedStageFlags |= SHADER_STAGE_COMP;
+
+            device.mDefaultProps.mROVsSupported = (bool)fragmentShaderInterlockFeatures.fragmentShaderPixelInterlock;
+            device.mDefaultProps.mTessellationSupported = gpuFeatures2.features.tessellationShader;
+            device.mDefaultProps.mGeometryShaderSupported = gpuFeatures2.features.geometryShader;
+            device.mDefaultProps.mSamplerAnisotropySupported = gpuFeatures2.features.samplerAnisotropy;
+            device.mVk.mShaderSampledImageArrayDynamicIndexingSupported = gpuFeatures2.features.shaderSampledImageArrayDynamicIndexing;
+            device.mVk.mFillModeNonSolid = gpuFeatures2.features.fillModeNonSolid;
+#if defined(AMDAGS)
+            pGpu->mSettings.mAmdAsicFamily = agsGetAsicFamily(gpuProperties.properties.deviceID);
+#endif
+
+            // save vendor and model Id as string
+            device.mDefaultProps.mGpuVendorPreset.mModelId = gpuProperties.properties.deviceID;
+            device.mDefaultProps.mGpuVendorPreset.mVendorId = gpuProperties.properties.vendorID;
+            strncpy(device.mDefaultProps.mGpuVendorPreset.mGpuName, gpuProperties.properties.deviceName, MAX_GPU_VENDOR_STRING_LENGTH);
+
+            // Disable memory device report on Xclipse GPUs since it can cause crashes
+            if (gpuVendorEquals(device.mDefaultProps.mGpuVendorPreset.mVendorId, "samsung"))
+            {
+                device.mVk.mDeviceMemoryReportExtension = 0;
+            }
+
+            // TODO: Fix once vulkan adds support for revision ID
+            GPUVendorPreset* preset = &device.mDefaultProps.mGpuVendorPreset;
+            preset->mRevisionId = 0;
+            preset->mPresetLevel = getGPUPresetLevel(preset->mVendorId, preset->mModelId, preset->mVendorName, preset->mGpuName);
+
+            // set default driver to be very high to not trigger driver rejection rules if NVAPI or AMDAGS fails
+            snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", 999999, 99);
+            if (gpuVendorEquals(device.mDefaultProps.mGpuVendorPreset.mVendorId, "nvidia"))
+            {
+#if defined(NVAPI)
+                if (NvAPI_Status::NVAPI_OK == gNvStatus)
+                {
+                    snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%lu.%lu",
+                             gNvGpuInfo.driverVersion / 100, gNvGpuInfo.driverVersion % 100);
+                }
+#else
+                uint32_t major, minor, secondaryBranch, tertiaryBranch;
+                major = (gpuProperties.properties.driverVersion >> 22) & 0x3ff;
+                minor = (gpuProperties.properties.driverVersion >> 14) & 0x0ff;
+                secondaryBranch = (gpuProperties.properties.driverVersion >> 6) & 0x0ff;
+                tertiaryBranch = (gpuProperties.properties.driverVersion) & 0x003f;
+                snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u.%u.%u", major, minor,
+                         secondaryBranch, tertiaryBranch);
+#endif
+            }
+            else if (gpuVendorEquals(device.mDefaultProps.mGpuVendorPreset.mVendorId, "amd"))
+            {
+#if defined(AMDAGS)
+                if (AGSReturnCode::AGS_SUCCESS == gAgsStatus)
+                {
+                    snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%s",
+                             gAgsGpuInfo.driverVersion);
+                }
+#else
+                VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion);
+                LOGF(eWARNING, "Parsing amd driver version without ags lib is unreliable, setting to default value: %s",
+                     device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion);
+#endif
+            }
+            else if (gpuVendorEquals(device.mDefaultProps.mGpuVendorPreset.mVendorId, "intel"))
+            {
+                VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion);
+                uint32_t major = gpuProperties.properties.driverVersion >> 14;
+                uint32_t minor = gpuProperties.properties.driverVersion & 0x3fff;
+                snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", major, minor);
+            }
+            else
+            {
+                VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion);
+            }
+
+            gpuProperties.pNext = NULL;
+            device.mVk.mGpuProperties = gpuProperties;
+
+            for (uint32_t i = 0; i < TinyImageFormat_Count; ++i)
+            {
+                VkFormatProperties formatSupport;
+                VkFormat           fmt = (VkFormat)TinyImageFormat_ToVkFormat((TinyImageFormat)i);
+                if (VK_FORMAT_UNDEFINED == fmt
+                    // these values were deprecated and will cause validation errors
+                    || VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG == fmt || VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG == fmt ||
+                    VK_FORMAT_PVRTC2_2BPP_UNORM_BLOCK_IMG == fmt || VK_FORMAT_PVRTC2_4BPP_UNORM_BLOCK_IMG == fmt ||
+                    VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG == fmt || VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG == fmt ||
+                    VK_FORMAT_PVRTC2_2BPP_SRGB_BLOCK_IMG == fmt || VK_FORMAT_PVRTC2_4BPP_SRGB_BLOCK_IMG == fmt)
+                {
+                    continue;
+                }
+                vkGetPhysicalDeviceFormatProperties(device.mVk.pGpu, fmt, &formatSupport);
+
+                if (formatSupport.linearTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)
+                {
+                    device.mCapBits.mFormatCaps[i] |= FORMAT_CAP_LINEAR_FILTER;
+                }
+                if (formatSupport.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)
+                {
+                    device.mCapBits.mFormatCaps[i] |= FORMAT_CAP_READ;
+                }
+                if (formatSupport.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT)
+                {
+                    device.mCapBits.mFormatCaps[i] |= FORMAT_CAP_WRITE | FORMAT_CAP_READ_WRITE;
+                }
+                if (formatSupport.optimalTilingFeatures &
+                    (VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT))
+                {
+                    device.mCapBits.mFormatCaps[i] |= FORMAT_CAP_RENDER_TARGET;
+                }
+            }
+
+            LOGF(LogLevel::eINFO, "GPU[%u] detected. Vendor ID: %#x, Model ID: %#x, Preset: %s, GPU Name: %s", i,
+                 device.mDefaultProps.mGpuVendorPreset.mVendorId, device.mDefaultProps.mGpuVendorPreset.mModelId,
+                 presetLevelToString(device.mDefaultProps.mGpuVendorPreset.mPresetLevel), device.mDefaultProps.mGpuVendorPreset.mGpuName);
+            arrpush(pContext->pAdapters, device);
+        }
+    }
+
+    arrfree(gpus);
+    arrfree(queueFamilyProperties);
+    arrfree(layers);
+    arrfree(exts);
+    arrfree(properties);
+    arrfree(wantedDeviceExtensions);
+    *ppContext = pContext;
 }
 
 void exitVulkanRendererContext(RendererContext* pContext)
 {
     ASSERT(pContext);
-
     vk_exitRendererContext(pContext);
+    
 }
 
 #include "Common_3/Graphics/ThirdParty/OpenSource/volk/volk.c"

@@ -737,13 +737,13 @@ static ResourceLoader* pResourceLoader = NULL;
 
 static uint32_t util_get_texture_row_alignment(Renderer* pRenderer)
 {
-    return max(1u, pRenderer->pGpu->mSettings.mUploadBufferTextureRowAlignment);
+    return max(1u, pRenderer->pProperties->mUploadBufferTextureRowAlignment);
 }
 
 static uint32_t util_get_texture_subresource_alignment(Renderer* pRenderer, TinyImageFormat fmt = TinyImageFormat_UNDEFINED)
 {
     uint32_t blockSize = max(1u, TinyImageFormat_BitSizeOfBlock(fmt) >> 3);
-    uint32_t alignment = round_up(pRenderer->pGpu->mSettings.mUploadBufferTextureAlignment, blockSize);
+    uint32_t alignment = round_up(pRenderer->pProperties->mUploadBufferTextureAlignment, blockSize);
     return round_up(alignment, util_get_texture_row_alignment(pRenderer));
 }
 
@@ -4039,8 +4039,8 @@ static bool load_shader_stage_byte_code(Renderer* pRenderer, const char* name, S
         if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_VULKAN)
         {
             // Needs to match with the way we set the derivatives in FSL scripts (vulkan.py, compilers.py)
-            derivativeHash = (uint64_t)pRenderer->pGpu->mVk.mShaderSampledImageArrayDynamicIndexingSupported |
-                             (uint64_t)pRenderer->pGpu->mVk.mDescriptorIndexingExtension << 1;
+            derivativeHash = (uint64_t)pRenderer->pAdapter->mVk.mShaderSampledImageArrayDynamicIndexingSupported |
+                             (uint64_t)pRenderer->pAdapter->mVk.mDescriptorIndexingExtension << 1;
         }
 #endif
 

@@ -201,8 +201,8 @@ DECLARE_INTERNAL_RENDERER_FUNCTION(void, removeTexture, Renderer* pRenderer, Tex
 /************************************************************************/
 
 // <-- This should move to graphic Properties --> */
-bool               gD3D11Unsupported = false;
-bool               gGLESUnsupported = false;
+//bool               gD3D11Unsupported = false;
+//bool               gGLESUnsupported = false;
 bool               gRendererUnsupported = false;
 const char*        pRendererUnsupportedReason = "";
 // < ------------------------------------------ > */
@@ -280,7 +280,7 @@ RendererApiFlags FORGE_CALLCONV avaliableAPIs()
 #endif
 #if defined(DIRECT3D11)
     if (d3d11dll_init())
-        flags |= RENDERER_API_D3D11_FLAG;
+    flags |= RENDERER_API_D3D11_FLAG;
 #endif
 #if defined(METAL)
     flags |= RENDERER_API_METAL_FLAG;
@@ -318,55 +318,6 @@ bool hasRendererInitializationError(const char** outReason)
 {
     *outReason = pRendererUnsupportedReason;
     return gRendererUnsupported;
-}
-
-static void initRendererAPI(const char* appName, const RendererDesc* pSettings, Renderer** ppRenderer, const RendererApi api)
-{
-    switch (api)
-    {
-#if defined(DIRECT3D11)
-    case RENDERER_API_D3D11:
-        initD3D11Renderer(appName, pSettings, ppRenderer);
-        break;
-#endif
-#if defined(DIRECT3D12)
-    case RENDERER_API_D3D12:
-        initD3D12RaytracingFunctions();
-        initD3D12Renderer(appName, pSettings, ppRenderer);
-        break;
-#endif
-#if defined(VULKAN)
-    case RENDERER_API_VULKAN:
-        initVulkanRaytracingFunctions();
-        initVulkanRenderer(appName, pSettings, ppRenderer);
-        break;
-#endif
-#if defined(METAL)
-    case RENDERER_API_METAL:
-        initMetalRaytracingFunctions();
-        initMetalRenderer(appName, pSettings, ppRenderer);
-        break;
-#endif
-#if defined(GLES)
-    case RENDERER_API_GLES:
-        initGLESRenderer(appName, pSettings, ppRenderer);
-        break;
-#endif
-#if defined(ORBIS)
-    case RENDERER_API_ORBIS:
-        initOrbisRenderer(appName, pSettings, ppRenderer);
-        break;
-#endif
-#if defined(PROSPERO)
-    case RENDERER_API_PROSPERO:
-        initProsperoRaytracingFunctions();
-        initProsperoRenderer(appName, pSettings, ppRenderer);
-        break;
-#endif
-    default:
-        LOGF(LogLevel::eERROR, "No Renderer API defined!");
-        break;
-    }
 }
 
 static void exitRendererAPI(Renderer* pRenderer, const RendererApi api)
@@ -414,36 +365,36 @@ static void exitRendererAPI(Renderer* pRenderer, const RendererApi api)
     }
 }
 
-static void initRendererContextAPI(const char* appName, const RendererContextDesc* pSettings, RendererContext** ppContext,
-                                   const RendererApi api)
-{
-    switch (api)
-    {
-#if defined(DIRECT3D12)
-    case RENDERER_API_D3D12:
-        initD3D12RendererContext(appName, pSettings, ppContext);
-        break;
-#endif
-#if defined(VULKAN)
-    case RENDERER_API_VULKAN:
-        initVulkanRendererContext(appName, pSettings, ppContext);
-        break;
-#endif
-#if defined(METAL)
-    case RENDERER_API_METAL:
-        initMetalRendererContext(appName, pSettings, ppContext);
-        break;
-#endif
-#if defined(DIRECT3D11)
-    case RENDERER_API_D3D11:
-        initD3D11RendererContext(appName, pSettings, ppContext);
-        break;
-#endif
-    default:
-        LOGF(LogLevel::eERROR, "No Renderer API defined!");
-        break;
-    }
-}
+//static void initRendererContextAPI(const char* appName, const RendererContextDesc* pSettings, RendererContext** ppContext,
+//                                   const RendererApi api)
+//{
+//    switch (api)
+//    {
+//#if defined(DIRECT3D12)
+//    case RENDERER_API_D3D12:
+//        initD3D12RendererContext(appName, pSettings, ppContext);
+//        break;
+//#endif
+//#if defined(VULKAN)
+//    case RENDERER_API_VULKAN:
+//        initVulkanRendererContext(appName, pSettings, ppContext);
+//        break;
+//#endif
+//#if defined(METAL)
+//    case RENDERER_API_METAL:
+//        initMetalRendererContext(appName, pSettings, ppContext);
+//        break;
+//#endif
+//#if defined(DIRECT3D11)
+//    case RENDERER_API_D3D11:
+//        initD3D11RendererContext(appName, pSettings, ppContext);
+//        break;
+//#endif
+//    default:
+//        LOGF(LogLevel::eERROR, "No Renderer API defined!");
+//        break;
+//    }
+//}
 
 static void exitRendererContextAPI(RendererContext* pContext, const RendererApi api)
 {
@@ -478,27 +429,41 @@ static void exitRendererContextAPI(RendererContext* pContext, const RendererApi 
 void initRendererContext(const char* appName, const RendererContextDesc* pSettings, RendererContext** ppContext)
 {
     ASSERT(ppContext);
-    ASSERT(*ppContext == NULL);
-
     ASSERT(pSettings);
 
     // no need for extendedSettings for configuring gpu, applyExtendedSettings is not called in this function
     ExtendedSettings* extendedSettings = NULL;
     addGPUConfigurationRules(extendedSettings);
 
-    gD3D11Unsupported = !pSettings->mD3D11Supported;
-    gGLESUnsupported = !pSettings->mGLESSupported;
-
-    // Init requested renderer API
-    if (!apiIsUnsupported(gPlatformParameters.mSelectedRendererApi))
+   switch (pSettings->mApi)
     {
-        initRendererContextAPI(appName, pSettings, ppContext, gPlatformParameters.mSelectedRendererApi);
-    }
-    else
-    {
+#if defined(DIRECT3D12)
+    case RENDERER_API_D3D12:
+        initD3D12RendererContext(appName, pSettings, ppContext);
+        break;
+#endif
+#if defined(VULKAN)
+    case RENDERER_API_VULKAN:
+        initVulkanRendererContext(appName, pSettings, ppContext);
+        break;
+#endif
+#if defined(METAL)
+    case RENDERER_API_METAL:
+        initMetalRendererContext(appName, pSettings, ppContext);
+        break;
+#endif
+#if defined(DIRECT3D11)
+    case RENDERER_API_D3D11:
+        initD3D11RendererContext(appName, pSettings, ppContext);
+        break;
+#endif
+    default:
         LOGF(LogLevel::eWARNING, "Requested Graphics API has been marked as disabled and/or not supported in the Renderer's descriptor!");
         LOGF(LogLevel::eWARNING, "Falling back to the first available API...");
+        break;
     }
+
+
 
 #if defined(USE_MULTIPLE_RENDER_APIS)
     // Fallback on other available APIs
@@ -522,50 +487,91 @@ void exitRendererContext(RendererContext* pContext)
     exitRendererContextAPI(pContext, gPlatformParameters.mSelectedRendererApi);
 }
 
-void setupPlatformParameters(Renderer* pRenderer)
-{
-    gPlatformParameters.mAvailableGpuCount = 0;
-    gPlatformParameters.mSelectedGpuIndex = 0;
-
-    // update available gpus and renderer api
-    if (pRenderer != NULL)
-    {
-        uint32_t gpuCount = pRenderer->pContext->mGpuCount;
-        ASSERT(gpuCount <= MAX_MULTIPLE_GPUS);
-        gPlatformParameters.mSelectedRendererApi = pRenderer->mRendererApi;
-        gPlatformParameters.mAvailableGpuCount = gpuCount;
-        gPlatformParameters.mSelectedGpuIndex = (uint32_t)(pRenderer->pGpu - pRenderer->pContext->mGpus);
-        for (uint32_t i = 0; i < gpuCount; ++i)
-        {
-            GPUSettings& gpuSettings = pRenderer->pContext->mGpus[i].mSettings;
-            strncpy(gPlatformParameters.ppAvailableGpuNames[i], gpuSettings.mGpuVendorPreset.mGpuName, MAX_GPU_VENDOR_STRING_LENGTH);
-            gPlatformParameters.pAvailableGpuIds[i] = gpuSettings.mGpuVendorPreset.mModelId;
-        }
-    }
-}
+//void setupPlatformParameters(Renderer* pRenderer)
+//{
+//    gPlatformParameters.mAvailableGpuCount = 0;
+//    gPlatformParameters.mSelectedGpuIndex = 0;
+//
+//    // update available gpus and renderer api
+//    if (pRenderer != NULL)
+//    {
+//        uint32_t gpuCount = pRenderer->pContext->mGpuCount;
+//        ASSERT(gpuCount <= MAX_MULTIPLE_GPUS);
+//        gPlatformParameters.mSelectedRendererApi = pRenderer->mRendererApi;
+//        gPlatformParameters.mAvailableGpuCount = gpuCount;
+//        gPlatformParameters.mSelectedGpuIndex = (uint32_t)(pRenderer->pGpu - pRenderer->pContext->mGpus);
+//        for (uint32_t i = 0; i < gpuCount; ++i)
+//        {
+//            GPUSettings& gpuSettings = pRenderer->pContext->mGpus[i].mSettings;
+//            strncpy(gPlatformParameters.ppAvailableGpuNames[i], gpuSettings.mGpuVendorPreset.mGpuName, MAX_GPU_VENDOR_STRING_LENGTH);
+//            gPlatformParameters.pAvailableGpuIds[i] = gpuSettings.mGpuVendorPreset.mModelId;
+//        }
+//    }
+//}
 
 void initRenderer(const char* appName, const RendererDesc* pSettings, Renderer** ppRenderer)
 {
     ASSERT(ppRenderer);
     ASSERT(*ppRenderer == NULL);
-
+    ASSERT(pSettings->pContext);
     ASSERT(pSettings);
 
-    gD3D11Unsupported = !pSettings->mD3D11Supported;
-    gGLESUnsupported = !pSettings->mGLESSupported;
+//    gD3D11Unsupported = !pSettings->mD3D11Supported;
+//    gGLESUnsupported = !pSettings->mGLESSupported;
 
     addGPUConfigurationRules(pSettings->pExtendedSettings);
 
     // Init requested renderer API
-    if (!apiIsUnsupported(gPlatformParameters.mSelectedRendererApi))
+    switch (pSettings->pContext->mApi)
     {
-        initRendererAPI(appName, pSettings, ppRenderer, gPlatformParameters.mSelectedRendererApi);
+#if defined(DIRECT3D11)
+    case RENDERER_API_D3D11:
+        initD3D11Renderer(appName, pSettings, ppRenderer);
+        break;
+#endif
+#if defined(DIRECT3D12)
+    case RENDERER_API_D3D12:
+        initD3D12RaytracingFunctions();
+        initD3D12Renderer(appName, pSettings, ppRenderer);
+        break;
+#endif
+#if defined(VULKAN)
+    case RENDERER_API_VULKAN:
+        initVulkanRaytracingFunctions();
+        initVulkanRenderer(appName, pSettings, ppRenderer);
+        break;
+#endif
+#if defined(METAL)
+    case RENDERER_API_METAL:
+        initMetalRaytracingFunctions();
+        initMetalRenderer(appName, pSettings, ppRenderer);
+        break;
+#endif
+#if defined(GLES)
+    case RENDERER_API_GLES:
+        initGLESRenderer(appName, pSettings, ppRenderer);
+        break;
+#endif
+#if defined(ORBIS)
+    case RENDERER_API_ORBIS:
+        initOrbisRenderer(appName, pSettings, ppRenderer);
+        break;
+#endif
+#if defined(PROSPERO)
+    case RENDERER_API_PROSPERO:
+        initProsperoRaytracingFunctions();
+        initProsperoRenderer(appName, pSettings, ppRenderer);
+        break;
+#endif
+    default:
+        LOGF(LogLevel::eERROR, "No Renderer API defined!");
+        break;
     }
-    else
-    {
-        LOGF(LogLevel::eWARNING, "Requested Graphics API has been marked as disabled and/or not supported in the Renderer's descriptor!");
-        LOGF(LogLevel::eWARNING, "Falling back to the first available API...");
-    }
+    // else
+    // {
+    //     LOGF(LogLevel::eWARNING, "Requested Graphics API has been marked as disabled and/or not supported in the Renderer's
+    //     descriptor!"); LOGF(LogLevel::eWARNING, "Falling back to the first available API...");
+    // }
 
 #if defined(USE_MULTIPLE_RENDER_APIS)
     // Fallback on other available APIs
@@ -580,12 +586,12 @@ void initRenderer(const char* appName, const RendererDesc* pSettings, Renderer**
 #endif
 
     // set available gpus and renderer api
-    setupPlatformParameters(*ppRenderer);
+    //setupPlatformParameters(*ppRenderer);
     // configure the user's settings using the newly created device
-    if (pSettings->pExtendedSettings && *ppRenderer)
-    {
-        setupExtendedSettings(pSettings->pExtendedSettings, &(*ppRenderer)->pGpu->mSettings);
-    }
+   // if (pSettings->pExtendedSettings && *ppRenderer)
+   // {
+   //     setupExtendedSettings(pSettings->pExtendedSettings, &(*ppRenderer)->pGpu->mSettings);
+   // }
 
     removeGPUConfigurationRules();
 }
@@ -597,6 +603,4 @@ void exitRenderer(Renderer* pRenderer)
     exitRendererAPI(pRenderer, pRenderer->mRendererApi);
     gPlatformParameters.mAvailableGpuCount = 0;
     gPlatformParameters.mSelectedGpuIndex = 0;
-    gD3D11Unsupported = false;
-    gGLESUnsupported = false;
 }
