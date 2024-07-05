@@ -1,20 +1,23 @@
 #include "Forge/Graphics/TF_GPUConfig.h"
+
+#include "Forge/Config.h"
+
 #include <cstdint>
+
 #include "Forge/Core/TF_String.h"
-#include "Forge/Config.h" 
 
-
-#define GPUCFG_VERSION_MAJOR           0
-#define GPUCFG_VERSION_MINOR           2
+#define GPUCFG_VERSION_MAJOR 0
+#define GPUCFG_VERSION_MINOR 2
 
 static bool testValueUint64(uint64_t a, uint64_t b, GPUConfigExprSymbol op);
 static bool testDriveVersion(GPUDriverVersion* v1, GPUDriverVersion* v2, GPUConfigExprSymbol op);
 
 static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input);
-static bool parseGPUExpression(struct TFScratchAllocator* alloc,struct GPUConfigExpression* expr, TStrSpan input); 
-struct TFStrGpuConfigIterable {
-  const struct TStrSpan buffer; // the buffer to iterrate over
-  size_t cursor; // the current position in the buffer
+static bool                parseGPUExpression(struct TFScratchAllocator* alloc, struct GPUConfigExpression* expr, TStrSpan input);
+struct TFStrGpuConfigIterable
+{
+    const struct TStrSpan buffer; // the buffer to iterrate over
+    size_t                cursor; // the current position in the buffer
 };
 
 static struct TStrSpan tfGPUConfigIter(struct TFStrGpuConfigIterable* iterable)
@@ -47,21 +50,21 @@ static struct TStrSpan tfGPUConfigIter(struct TFStrGpuConfigIterable* iterable)
             return res;
         }
     }
-    
+
     iterable->cursor = cursor;
     return (struct TStrSpan){ 0 };
 }
 
-void tfInitGPUConfiguration(struct GPUConfiguration* config) {
-    struct TFScratchAllocDesc allocDesc = {
-      .blockSize = 8192 
-    };
+void tfInitGPUConfiguration(struct GPUConfiguration* config)
+{
+    struct TFScratchAllocDesc allocDesc = { .blockSize = 8192 };
     tfAddScratchAllocator(&config->mAlloc, &allocDesc);
 }
 
-void tfFreeGPUConfiguration(struct GPUConfiguration* config) {
-  tfFreeScratchAllocator(&config->mAlloc);
-  arrfree(config->mGpuModels);
+void tfFreeGPUConfiguration(struct GPUConfiguration* config)
+{
+    tfFreeScratchAllocator(&config->mAlloc);
+    arrfree(config->mGpuModels);
 }
 
 static GPUPresetLevel strToPresetLevel(TStrSpan input)
@@ -81,13 +84,10 @@ static GPUPresetLevel strToPresetLevel(TStrSpan input)
     return GPU_PRESET_NONE;
 }
 
+static bool isTermToken(const char token) { return isalnum(token) || token == '.'; }
 
-static bool isTermToken(const char token) {
-    return isalnum(token) || token == '.';
-}
-
-
-static bool isOpRuleToken(const char token) {
+static bool isOpRuleToken(const char token)
+{
     switch (token)
     {
     case '<':
@@ -101,20 +101,21 @@ static bool isOpRuleToken(const char token) {
     return false;
 }
 
-static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input) {
-   if(tfStrEqual(input, tfToRef(">=")))
+static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input)
+{
+    if (tfStrEqual(input, tfToRef(">=")))
         return GPUConfigExprSymbol::GPUSymbolOpGTE;
-   if(tfStrEqual(input, tfToRef(">")))
+    if (tfStrEqual(input, tfToRef(">")))
         return GPUConfigExprSymbol::GPUSymbolOpGT;
-   if(tfStrEqual(input, tfToRef("<=")))
+    if (tfStrEqual(input, tfToRef("<=")))
         return GPUConfigExprSymbol::GPUSymbolOpLTE;
-   if(tfStrEqual(input, tfToRef(">")))
+    if (tfStrEqual(input, tfToRef(">")))
         return GPUConfigExprSymbol::GPUSymbolOpGT;
-   if(tfStrEqual(input, tfToRef("<")))
+    if (tfStrEqual(input, tfToRef("<")))
         return GPUConfigExprSymbol::GPUSymbolOpLT;
-   if(tfStrEqual(input, tfToRef("==")))
+    if (tfStrEqual(input, tfToRef("==")))
         return GPUConfigExprSymbol::GPUSymbolOpEQ;
-   if(tfStrEqual(input, tfToRef("!=")))
+    if (tfStrEqual(input, tfToRef("!=")))
         return GPUConfigExprSymbol::GPUSymbolOpNE;
     return GPUConfigExprSymbol::GPUSymbolNone;
 }
@@ -136,7 +137,8 @@ static bool parseDriverVersionNumber(TStrSpan input, GPUDriverVersion* version)
     return true;
 }
 
-static bool parseGPUTerm(struct TFScratchAllocator* alloc, struct GPUConfigTerm* term, TStrSpan input) {
+static bool parseGPUTerm(struct TFScratchAllocator* alloc, struct GPUConfigTerm* term, TStrSpan input)
+{
     unsigned long long value = 0;
     memset(term, 0, sizeof(struct GPUConfigTerm));
     if (tfStrIndexOf(input, tfToRef(".")) > 0)
@@ -156,8 +158,8 @@ static bool parseGPUTerm(struct TFScratchAllocator* alloc, struct GPUConfigTerm*
     return true;
 }
 
-
-static bool parseGPUExpression(struct TFScratchAllocator* alloc,struct GPUConfigExpression* expr, TStrSpan input) {
+static bool parseGPUExpression(struct TFScratchAllocator* alloc, struct GPUConfigExpression* expr, TStrSpan input)
+{
     TStrSpan leftParam = { 0 };
     TStrSpan rightParam = { 0 };
     TStrSpan op = { 0 };
@@ -189,23 +191,25 @@ static bool parseGPUExpression(struct TFScratchAllocator* alloc,struct GPUConfig
     consume = tfStrLTrim(tfSub(consume, cursor, consume.len));
 
     // still have characters left in the expression something is malformed
-    if(!tfStrEmpty(consume))
+    if (!tfStrEmpty(consume))
         return false;
 
-
-    if(!tfStrEmpty(leftParam) && !tfStrEmpty(op) && !tfStrEmpty(rightParam)) {
+    if (!tfStrEmpty(leftParam) && !tfStrEmpty(op) && !tfStrEmpty(rightParam))
+    {
         GPUConfigExprSymbol operatorSym = getOpSymbol(op);
         if (operatorSym == GPUConfigExprSymbol::GPUSymbolNone)
             return false;
         expr->opToken = operatorSym;
         unsigned long long value = 0;
-        if(!parseGPUTerm(alloc, &expr->mPrimary, leftParam))
+        if (!parseGPUTerm(alloc, &expr->mPrimary, leftParam))
             return false;
-        if(!parseGPUTerm(alloc, &expr->mSecondary, leftParam))
+        if (!parseGPUTerm(alloc, &expr->mSecondary, leftParam))
             return false;
         return true;
-    } else if(!tfStrEmpty(leftParam)) {
-        if(!parseGPUTerm(alloc, &expr->mPrimary, leftParam))
+    }
+    else if (!tfStrEmpty(leftParam))
+    {
+        if (!parseGPUTerm(alloc, &expr->mPrimary, leftParam))
             return false;
         return true;
     }
@@ -216,7 +220,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 {
     TFStrGpuConfigIterable iterable = { .buffer = input, .cursor = 0 };
     TStrSpan               line = tfGPUConfigIter(&iterable);
-    TStr tempLineMsg = { 0 };
+    TStr                   tempLineMsg = { 0 };
 
     while (iterable.cursor < iterable.buffer.len)
     {
@@ -231,34 +235,39 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                     continue;
                 if (tfStrIndexOf(line, tfToRef("END_GPU_SELECTION;")) >= 0)
                     break;
-                
-                if(config->mGpuSelectionCount >= TF_ARRAY_COUNT(config->mGPUSelection)) {
+
+                if (config->mGpuSelectionCount >= TF_ARRAY_COUNT(config->mGPUSelection))
+                {
                     tfStrClear(&tempLineMsg);
                     tfstrcatfmt(&tempLineMsg, "Max number of rules exausted '%d'.", TF_ARRAY_COUNT(config->mGPUSelection));
                     break;
                 }
-                
+
                 struct TFStrSplitIterable tokenIterable = { .buffer = line, .delim = tfToRef(";"), .cursor = 0 };
                 TStrSpan                  ruleSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
 
-                struct TFStrSplitIterable         ruleIterable = { .buffer = ruleSpan, .delim = tfToRef(","), .cursor = 0 };
-                bool                              isValid = true;
-                
+                struct TFStrSplitIterable ruleIterable = { .buffer = ruleSpan, .delim = tfToRef(","), .cursor = 0 };
+                bool                      isValid = true;
+
                 struct GPUConfigurationSelection* configurationSelection = &config->mGPUSelection[config->mGpuSelectionCount];
                 configurationSelection->mComparisonExprCount = 0;
 
                 while (ruleIterable.cursor < ruleIterable.buffer.len)
                 {
                     struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
-                    if(configurationSelection->mComparisonExprCount >= TF_ARRAY_COUNT(configurationSelection->mComparisonExpr)) {
+                    if (configurationSelection->mComparisonExprCount >= TF_ARRAY_COUNT(configurationSelection->mComparisonExpr))
+                    {
                         isValid = false;
                         tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(configurationSelection->mComparisonExpr));
+                        tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.",
+                                    TF_ARRAY_COUNT(configurationSelection->mComparisonExpr));
                         LOGF(eDEBUG, tempLineMsg.buf);
                         break;
                     }
 
-                    if (!parseGPUExpression(&config->mAlloc, &configurationSelection->mComparisonExpr[configurationSelection->mComparisonExprCount], exprSpan))
+                    if (!parseGPUExpression(&config->mAlloc,
+                                            &configurationSelection->mComparisonExpr[configurationSelection->mComparisonExprCount],
+                                            exprSpan))
                     {
                         isValid = false;
                         tfStrClear(&tempLineMsg);
@@ -293,7 +302,8 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 if (tfStrIndexOf(line, tfToRef("END_DRIVER_REJECTION;")) >= 0)
                     break;
 
-                if(config->mGpuRejectionCount >= TF_ARRAY_COUNT(config->mGPURejection)) {
+                if (config->mGpuRejectionCount >= TF_ARRAY_COUNT(config->mGPURejection))
+                {
                     tfStrClear(&tempLineMsg);
                     tfstrcatfmt(&tempLineMsg, "Max number of rules exausted '%d'.", TF_ARRAY_COUNT(config->mGPUSelection));
                     break;
@@ -305,11 +315,12 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 TStrSpan                  reasonSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 long long                 vendorId = 0;
                 bool                      isValid = true;
-                
+
                 struct GPUConfigurationRejection* rejection = &config->mGPURejection[config->mGpuRejectionCount];
                 rejection->mComparisonExprCount = 0;
 
-                if (!tfStrReadll(vendorSpan, &vendorId)) {
+                if (!tfStrReadll(vendorSpan, &vendorId))
+                {
                     tfStrClear(&tempLineMsg);
                     tfstrcatfmt(&tempLineMsg, "Invalid GPU rejection rule '%S'.", line);
                     LOGF(eDEBUG, tempLineMsg.buf);
@@ -320,22 +331,23 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 while (ruleIterable.cursor < ruleIterable.buffer.len)
                 {
                     struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
-                    
-                    if(rejection->mComparisonExprCount >= TF_ARRAY_COUNT(rejection->mComparisonExpr)) {
+
+                    if (rejection->mComparisonExprCount >= TF_ARRAY_COUNT(rejection->mComparisonExpr))
+                    {
                         isValid = false;
                         tfStrClear(&tempLineMsg);
                         tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(rejection->mComparisonExpr));
                         LOGF(eDEBUG, tempLineMsg.buf);
                         break;
                     }
-                    
 
-                    if (!parseGPUExpression(&config->mAlloc, &rejection->mComparisonExpr[rejection->mComparisonExprCount], exprSpan)) {
+                    if (!parseGPUExpression(&config->mAlloc, &rejection->mComparisonExpr[rejection->mComparisonExprCount], exprSpan))
+                    {
                         isValid = false;
                         tfStrClear(&tempLineMsg);
                         tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
                         LOGF(eDEBUG, tempLineMsg.buf);
-                    }   
+                    }
                     else
                     {
                         rejection->mComparisonExprCount++;
@@ -355,7 +367,6 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 rejection->mReasonStr.len = reasonSpan.len;
                 memcpy(rejection->mReasonStr.buf, reasonSpan.buf, reasonSpan.len);
             }
-
         }
         else if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_SETTINGS;")) >= 0)
         {
@@ -374,7 +385,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 bool                      isValid = true;
                 long long                 assignmentValue = 0;
 
-                if (!tfStrReadll(assignmentSpan, &assignmentValue ))
+                if (!tfStrReadll(assignmentSpan, &assignmentValue))
                 {
                     tfStrClear(&tempLineMsg);
                     tfstrcatfmt(&tempLineMsg, "Invalid GPU rejection rule '%S'.", line);
@@ -388,22 +399,24 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 while (ruleIterable.cursor < ruleIterable.buffer.len)
                 {
                     struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
-                    
-                    if(setting->mComparisonExprCount >= TF_ARRAY_COUNT(setting->mComparisonExpr)) {
+
+                    if (setting->mComparisonExprCount >= TF_ARRAY_COUNT(setting->mComparisonExpr))
+                    {
                         isValid = false;
                         tfStrClear(&tempLineMsg);
                         tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(setting->mComparisonExpr));
                         LOGF(eDEBUG, tempLineMsg.buf);
                         break;
                     }
-                    
-                    if (!parseGPUExpression(&config->mAlloc, &setting->mComparisonExpr[setting->mComparisonExprCount], exprSpan)) {
+
+                    if (!parseGPUExpression(&config->mAlloc, &setting->mComparisonExpr[setting->mComparisonExprCount], exprSpan))
+                    {
                         isValid = false;
                         tfStrClear(&tempLineMsg);
                         tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
                         LOGF(eDEBUG, tempLineMsg.buf);
                         break;
-                    }   
+                    }
                     setting->mComparisonExprCount++;
                 }
 
@@ -439,7 +452,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 bool                      isValid = true;
                 long long                 assignmentValue = 0;
 
-                if (!tfStrReadll(assignmentSpan, &assignmentValue ) || tfStrEmpty(ruleParametersSpan) || tfStrEmpty(propertySpan))
+                if (!tfStrReadll(assignmentSpan, &assignmentValue) || tfStrEmpty(ruleParametersSpan) || tfStrEmpty(propertySpan))
                 {
                     tfStrClear(&tempLineMsg);
                     tfstrcatfmt(&tempLineMsg, "Invalid GPU user setting rule '%S'.", line);
@@ -453,22 +466,24 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 while (ruleIterable.cursor < ruleIterable.buffer.len)
                 {
                     struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
-                    
-                    if(setting->mComparisonExprCount >= TF_ARRAY_COUNT(setting->mComparisonExpr)) {
+
+                    if (setting->mComparisonExprCount >= TF_ARRAY_COUNT(setting->mComparisonExpr))
+                    {
                         isValid = false;
                         tfStrClear(&tempLineMsg);
                         tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(setting->mComparisonExpr));
                         LOGF(eDEBUG, tempLineMsg.buf);
                         break;
                     }
-                    
-                    if (!parseGPUExpression(&config->mAlloc, &setting->mComparisonExpr[setting->mComparisonExprCount], exprSpan)) {
+
+                    if (!parseGPUExpression(&config->mAlloc, &setting->mComparisonExpr[setting->mComparisonExprCount], exprSpan))
+                    {
                         isValid = false;
                         tfStrClear(&tempLineMsg);
                         tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
                         LOGF(eDEBUG, tempLineMsg.buf);
                         break;
-                    }   
+                    }
                     setting->mComparisonExprCount++;
                 }
 
@@ -491,8 +506,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
     return true;
 }
 
-
-bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
+bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
 {
     TFStrGpuConfigIterable iterable = { .buffer = input, .cursor = 0 };
 
@@ -548,10 +562,10 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
                 }
                 else
                 {
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Error could not parse GPU Default Data Configuration rule '%S' in '%S'.",
-                                    ruleNameSpan, assignmentSpan);
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                    tfStrClear(&tempLineMsg);
+                    tfstrcatfmt(&tempLineMsg, "Error could not parse GPU Default Data Configuration rule '%S' in '%S'.", ruleNameSpan,
+                                assignmentSpan);
+                    LOGF(eDEBUG, tempLineMsg.buf);
                 }
             }
         }
@@ -662,7 +676,8 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
     LOGF(eINFO, "    DefaultGPUPresetLevel set to %s", presetLevelToString(config->mDefaultPresetLevel));
     // log gpu vendors
     LOGF(eINFO, "GPU vendors:");
-    for(uint32_t vendorIdx = 0; vendorIdx < config->mVendorCount; vendorIdx++) {
+    for (uint32_t vendorIdx = 0; vendorIdx < config->mVendorCount; vendorIdx++)
+    {
         GPUVendorDefinition* vendorDef = &config->mVendorDefinitions[vendorIdx];
         tfStrClear(&tempLineMsg);
         tfstrcatfmt(&tempLineMsg, "%S: ", vendorDef->mVendorName);
@@ -683,31 +698,29 @@ bool tfLoadGPUData(struct GPUConfiguration* config,TStrSpan input)
 typedef uint64_t (*PropertyGetter)(const GpuProperties* pSetting);
 typedef void (*PropertySetter)(GpuProperties* pSetting, uint64_t value);
 
-#define GPU_CONFIG_PROPERTY(name, prop)                                             \
-    {                                                                               \
-        name, [](const GpuProperties* pSetting) { return (uint64_t)pSetting->prop; }, \
-            [](GpuProperties* pSetting, uint64_t value)                               \
-        {                                                                           \
-            COMPILE_ASSERT(sizeof(decltype(pSetting->prop)) <= sizeof(value));      \
-            pSetting->prop = (decltype(pSetting->prop))value;                       \
-        }                                                                           \
+#define GPU_CONFIG_PROPERTY(name, prop)                                                                                           \
+    {                                                                                                                             \
+        name, [](const GpuProperties* pSetting) { return (uint64_t)pSetting->prop; }, [](GpuProperties* pSetting, uint64_t value) \
+        {                                                                                                                         \
+            COMPILE_ASSERT(sizeof(decltype(pSetting->prop)) <= sizeof(value));                                                    \
+            pSetting->prop = (decltype(pSetting->prop))value;                                                                     \
+        }                                                                                                                         \
     }
 
-#define GPU_CONFIG_PROPERTY_READ_ONLY(name, prop)                                   \
-    {                                                                               \
-        name, [](const GpuProperties* pSetting) { return (uint64_t)pSetting->prop; }, \
-            [](GpuProperties* pSetting, uint64_t value)                               \
-        {                                                                           \
-            UNREF_PARAM(value);                                                     \
-            UNREF_PARAM(pSetting);                                                  \
-            LOGF(eDEBUG, "GPUConfig: Unsupported setting %s from gpu.cfg", name);   \
-            ASSERT(false);                                                          \
-        }                                                                           \
+#define GPU_CONFIG_PROPERTY_READ_ONLY(name, prop)                                                                                 \
+    {                                                                                                                             \
+        name, [](const GpuProperties* pSetting) { return (uint64_t)pSetting->prop; }, [](GpuProperties* pSetting, uint64_t value) \
+        {                                                                                                                         \
+            UNREF_PARAM(value);                                                                                                   \
+            UNREF_PARAM(pSetting);                                                                                                \
+            LOGF(eDEBUG, "GPUConfig: Unsupported setting %s from gpu.cfg", name);                                                 \
+            ASSERT(false);                                                                                                        \
+        }                                                                                                                         \
     }
 
 struct GPUProperty
 {
-    TStrSpan  name;
+    TStrSpan       name;
     PropertyGetter getter;
     PropertySetter setter;
 };
@@ -764,7 +777,6 @@ const GPUProperty availableGpuProperties[] = {
     GPU_CONFIG_PROPERTY(tfToRef("waveopssupport"), mWaveOpsSupportFlags),
 };
 
-
 static const GPUProperty* findGPUProperty(TStrSpan test)
 {
     for (size_t i = 0; i < TF_ARRAY_COUNT(availableGpuProperties); i++)
@@ -801,7 +813,8 @@ static bool testDriveVersion(GPUDriverVersion* v1, GPUDriverVersion* v2, GPUConf
     return false;
 }
 
-static bool testValueUint64(uint64_t a, uint64_t b, GPUConfigExprSymbol op) {
+static bool testValueUint64(uint64_t a, uint64_t b, GPUConfigExprSymbol op)
+{
     switch (op)
     {
     case GPUConfigExprSymbol::GPUSymbolOpEQ:
@@ -832,7 +845,7 @@ static inline bool tryUnpackUintDriverTerm(GpuProperties* gpuProp, const GPUConf
         {
             return true;
         }
-    } 
+    }
     if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolDriverVersion)
     {
         (*value) = t1->mDriverVersion;
@@ -842,21 +855,25 @@ static inline bool tryUnpackUintDriverTerm(GpuProperties* gpuProp, const GPUConf
     return false;
 }
 
-static inline bool tryUnpackUint64Term(GpuProperties* gpuProp, const GPUConfigTerm* t1, uint64_t* value) {
+static inline bool tryUnpackUint64Term(GpuProperties* gpuProp, const GPUConfigTerm* t1, uint64_t* value)
+{
     if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
     {
         const GPUProperty* p1 = findGPUProperty(t1->mVariable);
-        if(p1) {
+        if (p1)
+        {
             (*value) = p1->getter(gpuProp);
             return true;
-        } else {
-            TStr str = {0};
+        }
+        else
+        {
+            TStr str = { 0 };
             tfstrcatfmt(&str, "failed to resolve variable: '%S'.", t1->mVariable);
             LOGF(eINFO, str.buf);
             tfStrFree(&str);
         }
     }
-    
+
     if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
     {
         (*value) = t1->mValue;
@@ -890,7 +907,7 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
                 bool isValid = true;
                 for (size_t ruleIdx = 0; ruleIdx < setting->mComparisonExprCount; ruleIdx++)
                 {
-                    const GPUConfigExpression* rule =  &setting->mComparisonExpr[ruleIdx];
+                    const GPUConfigExpression* rule = &setting->mComparisonExpr[ruleIdx];
                     {
                         GPUDriverVersion v1 = { 0 };
                         GPUDriverVersion v2 = { 0 };
@@ -909,7 +926,8 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
                         if (!isValid)
                             break;
                     }
-                    if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+                    if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable &&
+                        rule->opToken == GPUConfigExprSymbol::GPUSymbolNone)
                     {
                         const GPUProperty* p1 = findGPUProperty(rule->mPrimary.mVariable);
                         isValid = isValid && (p1->getter(&selections[j].properties) > 0);
@@ -941,11 +959,10 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
     {
         GpuSelection* testSelection = &selections[testIndex];
         GpuSelection* refSelection = &selections[selectionIndex];
-        bool          refPass = true;
-        bool          testPass = true;
-
         for (size_t ruleIndex = 0; ruleIndex < def->mGpuSelectionCount; ruleIndex++)
         {
+            bool                                    refPass = true;
+            bool                                    testPass = true;
             const struct GPUConfigurationSelection* selectionRule = &def->mGPUSelection[ruleIndex];
             for (size_t ruleIdx = 0; ruleIdx < selectionRule->mComparisonExprCount; ruleIdx++)
             {
@@ -978,31 +995,35 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
                         tryUnpackUint64Term(&refSelection->properties, &rule->mSecondary, &v2))
                         refPass = refPass && testValueUint64(v1, v2, rule->opToken);
                 }
-                if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+                if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable && rule->opToken == GPUConfigExprSymbol::GPUSymbolNone)
                 {
                     uint64_t refValue = 0;
                     uint64_t testValue = 0;
                     if (tryUnpackUint64Term(&refSelection->properties, &rule->mPrimary, &refValue) &&
-                        tryUnpackUint64Term(&testSelection->properties, &rule->mSecondary, &testValue)) {
-                        testPass &= testValue >= refValue;
-                        refPass &= refValue >= testValue;
+                        tryUnpackUint64Term(&testSelection->properties, &rule->mPrimary, &testValue))
+                    {
+                        testPass = testPass && (testValue >= refValue);
+                        refPass = refPass && (refValue >= testValue);
                     }
                 }
             }
-        }
-        if(testPass != refPass) {
-            // log rule selection
-            uint32_t chosenIndex = testPass ? testIndex : selectionIndex;
-            uint32_t nonChosenIndex = testPass ? selectionIndex : testIndex;
-            LOGF(eINFO, "Choosing GPU: %s", selections[chosenIndex].properties.mGpuVendorPreset.mGpuName);
-            if(testPass && !refPass) {
-                selectionIndex = testIndex;
+            if (testPass != refPass)
+            {
+                // log rule selection
+                // uint32_t chosenIndex = testPass ? testIndex : selectionIndex;
+                // uint32_t nonChosenIndex = testPass ? selectionIndex : testIndex;
+                if (testPass && !refPass)
+                {
+                    selectionIndex = testIndex;
+                }
+                break;
             }
         }
     }
 
+    LOGF(eINFO, "Choosing GPU: %s", selections[selectionIndex].properties.mGpuVendorPreset.mGpuName);
     tfStrFree(&tempLineMsg);
     GpuSelection result = selections[selectionIndex];
     arrfree(selections);
-    return result ;
+    return result;
 }

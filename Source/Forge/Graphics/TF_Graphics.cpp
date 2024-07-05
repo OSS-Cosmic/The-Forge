@@ -365,67 +365,6 @@ static void exitRendererAPI(Renderer* pRenderer, const RendererApi api)
     }
 }
 
-//static void initRendererContextAPI(const char* appName, const RendererContextDesc* pSettings, RendererContext** ppContext,
-//                                   const RendererApi api)
-//{
-//    switch (api)
-//    {
-//#if defined(DIRECT3D12)
-//    case RENDERER_API_D3D12:
-//        initD3D12RendererContext(appName, pSettings, ppContext);
-//        break;
-//#endif
-//#if defined(VULKAN)
-//    case RENDERER_API_VULKAN:
-//        initVulkanRendererContext(appName, pSettings, ppContext);
-//        break;
-//#endif
-//#if defined(METAL)
-//    case RENDERER_API_METAL:
-//        initMetalRendererContext(appName, pSettings, ppContext);
-//        break;
-//#endif
-//#if defined(DIRECT3D11)
-//    case RENDERER_API_D3D11:
-//        initD3D11RendererContext(appName, pSettings, ppContext);
-//        break;
-//#endif
-//    default:
-//        LOGF(LogLevel::eERROR, "No Renderer API defined!");
-//        break;
-//    }
-//}
-
-static void exitRendererContextAPI(RendererContext* pContext, const RendererApi api)
-{
-    switch (api)
-    {
-#if defined(DIRECT3D12)
-    case RENDERER_API_D3D12:
-        exitD3D12RendererContext(pContext);
-        break;
-#endif
-#if defined(VULKAN)
-    case RENDERER_API_VULKAN:
-        exitVulkanRendererContext(pContext);
-        break;
-#endif
-#if defined(METAL)
-    case RENDERER_API_METAL:
-        exitMetalRendererContext(pContext);
-        break;
-#endif
-#if defined(DIRECT3D11)
-    case RENDERER_API_D3D11:
-        exitD3D11RendererContext(pContext);
-        break;
-#endif
-    default:
-        LOGF(LogLevel::eERROR, "No Renderer API defined!");
-        break;
-    }
-}
-
 void initRendererContext(const char* appName, const RendererContextDesc* pSettings, RendererContext** ppContext)
 {
     ASSERT(ppContext);
@@ -484,30 +423,34 @@ void exitRendererContext(RendererContext* pContext)
 {
     ASSERT(pContext);
 
-    exitRendererContextAPI(pContext, gPlatformParameters.mSelectedRendererApi);
+    switch (pContext->mApi)
+    {
+#if defined(DIRECT3D12)
+    case RENDERER_API_D3D12:
+        exitD3D12RendererContext(pContext);
+        break;
+#endif
+#if defined(VULKAN)
+    case RENDERER_API_VULKAN:
+        exitVulkanRendererContext(pContext);
+        break;
+#endif
+#if defined(METAL)
+    case RENDERER_API_METAL:
+        exitMetalRendererContext(pContext);
+        break;
+#endif
+#if defined(DIRECT3D11)
+    case RENDERER_API_D3D11:
+        exitD3D11RendererContext(pContext);
+        break;
+#endif
+    default:
+        LOGF(LogLevel::eERROR, "No Renderer API defined!");
+        break;
+    }
 }
 
-//void setupPlatformParameters(Renderer* pRenderer)
-//{
-//    gPlatformParameters.mAvailableGpuCount = 0;
-//    gPlatformParameters.mSelectedGpuIndex = 0;
-//
-//    // update available gpus and renderer api
-//    if (pRenderer != NULL)
-//    {
-//        uint32_t gpuCount = pRenderer->pContext->mGpuCount;
-//        ASSERT(gpuCount <= MAX_MULTIPLE_GPUS);
-//        gPlatformParameters.mSelectedRendererApi = pRenderer->mRendererApi;
-//        gPlatformParameters.mAvailableGpuCount = gpuCount;
-//        gPlatformParameters.mSelectedGpuIndex = (uint32_t)(pRenderer->pGpu - pRenderer->pContext->mGpus);
-//        for (uint32_t i = 0; i < gpuCount; ++i)
-//        {
-//            GPUSettings& gpuSettings = pRenderer->pContext->mGpus[i].mSettings;
-//            strncpy(gPlatformParameters.ppAvailableGpuNames[i], gpuSettings.mGpuVendorPreset.mGpuName, MAX_GPU_VENDOR_STRING_LENGTH);
-//            gPlatformParameters.pAvailableGpuIds[i] = gpuSettings.mGpuVendorPreset.mModelId;
-//        }
-//    }
-//}
 
 void initRenderer(const char* appName, const RendererDesc* pSettings, Renderer** ppRenderer)
 {
