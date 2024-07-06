@@ -370,9 +370,9 @@ void initRendererContext(const char* appName, const RendererContextDesc* pSettin
     ASSERT(ppContext);
     ASSERT(pSettings);
 
-    // no need for extendedSettings for configuring gpu, applyExtendedSettings is not called in this function
-    ExtendedSettings* extendedSettings = NULL;
-    addGPUConfigurationRules(extendedSettings);
+    //// no need for extendedSettings for configuring gpu, applyExtendedSettings is not called in this function
+    //ExtendedSettings* extendedSettings = NULL;
+    //addGPUConfigurationRules(extendedSettings);
 
    switch (pSettings->mApi)
     {
@@ -458,11 +458,6 @@ void initRenderer(const char* appName, const RendererDesc* pSettings, Renderer**
     ASSERT(*ppRenderer == NULL);
     ASSERT(pSettings->pContext);
     ASSERT(pSettings);
-
-//    gD3D11Unsupported = !pSettings->mD3D11Supported;
-//    gGLESUnsupported = !pSettings->mGLESSupported;
-
-    addGPUConfigurationRules(pSettings->pExtendedSettings);
 
     // Init requested renderer API
     switch (pSettings->pContext->mApi)

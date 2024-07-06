@@ -2834,7 +2834,6 @@ typedef struct GPUVendorPreset
     uint32_t       mVendorId;
     uint32_t       mModelId;
     uint32_t       mRevisionId; // Optional as not all gpu's have that. Default is : 0x00
-    GPUPresetLevel mPresetLevel;
     char           mVendorName[MAX_GPU_VENDOR_STRING_LENGTH];
     char           mGpuName[MAX_GPU_VENDOR_STRING_LENGTH]; // If GPU Name is missing then value will be empty string
     char           mGpuDriverVersion[MAX_GPU_VENDOR_STRING_LENGTH];

@@ -3541,6 +3541,7 @@ static uint32_t gRendererCount = 0;
 void vk_exitRendererContext(RendererContext* pContext)
 {
     ASSERT(gRendererCount == 0);
+    arrfree(pContext->pAdapters);
 
     agsExit();
     nvapiExit();
@@ -10244,7 +10245,7 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
             // TODO: Fix once vulkan adds support for revision ID
             GPUVendorPreset* preset = &device.mDefaultProps.mGpuVendorPreset;
             preset->mRevisionId = 0;
-            preset->mPresetLevel = getGPUPresetLevel(preset->mVendorId, preset->mModelId, preset->mVendorName, preset->mGpuName);
+            //preset->mPresetLevel = getGPUPresetLevel(preset->mVendorId, preset->mModelId, preset->mVendorName, preset->mGpuName);
 
             // set default driver to be very high to not trigger driver rejection rules if NVAPI or AMDAGS fails
             snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", 999999, 99);
@@ -10338,9 +10339,8 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
                 }
             }
 
-            LOGF(LogLevel::eINFO, "GPU[%u] detected. Vendor ID: %#x, Model ID: %#x, Preset: %s, GPU Name: %s", i,
-                 device.mDefaultProps.mGpuVendorPreset.mVendorId, device.mDefaultProps.mGpuVendorPreset.mModelId,
-                 presetLevelToString(device.mDefaultProps.mGpuVendorPreset.mPresetLevel), device.mDefaultProps.mGpuVendorPreset.mGpuName);
+            LOGF(LogLevel::eINFO, "GPU[%u] detected. Vendor ID: %#x, Model ID: %#x, GPU Name: %s", i,
+                 device.mDefaultProps.mGpuVendorPreset.mVendorId, device.mDefaultProps.mGpuVendorPreset.mModelId, device.mDefaultProps.mGpuVendorPreset.mGpuName);
             arrpush(pContext->pAdapters, device);
         }
     }
