@@ -104,7 +104,6 @@ struct GPUConfiguration
     struct TFScratchAllocator mAlloc; // temporary scratch allocator for the lifetime of the configuration
 
     GPUPresetLevel mDefaultPresetLevel;
-
     size_t                           mGpuUserSettingCount;
     struct GPUConfigurationSetting   mConfigurationUserSettings[256];
     size_t                           mGpuConfigurationSettingCount;

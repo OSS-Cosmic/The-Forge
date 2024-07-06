@@ -221,7 +221,6 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 {
     TFStrGpuConfigIterable iterable = { .buffer = input, .cursor = 0 };
     TStrSpan               line = tfGPUConfigIter(&iterable);
-    TStr                   tempLineMsg = { 0 };
 
     while (iterable.cursor < iterable.buffer.len)
     {
@@ -239,8 +238,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 if (config->mGpuSelectionCount >= TF_ARRAY_COUNT(config->mGPUSelection))
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Max number of rules exausted '%d'.", TF_ARRAY_COUNT(config->mGPUSelection));
+                    LOGF(eDEBUG, "Max number of rules exausted '%d'.", TF_ARRAY_COUNT(config->mGPUSelection));
                     break;
                 }
 
@@ -259,10 +257,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                     if (configurationSelection->mComparisonExprCount >= TF_ARRAY_COUNT(configurationSelection->mComparisonExpr))
                     {
                         isValid = false;
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.",
-                                    TF_ARRAY_COUNT(configurationSelection->mComparisonExpr));
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(configurationSelection->mComparisonExpr));
                         break;
                     }
 
@@ -271,9 +266,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                                             exprSpan))
                     {
                         isValid = false;
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Invalid GPU expression '%.*s'.", (int)exprSpan.len, exprSpan.buf);
                     }
                     else
                     {
@@ -287,9 +280,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 }
                 else
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Invalid GPU selection rule '%S'.", line);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Invalid GPU selection rule '%.*s'.", line.len, line.buf);
                 }
             }
         }
@@ -305,8 +296,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 if (config->mGpuRejectionCount >= TF_ARRAY_COUNT(config->mGPURejection))
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Max number of rules exausted '%d'.", TF_ARRAY_COUNT(config->mGPUSelection));
+                    LOGF(eDEBUG, "Max number of rules exausted '%d'.", TF_ARRAY_COUNT(config->mGPUSelection));
                     break;
                 }
 
@@ -322,9 +312,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 if (!tfStrReadll(vendorSpan, &vendorId))
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Invalid GPU rejection rule '%S'.", line);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Invalid GPU rejection rule '%.*s'.", line.len, line.buf);
                     continue;
                 }
 
@@ -336,18 +324,14 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                     if (rejection->mComparisonExprCount >= TF_ARRAY_COUNT(rejection->mComparisonExpr))
                     {
                         isValid = false;
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(rejection->mComparisonExpr));
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(rejection->mComparisonExpr));
                         break;
                     }
 
                     if (!parseGPUExpression(&config->mAlloc, &rejection->mComparisonExpr[rejection->mComparisonExprCount], exprSpan))
                     {
                         isValid = false;
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Invalid GPU expression '%.*s'.", exprSpan.len, exprSpan.buf);
                     }
                     else
                     {
@@ -357,9 +341,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 if (!isValid)
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Invalid GPU rejection rule '%S'.", line);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Invalid GPU rejection rule '%.*s'.", line.len, line.buf);
                     continue;
                 }
                 config->mGpuRejectionCount++;
@@ -388,9 +370,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 if (!tfStrReadll(assignmentSpan, &assignmentValue))
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Invalid GPU rejection rule '%S'.", line);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Invalid GPU rejection rule '%.*s'.", (int)line.len, line.buf);
                     continue;
                 }
 
@@ -404,18 +384,14 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                     if (setting->mComparisonExprCount >= TF_ARRAY_COUNT(setting->mComparisonExpr))
                     {
                         isValid = false;
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(setting->mComparisonExpr));
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(setting->mComparisonExpr));
                         break;
                     }
 
                     if (!parseGPUExpression(&config->mAlloc, &setting->mComparisonExpr[setting->mComparisonExprCount], exprSpan))
                     {
                         isValid = false;
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Invalid GPU expression '%.*s'.", exprSpan.len, exprSpan.buf);
                         break;
                     }
                     setting->mComparisonExprCount++;
@@ -423,9 +399,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 if (!isValid)
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Invalid GPU setting rule '%S'.", line);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Invalid GPU setting rule '%.*s'.", (int)line.len, line.buf);
                     continue;
                 }
 
@@ -455,9 +429,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 if (!tfStrReadll(assignmentSpan, &assignmentValue) || tfStrEmpty(ruleParametersSpan) || tfStrEmpty(propertySpan))
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Invalid GPU user setting rule '%S'.", line);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Invalid GPU user setting rule '%.*s'.", (int)line.len, line.buf);
                     continue;
                 }
 
@@ -471,18 +443,14 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                     if (setting->mComparisonExprCount >= TF_ARRAY_COUNT(setting->mComparisonExpr))
                     {
                         isValid = false;
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(setting->mComparisonExpr));
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Number of expressions is exausted %d.", TF_ARRAY_COUNT(setting->mComparisonExpr));
                         break;
                     }
 
                     if (!parseGPUExpression(&config->mAlloc, &setting->mComparisonExpr[setting->mComparisonExprCount], exprSpan))
                     {
                         isValid = false;
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Invalid GPU expression '%S'.", exprSpan);
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Invalid GPU expression '%.*s'.", exprSpan.len, exprSpan.buf);
                         break;
                     }
                     setting->mComparisonExprCount++;
@@ -490,9 +458,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 if (!isValid)
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Invalid GPU user setting rule '%S'.", line);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Invalid GPU user setting rule '%.*s'.", (int)line.len, line.buf);
                     continue;
                 }
 
@@ -528,7 +494,7 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
             return false;
         }
     }
-    TStr tempLineMsg = { 0 };
+    //TStr tempLineMsg = { 0 };
 
     while (iterable.cursor < iterable.buffer.len)
     {
@@ -555,18 +521,12 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                     }
                     else
                     {
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Error invalid preset level in GPU Default Data Configuration value '%S' in '%S'.",
-                                    ruleNameSpan, line);
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Error invalid preset level in GPU Default Data Configuration value '%.*s' in '%.*s'.", (int)ruleNameSpan.len, ruleNameSpan.buf, line.len, line.buf);
                     }
                 }
                 else
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Error could not parse GPU Default Data Configuration rule '%S' in '%S'.", ruleNameSpan,
-                                assignmentSpan);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Error could not parse GPU Default Data Configuration rule '%.*s' in '%.*s'.", (int)ruleNameSpan.len, ruleNameSpan.buf, (int)assignmentSpan.len, assignmentSpan.buf);
                 }
             }
         }
@@ -648,9 +608,7 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                     }
                     else
                     {
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "Invalid GPU vendor identifier %S from line: '%S'.", vendorSpan, identiferSpan);
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "Invalid GPU vendor identifier %.*s from line: '%.*s'.", vendorSpan.len, vendorSpan.buf, identiferSpan.len, identiferSpan.buf);
                         break;
                     }
                 }
@@ -664,9 +622,7 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                 }
                 else
                 {
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "Error could not parse GPU vendor in '%S'.", line);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    LOGF(eDEBUG, "Error could not parse GPU vendor in '%.*s'.", line.len, line.buf);
                 }
             }
         }
@@ -677,22 +633,23 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
     LOGF(eINFO, "    DefaultGPUPresetLevel set to %s", presetLevelToString(config->mDefaultPresetLevel));
     // log gpu vendors
     LOGF(eINFO, "GPU vendors:");
+    TStr vendorBufStr = {0};
     for (uint32_t vendorIdx = 0; vendorIdx < config->mVendorCount; vendorIdx++)
     {
         GPUVendorDefinition* vendorDef = &config->mVendorDefinitions[vendorIdx];
-        tfStrClear(&tempLineMsg);
-        tfstrcatfmt(&tempLineMsg, "%S: ", vendorDef->mVendorName);
+        tfStrClear(&vendorBufStr);
+        tfstrcatfmt(&vendorBufStr, "%S: ", vendorDef->mVendorName);
         for (uint32_t identIdx = 0; identIdx < vendorDef->mIdentifierCount; identIdx++)
         {
             if (identIdx > 0)
             {
-                tfstrcatfmt(&tempLineMsg, ", ");
+                tfstrcatfmt(&vendorBufStr, ", ");
             }
-            tfstrcatprintf(&tempLineMsg, "%#x", vendorDef->mIdentifierArray[identIdx]);
+            tfstrcatprintf(&vendorBufStr, "%#x", vendorDef->mIdentifierArray[identIdx]);
         }
-        LOGF(eINFO, tempLineMsg.buf);
+        LOGF(eINFO, vendorBufStr.buf);
     }
-    tfStrFree(&tempLineMsg);
+    tfStrFree(&vendorBufStr);
     return true;
 }
 
@@ -832,7 +789,6 @@ struct GPUConfigSelection tfApplyGPUConfig(const struct GPUConfiguration* def, c
         }
     }
 
-    TStr tempLineMsg = { 0 };
     for (size_t selectionIdx = 0; selectionIdx < arrlen(selections); selectionIdx++)
     {
         for (size_t i = 0; i < def->mGpuConfigurationSettingCount; i++)
@@ -875,19 +831,10 @@ struct GPUConfigSelection tfApplyGPUConfig(const struct GPUConfiguration* def, c
 
                     if (writeVariableToProperty(&selections[selectionIdx], setting->mUpdateProperty, &writeTerm))
                     {
-                        tfStrClear(&tempLineMsg);
-                        tfstrcatfmt(&tempLineMsg, "GPU: %s, setting %S to %llu",
-                                    selections[selectionIdx].mGpuProperty.mGpuVendorPreset.mGpuName, setting->mUpdateProperty,
-                                    setting->mAssignmentValue);
-                        LOGF(eDEBUG, tempLineMsg.buf);
+                        LOGF(eDEBUG, "GPU: %s, setting %.*s to %llu", selections[selectionIdx].mDeviceAdapter->mGpuName,
+                             setting->mUpdateProperty.len, setting->mUpdateProperty.buf, setting->mAssignmentValue);
                     }
                 }
-            }
-            else
-            {
-                tfStrClear(&tempLineMsg);
-                tfstrcatfmt(&tempLineMsg, "Unhandled property '%S'.", setting->mUpdateProperty);
-                LOGF(eDEBUG, tempLineMsg.buf);
             }
         }
     }
@@ -953,7 +900,6 @@ struct GPUConfigSelection tfApplyGPUConfig(const struct GPUConfiguration* def, c
     }
 
     LOGF(eINFO, "Choosing GPU: %s", selections[selectionIndex].mGpuProperty.mGpuVendorPreset.mGpuName);
-    tfStrFree(&tempLineMsg);
     GPUConfigSelection result = selections[selectionIndex];
     arrfree(selections);
     return result;
