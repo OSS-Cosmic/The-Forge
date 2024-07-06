@@ -3993,27 +3993,27 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
         }
 
         // anything below LOW preset is not supported and we will exit
-        if (pRenderer->pProperties->mGpuVendorPreset.mPresetLevel < GPU_PRESET_VERYLOW)
-        {
-            // remove device and any memory we allocated in just above as this is the first function called
-            // when initializing the forge
-            RemoveDevice(pRenderer);
-            // if (pRenderer->mOwnsContext)
-            // {
-            //     vk_exitRendererContext(pRenderer->pContext);
-            // }
-            SAFE_FREE(pRenderer);
-            LOGF(LogLevel::eERROR, "Selected GPU has an Office Preset in gpu.cfg.");
-            LOGF(LogLevel::eERROR, "Office preset is not supported by The Forge.");
+        //if (pRenderer->pProperties->mGpuVendorPreset.mPresetLevel < GPU_PRESET_VERYLOW)
+        //{
+        //    // remove device and any memory we allocated in just above as this is the first function called
+        //    // when initializing the forge
+        //    RemoveDevice(pRenderer);
+        //    // if (pRenderer->mOwnsContext)
+        //    // {
+        //    //     vk_exitRendererContext(pRenderer->pContext);
+        //    // }
+        //    SAFE_FREE(pRenderer);
+        //    LOGF(LogLevel::eERROR, "Selected GPU has an Office Preset in gpu.cfg.");
+        //    LOGF(LogLevel::eERROR, "Office preset is not supported by The Forge.");
 
-            // have the condition in the assert as well so its cleared when the assert message box appears
-            ASSERT(pRenderer->pProperties->mGpuVendorPreset.mPresetLevel >= GPU_PRESET_VERYLOW); //-V547
+        //    // have the condition in the assert as well so its cleared when the assert message box appears
+        //    ASSERT(pRenderer->pProperties->mGpuVendorPreset.mPresetLevel >= GPU_PRESET_VERYLOW); //-V547
 
-            // return NULL pRenderer so that client can gracefully handle exit
-            // This is better than exiting from here in case client has allocated memory or has fallbacks   // Renderer is good!
-            *ppRenderer = NULL;
-            return;
-        }
+        //    // return NULL pRenderer so that client can gracefully handle exit
+        //    // This is better than exiting from here in case client has allocated memory or has fallbacks   // Renderer is good!
+        //    *ppRenderer = NULL;
+        //    return;
+        //}
         /************************************************************************/
         // Memory allocator
         /************************************************************************/
@@ -10224,6 +10224,11 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
 #if defined(AMDAGS)
             pGpu->mSettings.mAmdAsicFamily = agsGetAsicFamily(gpuProperties.properties.deviceID);
 #endif
+            device.mVendorId = gpuProperties.properties.vendorID;
+            device.mModelId = gpuProperties.properties.deviceID;
+            strncpy(device.mGpuName, gpuProperties.properties.deviceName, MAX_GPU_VENDOR_STRING_LENGTH);
+            device.mRevisionId = 0;
+
 
             // save vendor and model Id as string
             device.mDefaultProps.mGpuVendorPreset.mModelId = gpuProperties.properties.deviceID;
@@ -10243,12 +10248,13 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
 
             // set default driver to be very high to not trigger driver rejection rules if NVAPI or AMDAGS fails
             snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", 999999, 99);
+            snprintf(device.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", 999999, 99);
             if (gpuVendorEquals(device.mDefaultProps.mGpuVendorPreset.mVendorId, "nvidia"))
             {
 #if defined(NVAPI)
                 if (NvAPI_Status::NVAPI_OK == gNvStatus)
                 {
-                    snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%lu.%lu",
+                    snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%lu.%lu",
                              gNvGpuInfo.driverVersion / 100, gNvGpuInfo.driverVersion % 100);
                 }
 #else
@@ -10259,6 +10265,9 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
                 tertiaryBranch = (gpuProperties.properties.driverVersion) & 0x003f;
                 snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u.%u.%u", major, minor,
                          secondaryBranch, tertiaryBranch);
+                snprintf(device.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u.%u.%u", major, minor,
+                         secondaryBranch, tertiaryBranch);
+
 #endif
             }
             else if (gpuVendorEquals(device.mDefaultProps.mGpuVendorPreset.mVendorId, "amd"))
@@ -10266,11 +10275,14 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
 #if defined(AMDAGS)
                 if (AGSReturnCode::AGS_SUCCESS == gAgsStatus)
                 {
-                    snprintf(pGpu->mSettings.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%s",
+                    snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%s",
+                             gAgsGpuInfo.driverVersion);
+                    snprintf(device.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%s",
                              gAgsGpuInfo.driverVersion);
                 }
 #else
                 VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion);
+                VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, device.mGpuDriverVersion);
                 LOGF(eWARNING, "Parsing amd driver version without ags lib is unreliable, setting to default value: %s",
                      device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion);
 #endif
@@ -10281,10 +10293,12 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
                 uint32_t major = gpuProperties.properties.driverVersion >> 14;
                 uint32_t minor = gpuProperties.properties.driverVersion & 0x3fff;
                 snprintf(device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", major, minor);
+                snprintf(device.mGpuDriverVersion, MAX_GPU_VENDOR_STRING_LENGTH, "%u.%u", major, minor);
             }
             else
             {
                 VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, device.mDefaultProps.mGpuVendorPreset.mGpuDriverVersion);
+                VK_FORMAT_VERSION(gpuProperties.properties.driverVersion, device.mGpuDriverVersion);
             }
 
             gpuProperties.pNext = NULL;

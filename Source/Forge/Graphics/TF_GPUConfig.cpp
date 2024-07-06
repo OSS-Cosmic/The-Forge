@@ -10,7 +10,8 @@
 #define GPUCFG_VERSION_MINOR 2
 
 static bool testValueUint64(uint64_t a, uint64_t b, GPUConfigExprSymbol op);
-static bool testDriveVersion(GPUDriverVersion* v1, GPUDriverVersion* v2, GPUConfigExprSymbol op);
+static bool testDriveVersion(const GPUDriverVersion* v1, const GPUDriverVersion* v2, GPUConfigExprSymbol op);
+static bool parseDriverVersionNumber(TStrSpan input, GPUDriverVersion* version);
 
 static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input);
 static bool                parseGPUExpression(struct TFScratchAllocator* alloc, struct GPUConfigExpression* expr, TStrSpan input);
@@ -695,101 +696,55 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
     return true;
 }
 
-typedef uint64_t (*PropertyGetter)(const GpuProperties* pSetting);
-typedef void (*PropertySetter)(GpuProperties* pSetting, uint64_t value);
-
-#define GPU_CONFIG_PROPERTY(name, prop)                                                                                           \
-    {                                                                                                                             \
-        name, [](const GpuProperties* pSetting) { return (uint64_t)pSetting->prop; }, [](GpuProperties* pSetting, uint64_t value) \
-        {                                                                                                                         \
-            COMPILE_ASSERT(sizeof(decltype(pSetting->prop)) <= sizeof(value));                                                    \
-            pSetting->prop = (decltype(pSetting->prop))value;                                                                     \
-        }                                                                                                                         \
-    }
-
-#define GPU_CONFIG_PROPERTY_READ_ONLY(name, prop)                                                                                 \
-    {                                                                                                                             \
-        name, [](const GpuProperties* pSetting) { return (uint64_t)pSetting->prop; }, [](GpuProperties* pSetting, uint64_t value) \
-        {                                                                                                                         \
-            UNREF_PARAM(value);                                                                                                   \
-            UNREF_PARAM(pSetting);                                                                                                \
-            LOGF(eDEBUG, "GPUConfig: Unsupported setting %s from gpu.cfg", name);                                                 \
-            ASSERT(false);                                                                                                        \
-        }                                                                                                                         \
-    }
-
-struct GPUProperty
+static bool writeVariableToProperty(GPUConfigSelection* pSelection, TStrSpan variable, GPUConfigTerm* value)
 {
-    TStrSpan       name;
-    PropertyGetter getter;
-    PropertySetter setter;
-};
-
-// should we enable all setter? modifying the model or vendor id for example...
-const GPUProperty availableGpuProperties[] = {
-    GPU_CONFIG_PROPERTY(tfToRef("allowbuffertextureinsameheap"), mAllowBufferTextureInSameHeap),
-    GPU_CONFIG_PROPERTY(tfToRef("amdasicfamily"), mAmdAsicFamily),
-    GPU_CONFIG_PROPERTY(tfToRef("builtindrawid"), mBuiltinDrawID),
-#if defined(METAL)
-    GPU_CONFIG_PROPERTY(tfToRef("cubemaptexturearraysupported"), mCubeMapTextureArraySupported),
-    GPU_CONFIG_PROPERTY(tfToRef("tessellationindirectdrawsupported"), mTessellationIndirectDrawSupported),
-#if !defined(TARGET_IOS)
-    GPU_CONFIG_PROPERTY(tfToRef("isheadless"), mIsHeadLess),
-#endif
-#endif
-    GPU_CONFIG_PROPERTY_READ_ONLY(tfToRef("deviceid"), mGpuVendorPreset.mModelId),
-#if defined(DIRECT3D11) || defined(DIRECT3D12)
-    GPU_CONFIG_PROPERTY(tfToRef("directxfeaturelevel"), mFeatureLevel),
-    GPU_CONFIG_PROPERTY(tfToRef("suppressinvalidsubresourcestateafterexit"), mSuppressInvalidSubresourceStateAfterExit),
-#endif
-    GPU_CONFIG_PROPERTY(tfToRef("geometryshadersupported"), mGeometryShaderSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("gpupresetlevel"), mGpuVendorPreset.mPresetLevel),
-    GPU_CONFIG_PROPERTY(tfToRef("graphicqueuesupported"), mGraphicsQueueSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("hdrsupported"), mHDRSupported),
-#if defined(VULKAN)
-    GPU_CONFIG_PROPERTY(tfToRef("dynamicrenderingenabled"), mDynamicRenderingSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("xclipsetransferqueueworkaroundenabled"), mXclipseTransferQueueWorkaround),
-#endif
-    GPU_CONFIG_PROPERTY(tfToRef("indirectcommandbuffer"), mIndirectCommandBuffer),
-    GPU_CONFIG_PROPERTY(tfToRef("indirectrootconstant"), mIndirectRootConstant),
-    GPU_CONFIG_PROPERTY(tfToRef("maxboundtextures"), mMaxBoundTextures),
-#if defined(DIRECT3D12)
-    GPU_CONFIG_PROPERTY(tfToRef("maxrootsignaturedwords", mMaxRootSignatureDWORDS),
-#endif
-    GPU_CONFIG_PROPERTY(tfToRef("maxvertexinputbindings"), mMaxVertexInputBindings),
-    GPU_CONFIG_PROPERTY(tfToRef("multidrawindirect"), mMultiDrawIndirect),
-    GPU_CONFIG_PROPERTY(tfToRef("occlusionqueries"), mOcclusionQueries),
-    GPU_CONFIG_PROPERTY(tfToRef("pipelinestatsqueries"), mPipelineStatsQueries),
-    GPU_CONFIG_PROPERTY(tfToRef("primitiveidsupported"), mPrimitiveIdSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("rasterorderviewsupport"), mROVsSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("raytracingsupported"), mRaytracingSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("rayquerysupported"), mRayQuerySupported),
-    GPU_CONFIG_PROPERTY(tfToRef("raypipelinesupported"), mRayPipelineSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("softwarevrssupported"), mSoftwareVRSSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("tessellationsupported"), mTessellationSupported),
-    GPU_CONFIG_PROPERTY(tfToRef("timestampqueries"), mTimestampQueries),
-    GPU_CONFIG_PROPERTY(tfToRef("uniformbufferalignment"), mUniformBufferAlignment),
-    GPU_CONFIG_PROPERTY(tfToRef("uploadbuffertexturealignment"), mUploadBufferTextureAlignment),
-    GPU_CONFIG_PROPERTY(tfToRef("uploadbuffertexturerowalignment"), mUploadBufferTextureRowAlignment),
-    GPU_CONFIG_PROPERTY_READ_ONLY(tfToRef("vendorid"), mGpuVendorPreset.mVendorId),
-    GPU_CONFIG_PROPERTY(tfToRef("vram"), mVRAM),
-    GPU_CONFIG_PROPERTY(tfToRef("wavelanecount"), mWaveLaneCount),
-    GPU_CONFIG_PROPERTY(tfToRef("waveopssupport"), mWaveOpsSupportFlags),
-};
-
-static const GPUProperty* findGPUProperty(TStrSpan test)
-{
-    for (size_t i = 0; i < TF_ARRAY_COUNT(availableGpuProperties); i++)
+    if (value->mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
     {
-        if (tfStrCaselessEqual(availableGpuProperties[i].name, test))
-        {
-            return &availableGpuProperties[i];
-        }
+#define GPU_CONFIG_PROPERTY(VAR, PROPERTY)                                       \
+    if (tfStrCaselessEqual(tfToRef(VAR), variable))                              \
+    {                                                                            \
+        COMPILE_ASSERT(sizeof(decltype(pSelection->PROPERTY)) <= sizeof(value)); \
+        pSelection->PROPERTY = (decltype(pSelection->PROPERTY))value->mValue;    \
+        return true;                                                             \
     }
-    return NULL;
+#define GPU_CONFIG_PROPERTY_READ_ONLY(VAR, PROPERTY)
+#include "./GPUPropTable.inl"
+#undef GPU_CONFIG_PROPERTY_READ_ONLY
+#undef GPU_CONFIG_PROPERTY
+    }
+
+    return false;
 }
 
-static bool testDriveVersion(GPUDriverVersion* v1, GPUDriverVersion* v2, GPUConfigExprSymbol op)
+static bool readVariableFromProperty(GPUConfigSelection* pSelection, TStrSpan variable, GPUConfigTerm* value)
+{
+    if (tfStrCaselessEqual(variable, tfToRef("driverversion")))
+    {
+        if (parseDriverVersionNumber(
+                TStrSpan{ pSelection->mDeviceAdapter->mGpuDriverVersion, strlen(pSelection->mDeviceAdapter->mGpuDriverVersion) },
+                &value->mDriverVersion))
+        {
+            value->mSymbol = GPUConfigExprSymbol::GPUSymbolDriverVersion;
+            return true;
+        }
+        return false;
+    }
+
+#define GPU_CONFIG_PROPERTY(VAR, PROPERTY)                      \
+    if (tfStrCaselessEqual(tfToRef(VAR), variable))             \
+    {                                                           \
+        (*value).mSymbol = GPUConfigExprSymbol::GPUSymbolDigit; \
+        (*value).mValue = (uint64_t)(pSelection->PROPERTY);     \
+        return true;                                            \
+    }
+#define GPU_CONFIG_PROPERTY_READ_ONLY(VAR, PROPERTY) GPU_CONFIG_PROPERTY(VAR, PROPERTY)
+#include "./GPUPropTable.inl"
+#undef GPU_CONFIG_PROPERTY_READ_ONLY
+#undef GPU_CONFIG_PROPERTY
+    return false;
+}
+
+static bool testDriveVersion(const GPUDriverVersion* v1, const GPUDriverVersion* v2, GPUConfigExprSymbol op)
 {
     uint32_t tokenLength = TF_MAX(v1->versionNumbersCount, v2->versionNumbersCount);
     if (op == GPUConfigExprSymbol::GPUSymbolOpGTE || op == GPUConfigExprSymbol::GPUSymbolOpLTE || op == GPUConfigExprSymbol::GPUSymbolOpEQ)
@@ -836,101 +791,77 @@ static bool testValueUint64(uint64_t a, uint64_t b, GPUConfigExprSymbol op)
     return false;
 }
 
-static inline bool tryUnpackUintDriverTerm(GpuProperties* gpuProp, const GPUConfigTerm* t1, GPUDriverVersion* value)
+static int compareTerms(const GPUConfigTerm* t1, const GPUConfigTerm* t2, GPUConfigExprSymbol op)
 {
-    if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolVariable && tfStrCaselessEqual(t1->mVariable, tfToRef("driverversion")))
+    if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolDigit && t2->mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
     {
-        if (parseDriverVersionNumber(
-                TStrSpan{ gpuProp->mGpuVendorPreset.mGpuDriverVersion, strlen(gpuProp->mGpuVendorPreset.mGpuDriverVersion) }, value))
-        {
-            return true;
-        }
+        return testValueUint64(t1->mValue, t2->mValue, op) ? 1 : -1;
     }
-    if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolDriverVersion)
+    if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolDriverVersion && t2->mSymbol == GPUConfigExprSymbol::GPUSymbolDriverVersion)
     {
-        (*value) = t1->mDriverVersion;
-        return true;
+        return testDriveVersion(&t1->mDriverVersion, &t2->mDriverVersion, op) ? 1 : -1;
     }
-
-    return false;
+    return 0;
 }
 
-static inline bool tryUnpackUint64Term(GpuProperties* gpuProp, const GPUConfigTerm* t1, uint64_t* value)
+GPUPresetLevel tfQueryPresetLevel(const struct GPUConfiguration* config, uint32_t vendorId, uint32_t modelId)
 {
-    if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+    for (uint32_t modelIndex = 0; modelIndex < arrlen(config->mGpuModels); modelIndex++)
     {
-        const GPUProperty* p1 = findGPUProperty(t1->mVariable);
-        if (p1)
+        struct GPUModelDefinition* model = &config->mGpuModels[modelIndex];
+        if (model->mVendorId == vendorId && model->mDeviceId == modelId && model->mDeviceId)
         {
-            (*value) = p1->getter(gpuProp);
-            return true;
-        }
-        else
-        {
-            TStr str = { 0 };
-            tfstrcatfmt(&str, "failed to resolve variable: '%S'.", t1->mVariable);
-            LOGF(eINFO, str.buf);
-            tfStrFree(&str);
+            return model->mPreset;
         }
     }
-
-    if (t1->mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
-    {
-        (*value) = t1->mValue;
-        return true;
-    }
-    return false;
+    return GPU_PRESET_NONE;
 }
 
-struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const struct RendererContext* context)
+struct GPUConfigSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const struct RendererContext* context)
 {
-    GpuSelection* selections = NULL;
+    GPUConfigSelection* selections = NULL;
     {
         const size_t numberOfDevices = arrlen(context->pAdapters);
         arrsetlen(selections, numberOfDevices);
         for (size_t i = 0; i < numberOfDevices; i++)
         {
-            memcpy(&selections[i].properties, &context->pAdapters[i].mDefaultProps, sizeof(GpuProperties));
-            selections[i].device = &context->pAdapters[i];
+            memcpy(&selections[i].mGpuProperty, &context->pAdapters[i].mDefaultProps, sizeof(GpuProperties));
+            selections[i].mDeviceAdapter = &context->pAdapters[i];
+            selections[i].mPresetLevel = tfQueryPresetLevel(def, selections[i].mGpuProperty.mGpuVendorPreset.mVendorId,
+                                                            selections[i].mGpuProperty.mGpuVendorPreset.mModelId);
         }
     }
 
     TStr tempLineMsg = { 0 };
-    for (size_t j = 0; j < arrlen(selections); j++)
+    for (size_t selectionIdx = 0; selectionIdx < arrlen(selections); selectionIdx++)
     {
         for (size_t i = 0; i < def->mGpuConfigurationSettingCount; i++)
         {
             const struct GPUConfigurationSetting* setting = &def->mConfigurationSetting[i];
-            const GPUProperty*                    assignmentProp = findGPUProperty(setting->mUpdateProperty);
-            if (assignmentProp)
+            GPUConfigTerm                         assignmentTerm;
+            if (readVariableFromProperty(&selections[selectionIdx], setting->mUpdateProperty, &assignmentTerm) &&
+                assignmentTerm.mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
             {
                 bool isValid = true;
                 for (size_t ruleIdx = 0; ruleIdx < setting->mComparisonExprCount; ruleIdx++)
                 {
                     const GPUConfigExpression* rule = &setting->mComparisonExpr[ruleIdx];
-                    {
-                        GPUDriverVersion v1 = { 0 };
-                        GPUDriverVersion v2 = { 0 };
-                        if (tryUnpackUintDriverTerm(&selections[j].properties, &rule->mPrimary, &v1) &&
-                            tryUnpackUintDriverTerm(&selections[j].properties, &rule->mSecondary, &v2))
-                            isValid = isValid && testDriveVersion(&v1, &v2, rule->opToken);
-                        if (!isValid)
-                            break;
-                    }
-                    {
-                        uint64_t v1 = 0;
-                        uint64_t v2 = 0;
-                        if (tryUnpackUint64Term(&selections[j].properties, &rule->mPrimary, &v1) &&
-                            tryUnpackUint64Term(&selections[j].properties, &rule->mSecondary, &v2))
-                            isValid = isValid && testValueUint64(v1, v2, rule->opToken);
-                        if (!isValid)
-                            break;
-                    }
+
+                    GPUConfigTerm primaryTerm = rule->mPrimary;
+                    GPUConfigTerm secondTerm = rule->mSecondary;
+                    if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+                        readVariableFromProperty(&selections[selectionIdx], rule->mPrimary.mVariable, &primaryTerm);
+                    if (rule->mSecondary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+                        readVariableFromProperty(&selections[selectionIdx], rule->mSecondary.mVariable, &secondTerm);
+
+                    const int termRes = compareTerms(&primaryTerm, &secondTerm, rule->opToken);
+                    if (termRes != 0)
+                        isValid = isValid && (termRes > 0);
+
                     if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable &&
                         rule->opToken == GPUConfigExprSymbol::GPUSymbolNone)
                     {
-                        const GPUProperty* p1 = findGPUProperty(rule->mPrimary.mVariable);
-                        isValid = isValid && (p1->getter(&selections[j].properties) > 0);
+                        isValid = isValid && (assignmentTerm.mValue > 0);
                         if (!isValid)
                             break;
                     }
@@ -938,11 +869,18 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
 
                 if (isValid)
                 {
-                    assignmentProp->setter(&selections[j].properties, setting->mAssignmentValue);
-                    tfStrClear(&tempLineMsg);
-                    tfstrcatfmt(&tempLineMsg, "GPU: %s, setting %S to %llu", selections[j].properties.mGpuVendorPreset.mGpuName,
-                                setting->mUpdateProperty, setting->mAssignmentValue);
-                    LOGF(eDEBUG, tempLineMsg.buf);
+                    GPUConfigTerm writeTerm;
+                    writeTerm.mSymbol = GPUConfigExprSymbol::GPUSymbolDigit;
+                    writeTerm.mValue = setting->mAssignmentValue;
+
+                    if (writeVariableToProperty(&selections[selectionIdx], setting->mUpdateProperty, &writeTerm))
+                    {
+                        tfStrClear(&tempLineMsg);
+                        tfstrcatfmt(&tempLineMsg, "GPU: %s, setting %S to %llu",
+                                    selections[selectionIdx].mGpuProperty.mGpuVendorPreset.mGpuName, setting->mUpdateProperty,
+                                    setting->mAssignmentValue);
+                        LOGF(eDEBUG, tempLineMsg.buf);
+                    }
                 }
             }
             else
@@ -957,8 +895,8 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
     uint32_t selectionIndex = 0;
     for (size_t testIndex = 0; testIndex < arrlen(selections); testIndex++)
     {
-        GpuSelection* testSelection = &selections[testIndex];
-        GpuSelection* refSelection = &selections[selectionIndex];
+        GPUConfigSelection* testSelection = &selections[testIndex];
+        GPUConfigSelection* refSelection = &selections[selectionIndex];
         for (size_t ruleIndex = 0; ruleIndex < def->mGpuSelectionCount; ruleIndex++)
         {
             bool                                    refPass = true;
@@ -967,43 +905,36 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
             for (size_t ruleIdx = 0; ruleIdx < selectionRule->mComparisonExprCount; ruleIdx++)
             {
                 const GPUConfigExpression* rule = &selectionRule->mComparisonExpr[ruleIdx];
-                {
-                    GPUDriverVersion v1 = { 0 };
-                    GPUDriverVersion v2 = { 0 };
-                    if (tryUnpackUintDriverTerm(&testSelection->properties, &rule->mPrimary, &v1) &&
-                        tryUnpackUintDriverTerm(&testSelection->properties, &rule->mSecondary, &v2))
-                        testPass = testPass && testDriveVersion(&v1, &v2, rule->opToken);
-                }
-                {
-                    uint64_t v1 = 0;
-                    uint64_t v2 = 0;
-                    if (tryUnpackUint64Term(&testSelection->properties, &rule->mPrimary, &v1) &&
-                        tryUnpackUint64Term(&testSelection->properties, &rule->mSecondary, &v2))
-                        testPass = testPass && testValueUint64(v1, v2, rule->opToken);
-                }
-                {
-                    GPUDriverVersion v1 = { 0 };
-                    GPUDriverVersion v2 = { 0 };
-                    if (tryUnpackUintDriverTerm(&refSelection->properties, &rule->mPrimary, &v1) &&
-                        tryUnpackUintDriverTerm(&refSelection->properties, &rule->mSecondary, &v2))
-                        refPass = refPass && testDriveVersion(&v1, &v2, rule->opToken);
-                }
-                {
-                    uint64_t v1 = 0;
-                    uint64_t v2 = 0;
-                    if (tryUnpackUint64Term(&refSelection->properties, &rule->mPrimary, &v1) &&
-                        tryUnpackUint64Term(&refSelection->properties, &rule->mSecondary, &v2))
-                        refPass = refPass && testValueUint64(v1, v2, rule->opToken);
-                }
+
+                GPUConfigTerm testPrimaryTerm = rule->mPrimary;
+                GPUConfigTerm testSecondaryTerm = rule->mSecondary;
+                if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+                    readVariableFromProperty(testSelection, rule->mPrimary.mVariable, &testPrimaryTerm);
+                if (rule->mSecondary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+                    readVariableFromProperty(testSelection, rule->mSecondary.mVariable, &testSecondaryTerm);
+
+                const int testRes = compareTerms(&testPrimaryTerm, &testSecondaryTerm, rule->opToken);
+                if (testRes != 0)
+                    testPass = testPass && (testRes > 0);
+
+                GPUConfigTerm refPrimaryTerm = rule->mPrimary;
+                GPUConfigTerm refSecondaryTerm = rule->mSecondary;
+                if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+                    readVariableFromProperty(refSelection, rule->mPrimary.mVariable, &refPrimaryTerm);
+                if (rule->mSecondary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable)
+                    readVariableFromProperty(refSelection, rule->mSecondary.mVariable, &refSecondaryTerm);
+
+                const int refRes = compareTerms(&testPrimaryTerm, &testSecondaryTerm, rule->opToken);
+                if (refRes != 0)
+                    refPass = refPass && (refRes > 0);
+
                 if (rule->mPrimary.mSymbol == GPUConfigExprSymbol::GPUSymbolVariable && rule->opToken == GPUConfigExprSymbol::GPUSymbolNone)
                 {
-                    uint64_t refValue = 0;
-                    uint64_t testValue = 0;
-                    if (tryUnpackUint64Term(&refSelection->properties, &rule->mPrimary, &refValue) &&
-                        tryUnpackUint64Term(&testSelection->properties, &rule->mPrimary, &testValue))
+                    if (testPrimaryTerm.mSymbol == GPUConfigExprSymbol::GPUSymbolDigit &&
+                        refPrimaryTerm.mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
                     {
-                        testPass = testPass && (testValue >= refValue);
-                        refPass = refPass && (refValue >= testValue);
+                        testPass = testPass && (testPrimaryTerm.mValue >= refPrimaryTerm.mValue);
+                        refPass = refPass && (refPrimaryTerm.mValue >= testPrimaryTerm.mValue);
                     }
                 }
             }
@@ -1021,9 +952,9 @@ struct GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const s
         }
     }
 
-    LOGF(eINFO, "Choosing GPU: %s", selections[selectionIndex].properties.mGpuVendorPreset.mGpuName);
+    LOGF(eINFO, "Choosing GPU: %s", selections[selectionIndex].mGpuProperty.mGpuVendorPreset.mGpuName);
     tfStrFree(&tempLineMsg);
-    GpuSelection result = selections[selectionIndex];
+    GPUConfigSelection result = selections[selectionIndex];
     arrfree(selections);
     return result;
 }

@@ -12,10 +12,11 @@
 #define MAX_INDENTIFIER_PER_GPU_VENDOR_COUNT 12
 #define MAX_GPU_COMPARISON_OP_COUNT          16
 
-struct GpuSelection
+struct GPUConfigSelection
 {
-    DeviceAdapter* device;
-    GpuProperties   properties;
+    GPUPresetLevel mPresetLevel;
+    DeviceAdapter* mDeviceAdapter;
+    GpuProperties  mGpuProperty;
 };
 
 enum class GPUConfigExprSymbol : uint8_t
@@ -119,9 +120,11 @@ struct GPUConfiguration
     struct GPUModelDefinition* mGpuModels;
 };
 
+GPUPresetLevel tfQueryPresetLevel(const struct GPUConfiguration* config, uint32_t vendorId, uint32_t modelId);
+
 void tfInitGPUConfiguration(struct GPUConfiguration* def);
 bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input);
 bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input);
 void tfFreeGPUConfiguration(struct GPUConfiguration* def);
 
-GpuSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const struct RendererContext* context);
+GPUConfigSelection tfApplyGPUConfig(const struct GPUConfiguration* def, const struct RendererContext* context);
