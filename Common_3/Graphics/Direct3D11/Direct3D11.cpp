@@ -817,114 +817,7 @@ void d3d11_cmdUpdateSubresource(Cmd* pCmd, Texture* pTexture, Buffer* pSrcBuffer
         pContext->Unmap(pSrcBuffer->mDx11.pResource, 0);
     }
 }
-/************************************************************************/
-// Internal init functions
-/************************************************************************/
-static bool AddDevice(Renderer* pRenderer, const RendererDesc* pDesc)
-{
-    int               levelIndex = pDesc->mDx11.mUseDx10 ? 2 : 0;
-    D3D_FEATURE_LEVEL featureLevels[] = {
-        D3D_FEATURE_LEVEL_11_1,
-        D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0,
-    };
-    const uint32_t featureLevelCount = TF_ARRAY_COUNT(featureLevels) - levelIndex;
 
-    GPUSettings gpuSettings[MAX_MULTIPLE_GPUS] = {};
-
-    for (uint32_t i = 0; i < pRenderer->pContext->mGpuCount; ++i)
-    {
-        gpuSettings[i] = pRenderer->pContext->mGpus[i].mSettings;
-    }
-
-    // Select Best GPUs by poth Preset and highest feature level gpu at front
-    uint32_t gpuIndex = util_select_best_gpu(gpuSettings, pRenderer->pContext->mGpuCount);
-
-    // Get the latest and greatest feature level gpu
-    pRenderer->pGpu = &pRenderer->pContext->mGpus[gpuIndex];
-    pRenderer->mLinkedNodeCount = 1;
-
-    // rejection rules from gpu.cfg
-    bool driverValid = checkDriverRejectionSettings(&gpuSettings[gpuIndex]);
-    if (!driverValid)
-    {
-        setRendererInitializationError("Driver rejection return invalid result.\nPlease, update your driver to the latest version.");
-        return false;
-    }
-
-    // print selected GPU information
-    LOGF(LogLevel::eINFO, "GPU[%u] is selected as default GPU", gpuIndex);
-    LOGF(LogLevel::eINFO, "Name of selected gpu: %s", pRenderer->pGpu->mSettings.mGpuVendorPreset.mGpuName);
-    LOGF(LogLevel::eINFO, "Vendor id of selected gpu: %#x", pRenderer->pGpu->mSettings.mGpuVendorPreset.mVendorId);
-    LOGF(LogLevel::eINFO, "Model id of selected gpu: %#x", pRenderer->pGpu->mSettings.mGpuVendorPreset.mModelId);
-    LOGF(LogLevel::eINFO, "Revision id of selected gpu: %#x", pRenderer->pGpu->mSettings.mGpuVendorPreset.mRevisionId);
-    LOGF(LogLevel::eINFO, "Preset of selected gpu: %s", presetLevelToString(pRenderer->pGpu->mSettings.mGpuVendorPreset.mPresetLevel));
-
-    // Create the actual device
-    DWORD deviceFlags = 0;
-
-    // The D3D debug layer (as well as Microsoft PIX and other graphics debugger
-    // tools using an injection library) is not compatible with Nsight Aftermath.
-    // If Aftermath detects that any of these tools are present it will fail initialization.
-#if defined(ENABLE_GRAPHICS_DEBUG) && !defined(ENABLE_NSIGHT_AFTERMATH)
-    deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-#if defined(ENABLE_NSIGHT_AFTERMATH)
-    // Enable Nsight Aftermath GPU crash dump creation.
-    // This needs to be done before the Vulkan device is created.
-    CreateAftermathTracker(pRenderer->pName, &pRenderer->mAftermathTracker);
-#endif
-
-    D3D_FEATURE_LEVEL featureLevel;
-    HRESULT           hr = d3d11dll_CreateDevice(pRenderer->pGpu->mDx11.pGpu, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, deviceFlags,
-                                       &featureLevels[levelIndex], featureLevelCount, D3D11_SDK_VERSION, &pRenderer->mDx11.pDevice,
-                                       &featureLevel, // max feature level
-                                       &pRenderer->mDx11.pContext);
-
-    if (FAILED(hr))
-    {
-        LOGF(eWARNING, "Failed to initialize D3D11 debug device, fallback to non-debug");
-        hr = d3d11dll_CreateDevice(pRenderer->pGpu->mDx11.pGpu, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex],
-                                   featureLevelCount, D3D11_SDK_VERSION, &pRenderer->mDx11.pDevice,
-                                   &featureLevel, // max feature level
-                                   &pRenderer->mDx11.pContext);
-    }
-
-    if (E_INVALIDARG == hr)
-    {
-        hr = d3d11dll_CreateDevice(pRenderer->pGpu->mDx11.pGpu, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, deviceFlags,
-                                   &featureLevels[levelIndex + 1], featureLevelCount - 1, D3D11_SDK_VERSION, &pRenderer->mDx11.pDevice,
-                                   &featureLevel, // max feature level
-                                   &pRenderer->mDx11.pContext);
-    }
-    ASSERT(SUCCEEDED(hr));
-    if (FAILED(hr))
-        LOGF(LogLevel::eERROR, "Failed to create D3D11 device and context.");
-
-    pRenderer->mDx11.pContext1 = NULL;
-    hr = pRenderer->mDx11.pContext->QueryInterface(&pRenderer->mDx11.pContext1);
-    if (SUCCEEDED(hr))
-    {
-        LOGF(LogLevel::eINFO, "Device supports ID3D11DeviceContext1.");
-    }
-
-#if defined(ENABLE_NSIGHT_AFTERMATH)
-    SetAftermathDevice(pRenderer->mDx11.pDevice);
-#endif
-
-#if defined(ENABLE_GRAPHICS_DEBUG)
-    hr = pRenderer->mDx11.pContext->QueryInterface(__uuidof(pRenderer->mDx11.pUserDefinedAnnotation),
-                                                   (void**)(&pRenderer->mDx11.pUserDefinedAnnotation));
-    if (FAILED(hr))
-    {
-        LOGF(LogLevel::eERROR, "Failed to query interface ID3DUserDefinedAnnotation.");
-    }
-#endif
-
-    return true;
-}
 
 static void RemoveDevice(Renderer* pRenderer)
 {
@@ -1137,347 +1030,120 @@ static void remove_default_resources(Renderer* pRenderer)
     SAFE_RELEASE(pRenderer->mDx11.pDefaultDepthState);
     SAFE_RELEASE(pRenderer->mDx11.pDefaultRasterizerState);
 }
-/************************************************************************/
-// Renderer Init Remove
-/************************************************************************/
-void d3d11_initRendererContext(const char* appName, const RendererContextDesc* pDesc, RendererContext** ppContext)
-{
-    UNREF_PARAM(appName);
-    d3d11dll_init();
-
-    RendererContext* pContext = (RendererContext*)tf_calloc_memalign(1, alignof(RendererContext), sizeof(RendererContext));
-    ASSERT(pContext);
-
-    for (uint32_t i = 0; i < TF_ARRAY_COUNT(pContext->mGpus); ++i)
-    {
-        setDefaultGPUSettings(&pContext->mGpus[i].mSettings);
-    }
-
-    if (FAILED(d3d11dll_CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&pContext->mDx11.pDXGIFactory)))
-    {
-        LOGF(LogLevel::eERROR, "Could not create DXGI factory.");
-        return;
-    }
-    ASSERT(pContext->mDx11.pDXGIFactory);
-
-    int               levelIndex = pDesc->mDx11.mUseDx10 ? 2 : 0;
-    D3D_FEATURE_LEVEL featureLevels[] = {
-        D3D_FEATURE_LEVEL_11_1,
-        D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0,
-    };
-    const uint32_t featureLevelCount = TF_ARRAY_COUNT(featureLevels) - levelIndex;
-
-    HRESULT hr = 0;
-
-    // Enumerate all adapters
-    typedef struct GpuDesc
-    {
-        IDXGIAdapter1*                   pGpu;
-        D3D_FEATURE_LEVEL                mMaxSupportedFeatureLevel;
-        D3D11_FEATURE_DATA_D3D11_OPTIONS mFeatureDataOptions;
-#if WINVER > _WIN32_WINNT_WINBLUE
-        D3D11_FEATURE_DATA_D3D11_OPTIONS2 mFeatureDataOptions2;
-#endif
-        SIZE_T         mDedicatedVideoMemory;
-        uint32_t       mVendorId;
-        uint32_t       mDeviceId;
-        uint32_t       mRevisionId;
-        char           mName[MAX_GPU_VENDOR_STRING_LENGTH];
-        GPUPresetLevel mPreset;
-    } GpuDesc;
-
-    uint32_t       gpuCount = 0;
-    IDXGIAdapter1* adapter = NULL;
-    bool           foundSoftwareAdapter = false;
-
-    for (UINT i = 0; DXGI_ERROR_NOT_FOUND != pContext->mDx11.pDXGIFactory->EnumAdapters1(i, (IDXGIAdapter1**)&adapter); ++i)
-    {
-        DECLARE_ZERO(DXGI_ADAPTER_DESC1, desc);
-        adapter->GetDesc1(&desc);
-
-        if (!(desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE))
-        {
-            // Make sure the adapter can support a D3D11 device
-            D3D_FEATURE_LEVEL featLevelOut;
-            hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex], featureLevelCount,
-                                       D3D11_SDK_VERSION, NULL, &featLevelOut, NULL);
-            if (E_INVALIDARG == hr)
-            {
-                hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex + 1],
-                                           featureLevelCount - 1, D3D11_SDK_VERSION, NULL, &featLevelOut, NULL);
-            }
-            if (SUCCEEDED(hr))
-            {
-                GpuDesc gpuDesc = {};
-                hr = adapter->QueryInterface(IID_ARGS(&gpuDesc.pGpu));
-                if (SUCCEEDED(hr))
-                {
-                    SAFE_RELEASE(gpuDesc.pGpu);
-                    ++gpuCount;
-                }
-            }
-        }
-        else
-        {
-            foundSoftwareAdapter = true;
-        }
-
-        adapter->Release();
-    }
-
-    // If the only adapter we found is a software adapter, log error message for QA
-    if (!gpuCount && foundSoftwareAdapter)
-    {
-        LOGF(eERROR, "The only available GPU has DXGI_ADAPTER_FLAG_SOFTWARE. Early exiting");
-        ASSERT(false);
-        return;
-    }
-
-    ASSERT(gpuCount);
-    GpuDesc* gpuDesc = (GpuDesc*)alloca(gpuCount * sizeof(GpuDesc));
-    memset(gpuDesc, 0, gpuCount * sizeof(GpuDesc));
-    gpuCount = 0;
-
-    for (UINT i = 0; DXGI_ERROR_NOT_FOUND != pContext->mDx11.pDXGIFactory->EnumAdapters1(i, (IDXGIAdapter1**)&adapter); ++i)
-    {
-        DXGI_ADAPTER_DESC1 desc = {};
-        adapter->GetDesc1(&desc);
-
-        // Test for display output presence and hardware adapter first to even consider the adapter
-        IDXGIOutput* outputs;
-        if (!(desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) && SUCCEEDED(adapter->EnumOutputs(0, &outputs)))
-        {
-            // Make sure the adapter can support a D3D11 device
-            D3D_FEATURE_LEVEL featLevelOut;
-            hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex], featureLevelCount,
-                                       D3D11_SDK_VERSION, NULL, &featLevelOut, NULL);
-            if (E_INVALIDARG == hr)
-            {
-                hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex + 1],
-                                           featureLevelCount - 1, D3D11_SDK_VERSION, NULL, &featLevelOut, NULL);
-            }
-            if (SUCCEEDED(hr))
-            {
-                hr = adapter->QueryInterface(IID_ARGS(&gpuDesc[gpuCount].pGpu));
-                if (SUCCEEDED(hr))
-                {
-                    ID3D11Device* device = NULL;
-                    hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex],
-                                               featureLevelCount, D3D11_SDK_VERSION, &device, &featLevelOut, NULL);
-
-                    if (E_INVALIDARG == hr)
-                    {
-                        hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex + 1],
-                                                   featureLevelCount - 1, D3D11_SDK_VERSION, &device, &featLevelOut, NULL);
-                    }
-
-                    if (!device)
-                    {
-                        LOGF(eERROR, "Device creation failed for adapter %s with code %u", gpuDesc[gpuCount].mName, (uint32_t)hr);
-                        ++gpuCount;
-                        continue;
-                    }
-
-                    d3d11CapsBuilder(device, &pContext->mGpus[i].mCapBits);
-
-                    D3D11_FEATURE_DATA_D3D11_OPTIONS featureData = {};
-                    hr = device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &featureData, sizeof(featureData));
-                    if (FAILED(hr))
-                        LOGF(LogLevel::eINFO, "D3D11 CheckFeatureSupport D3D11_FEATURE_D3D11_OPTIONS error 0x%x", hr);
-#if WINVER > _WIN32_WINNT_WINBLUE
-                    D3D11_FEATURE_DATA_D3D11_OPTIONS2 featureData2 = {};
-                    hr = device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS2, &featureData2, sizeof(featureData2));
-                    if (FAILED(hr))
-                        LOGF(LogLevel::eINFO, "D3D11 CheckFeatureSupport D3D11_FEATURE_D3D11_OPTIONS2 error 0x%x", hr);
-
-                    gpuDesc[gpuCount].mFeatureDataOptions2 = featureData2;
-#endif
-                    gpuDesc[gpuCount].mMaxSupportedFeatureLevel = featLevelOut;
-                    gpuDesc[gpuCount].mDedicatedVideoMemory = desc.DedicatedVideoMemory;
-                    gpuDesc[gpuCount].mFeatureDataOptions = featureData;
-
-                    // save vendor and model Id as string
-                    // char hexChar[10];
-                    // convert deviceId and assign it
-                    gpuDesc[gpuCount].mDeviceId = desc.DeviceId;
-                    // convert modelId and assign it
-                    gpuDesc[gpuCount].mVendorId = desc.VendorId;
-                    // convert Revision Id
-                    gpuDesc[gpuCount].mRevisionId = desc.Revision;
-                    // save gpu name (Some situtations this can show description instead of name)
-                    // char sName[MAX_PATH];
-                    wcstombs(gpuDesc[gpuCount].mName, desc.Description, FS_MAX_PATH);
-
-                    // get preset for current gpu description
-                    gpuDesc[gpuCount].mPreset = getGPUPresetLevel(gpuDesc[gpuCount].mVendorId, gpuDesc[gpuCount].mDeviceId,
-                                                                  getGPUVendorName(gpuDesc[gpuCount].mVendorId), gpuDesc[gpuCount].mName);
-
-                    ++gpuCount;
-                    SAFE_RELEASE(device);
-
-                    // Default GPU is the first GPU received in EnumAdapters
-                    if (pDesc->mDx11.mUseDefaultGpu)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        adapter->Release();
-    }
-
-    ASSERT(gpuCount);
-
-    // update renderer gpu settings
-    pContext->mGpuCount = gpuCount;
-
-    for (uint32_t i = 0; i < gpuCount; ++i)
-    {
-        GpuInfo* gpu = &pContext->mGpus[i];
-        gpuDesc[i].pGpu->QueryInterface(&gpu->mDx11.pGpu);
-        SAFE_RELEASE(gpuDesc[i].pGpu);
-
-        gpu->mSettings.mUniformBufferAlignment = 256;
-        gpu->mSettings.mUploadBufferTextureAlignment = 1;
-        gpu->mSettings.mUploadBufferTextureRowAlignment = 1;
-        gpu->mSettings.mMultiDrawIndirect = false; // no such thing
-        gpu->mSettings.mMaxVertexInputBindings = 32U;
-        gpu->mSettings.mMaxBoundTextures = 128;
-        gpu->mSettings.mIndirectRootConstant = false;
-        gpu->mSettings.mBuiltinDrawID = false;
-        gpu->mSettings.mTimestampQueries = true;
-        gpu->mSettings.mOcclusionQueries = true;
-        gpu->mSettings.mPipelineStatsQueries = true;
-        gpu->mSettings.mVRAM = gpuDesc[i].mDedicatedVideoMemory;
-
-        // assign device ID
-        gpu->mSettings.mGpuVendorPreset.mModelId = gpuDesc[i].mDeviceId;
-        // assign vendor ID
-        gpu->mSettings.mGpuVendorPreset.mVendorId = gpuDesc[i].mVendorId;
-        // assign Revision ID
-        gpu->mSettings.mGpuVendorPreset.mRevisionId = gpuDesc[i].mRevisionId;
-        // get name from api
-        strncpy(gpu->mSettings.mGpuVendorPreset.mGpuName, gpuDesc[i].mName, MAX_GPU_VENDOR_STRING_LENGTH);
-        // get preset
-        gpu->mSettings.mGpuVendorPreset.mPresetLevel = gpuDesc[i].mPreset;
-
-        // Determine root signature size for this gpu driver
-#if WINVER > _WIN32_WINNT_WINBLUE
-        gpu->mSettings.mROVsSupported = gpuDesc[i].mFeatureDataOptions2.ROVsSupported ? true : false;
-#else
-        gpu->mSettings.mROVsSupported = false;
-#endif
-        gpu->mSettings.mTessellationSupported = gpuDesc[i].mMaxSupportedFeatureLevel >= D3D_FEATURE_LEVEL_11_0;
-        gpu->mSettings.mGeometryShaderSupported = gpuDesc[i].mMaxSupportedFeatureLevel >= D3D_FEATURE_LEVEL_10_0;
-        gpu->mSettings.mWaveOpsSupportFlags = WAVE_OPS_SUPPORT_FLAG_NONE;
-        gpu->mSettings.mWaveOpsSupportedStageFlags = SHADER_STAGE_NONE;
-
-        if (gpuDesc[i].mMaxSupportedFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-        {
-            // https://learn.microsoft.com/en-us/windows/win32/direct3d11/direct3d-11-advanced-stages-compute-shader
-            gpu->mSettings.mMaxTotalComputeThreads = gpuDesc[i].mMaxSupportedFeatureLevel >= D3D_FEATURE_LEVEL_11_0
-                                                         ? D3D11_CS_THREAD_GROUP_MAX_THREADS_PER_GROUP
-                                                         : D3D11_CS_4_X_THREAD_GROUP_MAX_THREADS_PER_GROUP;
-            gpu->mSettings.mMaxComputeThreads[0] = gpuDesc[i].mMaxSupportedFeatureLevel >= D3D_FEATURE_LEVEL_11_0
-                                                       ? D3D11_CS_THREAD_GROUP_MAX_X
-                                                       : D3D11_CS_4_X_THREAD_GROUP_MAX_X;
-            gpu->mSettings.mMaxComputeThreads[1] = gpuDesc[i].mMaxSupportedFeatureLevel >= D3D_FEATURE_LEVEL_11_0
-                                                       ? D3D11_CS_THREAD_GROUP_MAX_Y
-                                                       : D3D11_CS_4_X_THREAD_GROUP_MAX_Y;
-            gpu->mSettings.mMaxComputeThreads[2] = gpuDesc[i].mMaxSupportedFeatureLevel >= D3D_FEATURE_LEVEL_11_0
-                                                       ? D3D11_CS_THREAD_GROUP_MAX_Z
-                                                       : D3D11_CS_4_X_DISPATCH_MAX_THREAD_GROUPS_IN_Z_DIMENSION;
-        }
-
-        gpu->mDx11.mPartialUpdateConstantBufferSupported = gpuDesc[i].mFeatureDataOptions.ConstantBufferPartialUpdate;
-        gpu->mSettings.mFeatureLevel = gpuDesc[i].mMaxSupportedFeatureLevel;
-
-        applyGPUConfigurationRules(&gpu->mSettings, &gpu->mCapBits);
-
-        // Determine root signature size for this gpu driver
-        DXGI_ADAPTER_DESC adapterDesc;
-        gpu->mDx11.pGpu->GetDesc(&adapterDesc);
-        LOGF(LogLevel::eINFO, "GPU[%u] detected. Vendor ID: %x, Model ID: %x, Revision ID: %x, Preset: %s, GPU Name: %S", i,
-             adapterDesc.VendorId, adapterDesc.DeviceId, adapterDesc.Revision,
-             presetLevelToString(gpu->mSettings.mGpuVendorPreset.mPresetLevel), adapterDesc.Description);
-    }
-
-    *ppContext = pContext;
-}
 
 void d3d11_exitRendererContext(RendererContext* pContext)
 {
     ASSERT(pContext);
 
-    for (uint32_t i = 0; i < pContext->mGpuCount; ++i)
+    for (uint32_t i = 0; i < arrlen(pContext->pAdapters); ++i)
     {
-        SAFE_RELEASE(pContext->mGpus[i].mDx11.pGpu);
+        pContext->pAdapters->mDx11.pGpu->Release();
     }
+    arrfree(pContext->pAdapters);
 
     SAFE_RELEASE(pContext->mDx11.pDXGIFactory);
     d3d11dll_exit();
     SAFE_FREE(pContext);
 }
 
-void d3d11_initRenderer(const char* appName, const RendererDesc* settings, Renderer** ppRenderer)
+void d3d11_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** ppRenderer)
 {
     ASSERT(ppRenderer);
-    ASSERT(settings);
-    ASSERT(settings->mShaderTarget <= SHADER_TARGET_5_0);
+    ASSERT(pDesc);
+    ASSERT(pDesc->mShaderTarget <= SHADER_TARGET_5_0);
 
-    Renderer* pRenderer = (Renderer*)tf_calloc_memalign(1, alignof(Renderer), sizeof(Renderer));
-    ASSERT(pRenderer);
+    uint8_t* mem = (uint8_t*)tf_calloc_memalign(1, alignof(Renderer), sizeof(Renderer) + sizeof(GpuProperties));
+    ASSERT(mem);
 
-    pRenderer->mRendererApi = RENDERER_API_D3D11;
-    pRenderer->mGpuMode = settings->mGpuMode;
+    Renderer* pRenderer = (Renderer*)mem;
+    pRenderer->mGpuMode = pDesc->mGpuMode;
     pRenderer->mShaderTarget = SHADER_TARGET_5_0;
     pRenderer->pName = appName;
+    pRenderer->pProperties = (GpuProperties*)(mem + sizeof(Renderer));
+    pRenderer->pContext = pDesc->pContext;
+    pRenderer->pAdapter = pDesc->pSelectedDevice;
+    pRenderer->mLinkedNodeCount = 1;
+    memcpy(pRenderer->pProperties, &pDesc->mProperties, sizeof(GpuProperties));
 
-    if (settings->pContext)
-    {
-        pRenderer->pContext = settings->pContext;
-        pRenderer->mOwnsContext = false;
-    }
-    else
-    {
-        RendererContextDesc contextDesc = {};
-        contextDesc.mEnableGpuBasedValidation = settings->mEnableGpuBasedValidation;
-        contextDesc.mD3D11Supported = settings->mD3D11Supported;
-        COMPILE_ASSERT(sizeof(contextDesc.mDx11) == sizeof(settings->mDx11));
-        memcpy(&contextDesc.mDx11, &settings->mDx11, sizeof(settings->mDx11));
-        d3d11_initRendererContext(appName, &contextDesc, &pRenderer->pContext);
-        pRenderer->mOwnsContext = true;
-    }
+    LOGF(LogLevel::eINFO, "Name of selected gpu: %s", pRenderer->pAdapter->mGpuName);
+    LOGF(LogLevel::eINFO, "Vendor id of selected gpu: %#x", pRenderer->pAdapter->mVendorId);
+    LOGF(LogLevel::eINFO, "Model id of selected gpu: %#x", pRenderer->pAdapter->mModelId);
+    LOGF(LogLevel::eINFO, "Revision id of selected gpu: %#x", pRenderer->pAdapter->mRevisionId);
 
     // Initialize the D3D11 bits
     {
-        if (!AddDevice(pRenderer, settings))
+        const int               levelIndex = pDesc->mDx11.mUseDx10 ? 2 : 0;
+        D3D_FEATURE_LEVEL featureLevels[] = {
+            D3D_FEATURE_LEVEL_11_1,
+            D3D_FEATURE_LEVEL_11_0,
+            D3D_FEATURE_LEVEL_10_1,
+            D3D_FEATURE_LEVEL_10_0,
+        };
+        const uint32_t featureLevelCount = TF_ARRAY_COUNT(featureLevels) - levelIndex;
+
+        GPUSettings gpuSettings[MAX_MULTIPLE_GPUS] = {};
+
+        // Create the actual device
+        DWORD deviceFlags = 0;
+
+        // The D3D debug layer (as well as Microsoft PIX and other graphics debugger
+        // tools using an injection library) is not compatible with Nsight Aftermath.
+        // If Aftermath detects that any of these tools are present it will fail initialization.
+#if defined(ENABLE_GRAPHICS_DEBUG) && !defined(ENABLE_NSIGHT_AFTERMATH)
+        deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+#if defined(ENABLE_NSIGHT_AFTERMATH)
+        // Enable Nsight Aftermath GPU crash dump creation.
+        // This needs to be done before the Vulkan device is created.
+        CreateAftermathTracker(pRenderer->pName, &pRenderer->mAftermathTracker);
+#endif
+
+        D3D_FEATURE_LEVEL featureLevel;
+        HRESULT           hr = d3d11dll_CreateDevice(pRenderer->pAdapter->mDx11.pGpu, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, deviceFlags,
+                                                     &featureLevels[levelIndex], featureLevelCount, D3D11_SDK_VERSION, &pRenderer->mDx11.pDevice,
+                                                     &featureLevel, // max feature level
+                                                     &pRenderer->mDx11.pContext);
+
+        if (FAILED(hr))
         {
-            *ppRenderer = NULL;
-            return;
+            LOGF(eWARNING, "Failed to initialize D3D11 debug device, fallback to non-debug");
+            hr = d3d11dll_CreateDevice(pRenderer->pAdapter->mDx11.pGpu, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex],
+                                       featureLevelCount, D3D11_SDK_VERSION, &pRenderer->mDx11.pDevice,
+                                       &featureLevel, // max feature level
+                                       &pRenderer->mDx11.pContext);
         }
 
-        // anything below LOW preset is not supported and we will exit
-        if (pRenderer->pGpu->mSettings.mGpuVendorPreset.mPresetLevel < GPU_PRESET_VERYLOW)
+        if (E_INVALIDARG == hr)
         {
-            // remove device and any memory we allocated in just above as this is the first function called
-            // when initializing the forge
-            RemoveDevice(pRenderer);
-            SAFE_FREE(pRenderer);
-            LOGF(LogLevel::eERROR, "Selected GPU has an Office Preset in gpu.cfg.");
-            LOGF(LogLevel::eERROR, "Office preset is not supported by The Forge.");
-
-            // have the condition in the assert as well so its cleared when the assert message box appears
-            ASSERT(pRenderer->pGpu->mSettings.mGpuVendorPreset.mPresetLevel >= GPU_PRESET_VERYLOW); //-V547
-
-            // return NULL pRenderer so that client can gracefully handle exit
-            // This is better than exiting from here in case client has allocated memory or has fallbacks
-            *ppRenderer = NULL;
-            return;
+            hr = d3d11dll_CreateDevice(pRenderer->pAdapter->mDx11.pGpu, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, deviceFlags,
+                                       &featureLevels[levelIndex + 1], featureLevelCount - 1, D3D11_SDK_VERSION, &pRenderer->mDx11.pDevice,
+                                       &featureLevel, // max feature level
+                                       &pRenderer->mDx11.pContext);
         }
+        ASSERT(SUCCEEDED(hr));
+        if (FAILED(hr))
+            LOGF(LogLevel::eERROR, "Failed to create D3D11 device and context.");
+
+        pRenderer->mDx11.pContext1 = NULL;
+        hr = pRenderer->mDx11.pContext->QueryInterface(&pRenderer->mDx11.pContext1);
+        if (SUCCEEDED(hr))
+        {
+            LOGF(LogLevel::eINFO, "Device supports ID3D11DeviceContext1.");
+        }
+
+#if defined(ENABLE_NSIGHT_AFTERMATH)
+        SetAftermathDevice(pRenderer->mDx11.pDevice);
+#endif
+
+#if defined(ENABLE_GRAPHICS_DEBUG)
+        hr = pRenderer->mDx11.pContext->QueryInterface(__uuidof(pRenderer->mDx11.pUserDefinedAnnotation),
+                                                       (void**)(&pRenderer->mDx11.pUserDefinedAnnotation));
+        if (FAILED(hr))
+        {
+            LOGF(LogLevel::eERROR, "Failed to query interface ID3DUserDefinedAnnotation.");
+        }
+#endif
     }
 
     add_default_resources(pRenderer);
@@ -1493,11 +1159,6 @@ void d3d11_exitRenderer(Renderer* pRenderer)
     remove_default_resources(pRenderer);
 
     RemoveDevice(pRenderer);
-
-    if (pRenderer->mOwnsContext)
-    {
-        d3d11_exitRendererContext(pRenderer->pContext);
-    }
 
     // Free all the renderer components
     SAFE_FREE(pRenderer);
@@ -2233,7 +1894,7 @@ void d3d11_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBu
     //  Align the buffer size to multiples of 256
     if ((pDesc->mDescriptors & DESCRIPTOR_TYPE_UNIFORM_BUFFER))
     {
-        allocationSize = round_up_64(allocationSize, pRenderer->pGpu->mSettings.mUniformBufferAlignment);
+        allocationSize = round_up_64(allocationSize, pRenderer->pProperties->mUniformBufferAlignment);
     }
 
     D3D11_BUFFER_DESC desc = {};
@@ -2353,7 +2014,7 @@ void d3d11_mapBuffer(Renderer* pRenderer, Buffer* pBuffer, ReadRange* pRange)
         {
             if (pRange == NULL)
                 mapType = D3D11_MAP_WRITE_DISCARD;
-            else if (pRenderer->pGpu->mDx11.mPartialUpdateConstantBufferSupported)
+            else if (pRenderer->pAdapter->mDx11.mPartialUpdateConstantBufferSupported)
                 mapType = D3D11_MAP_WRITE_NO_OVERWRITE;
             else
                 LOGF(LogLevel::eERROR, "Device doesn't support partial uniform buffer updates");
@@ -2419,7 +2080,7 @@ void d3d11_addTexture(Renderer* pRenderer, const TextureDesc* pDesc, Texture** p
     DescriptorType           descriptors = pDesc->mDescriptors;
     D3D11_RESOURCE_DIMENSION res_dim = {};
 
-    bool featureLevel11 = pRenderer->pGpu->mSettings.mFeatureLevel >= D3D_FEATURE_LEVEL_11_0;
+    bool featureLevel11 = pRenderer->pProperties->mFeatureLevel >= D3D_FEATURE_LEVEL_11_0;
 
     if (!featureLevel11)
     {
@@ -3777,7 +3438,7 @@ void d3d11_cmdBindPipeline(Cmd* pCmd, Pipeline* pPipeline)
 
     static const float dummyClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    if (pCmd->pRenderer->pGpu->mSettings.mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+    if (pCmd->pRenderer->pProperties->mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
     {
         reset_uavs(pContext);
     }
@@ -4738,7 +4399,172 @@ void exitD3D11Renderer(Renderer* pRenderer)
 void initD3D11RendererContext(const char* appName, const RendererContextDesc* pSettings, RendererContext** ppContext)
 {
     // No need to initialize API function pointers, initRenderer MUST be called before using anything else anyway.
-    d3d11_initRendererContext(appName, pSettings, ppContext);
+    UNREF_PARAM(appName);
+    d3d11dll_init();
+
+    RendererContext* pContext = (RendererContext*)tf_calloc_memalign(1, alignof(RendererContext), sizeof(RendererContext));
+    pContext->mApi = RendererApi::RENDERER_API_D3D11;
+
+    ASSERT(pContext);
+
+    if (FAILED(d3d11dll_CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&pContext->mDx11.pDXGIFactory)))
+    {
+        LOGF(LogLevel::eERROR, "Could not create DXGI factory.");
+        return;
+    }
+    ASSERT(pContext->mDx11.pDXGIFactory);
+
+    const int         levelIndex = pSettings->mDx11.mUseDx10 ? 2 : 0;
+    D3D_FEATURE_LEVEL featureLevels[] = {
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0,
+    };
+    const uint32_t featureLevelCount = TF_ARRAY_COUNT(featureLevels) - levelIndex;
+
+    IDXGIAdapter1* adapter = NULL;
+    for (UINT i = 0; DXGI_ERROR_NOT_FOUND != pContext->mDx11.pDXGIFactory->EnumAdapters1(i, (IDXGIAdapter1**)&adapter); ++i)
+    {
+        DXGI_ADAPTER_DESC1 desc = {};
+        adapter->GetDesc1(&desc);
+
+        // Test for display output presence and hardware adapter first to even consider the adapter
+        IDXGIOutput* outputs;
+        if (!(desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) && SUCCEEDED(adapter->EnumOutputs(0, &outputs)))
+        {
+            struct DeviceAdapter deviceAdapter = { 0 };
+
+            // assign device ID
+            deviceAdapter.mModelId = desc.DeviceId;
+            // assign vendor ID
+            deviceAdapter.mVendorId = desc.VendorId;
+            // assign Revision ID
+            deviceAdapter.mRevisionId = desc.Revision;
+            
+            // get name from api
+            // save gpu name (Some situtations this can show description instead of name)
+            // char sName[MAX_PATH];
+            wcstombs(deviceAdapter.mGpuName, desc.Description, FS_MAX_PATH);
+            
+            deviceAdapter.mDefaultProps.mVRAM = desc.DedicatedVideoMemory;
+
+            // Make sure the adapter can support a D3D11 device
+            D3D_FEATURE_LEVEL featLevelOut;
+            HRESULT hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex],
+                                              featureLevelCount,
+                                       D3D11_SDK_VERSION, NULL, &featLevelOut, NULL);
+            if (E_INVALIDARG == hr)
+            {
+                hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex + 1],
+                                           featureLevelCount - 1, D3D11_SDK_VERSION, NULL, &featLevelOut, NULL);
+            }
+            if (SUCCEEDED(hr))
+            {
+                hr = adapter->QueryInterface(IID_ARGS(&deviceAdapter.mDx11.pGpu));
+                if (SUCCEEDED(hr))
+                {
+                    ID3D11Device* device = NULL;
+                    hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex],
+                                               featureLevelCount, D3D11_SDK_VERSION, &device, &featLevelOut, NULL);
+
+                    if (E_INVALIDARG == hr)
+                    {
+                        hr = d3d11dll_CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, (HMODULE)0, 0, &featureLevels[levelIndex + 1],
+                                                   featureLevelCount - 1, D3D11_SDK_VERSION, &device, &featLevelOut, NULL);
+                    }
+
+                    if (!device)
+                    {
+                        // device name is empty ...
+                        LOGF(eERROR, "Device creation failed for adapter %s with code  %u", deviceAdapter.mGpuName, (uint32_t)hr);
+                        adapter->Release();
+                        continue;
+                    }
+
+                    d3d11CapsBuilder(device, &deviceAdapter.mCapBits);
+
+                    D3D11_FEATURE_DATA_D3D11_OPTIONS featureData = {};
+                    hr = device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &featureData, sizeof(featureData));
+                    if (FAILED(hr))
+                        LOGF(LogLevel::eINFO, "D3D11 CheckFeatureSupport D3D11_FEATURE_D3D11_OPTIONS error 0x%x", hr);
+#if WINVER > _WIN32_WINNT_WINBLUE
+                    D3D11_FEATURE_DATA_D3D11_OPTIONS2 featureData2 = {};
+                    hr = device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS2, &featureData2, sizeof(featureData2));
+                    if (FAILED(hr))
+                        LOGF(LogLevel::eINFO, "D3D11 CheckFeatureSupport D3D11_FEATURE_D3D11_OPTIONS2 error 0x%x", hr);
+
+                    deviceAdapter.mDefaultProps.mROVsSupported = featureData2.ROVsSupported ? true : false;
+#else
+                    deviceAdapter.mDefaultProps.mROVsSupported = false;
+#endif
+
+                    deviceAdapter.mDefaultProps.mSamplerAnisotropySupported = 1;
+                    deviceAdapter.mDefaultProps.mGraphicsQueueSupported = 1;
+                    deviceAdapter.mDefaultProps.mPrimitiveIdSupported = 1;
+      
+                    deviceAdapter.mDefaultProps.mUniformBufferAlignment = 256;
+                    deviceAdapter.mDefaultProps.mUploadBufferTextureAlignment = 1;
+                    deviceAdapter.mDefaultProps.mUploadBufferTextureRowAlignment = 1;
+                    deviceAdapter.mDefaultProps.mMultiDrawIndirect = false; // no such thing
+                    deviceAdapter.mDefaultProps.mMaxVertexInputBindings = 32U;
+                    deviceAdapter.mDefaultProps.mMaxBoundTextures = 128;
+                    deviceAdapter.mDefaultProps.mIndirectRootConstant = false;
+                    deviceAdapter.mDefaultProps.mBuiltinDrawID = false;
+                    deviceAdapter.mDefaultProps.mTimestampQueries = true;
+                    deviceAdapter.mDefaultProps.mOcclusionQueries = true;
+                    deviceAdapter.mDefaultProps.mPipelineStatsQueries = true;
+
+                    // Determine root signature size for this gpu driver
+
+                    deviceAdapter.mDefaultProps.mTessellationSupported = featLevelOut >= D3D_FEATURE_LEVEL_11_0;
+                    deviceAdapter.mDefaultProps.mGeometryShaderSupported = featLevelOut >= D3D_FEATURE_LEVEL_10_0;
+                    deviceAdapter.mDefaultProps.mWaveOpsSupportFlags = WAVE_OPS_SUPPORT_FLAG_NONE;
+                    deviceAdapter.mDefaultProps.mWaveOpsSupportedStageFlags = SHADER_STAGE_NONE;
+
+                    if (featLevelOut >= D3D_FEATURE_LEVEL_10_0)
+                    {
+                        // https://learn.microsoft.com/en-us/windows/win32/direct3d11/direct3d-11-advanced-stages-compute-shader
+                        deviceAdapter.mDefaultProps.mMaxTotalComputeThreads = featLevelOut >= D3D_FEATURE_LEVEL_11_0
+                                                                     ? D3D11_CS_THREAD_GROUP_MAX_THREADS_PER_GROUP
+                                                                     : D3D11_CS_4_X_THREAD_GROUP_MAX_THREADS_PER_GROUP;
+                        deviceAdapter.mDefaultProps.mMaxComputeThreads[0] =
+                            featLevelOut >= D3D_FEATURE_LEVEL_11_0
+                                                                   ? D3D11_CS_THREAD_GROUP_MAX_X
+                                                                   : D3D11_CS_4_X_THREAD_GROUP_MAX_X;
+                        deviceAdapter.mDefaultProps.mMaxComputeThreads[1] =
+                            featLevelOut >= D3D_FEATURE_LEVEL_11_0
+                                                                   ? D3D11_CS_THREAD_GROUP_MAX_Y
+                                                                   : D3D11_CS_4_X_THREAD_GROUP_MAX_Y;
+                        deviceAdapter.mDefaultProps.mMaxComputeThreads[2] = featLevelOut >= D3D_FEATURE_LEVEL_11_0
+                                                                   ? D3D11_CS_THREAD_GROUP_MAX_Z
+                                                                   : D3D11_CS_4_X_DISPATCH_MAX_THREAD_GROUPS_IN_Z_DIMENSION;
+                    }
+
+                    deviceAdapter.mDx11.mPartialUpdateConstantBufferSupported = featureData.ConstantBufferPartialUpdate;
+                    deviceAdapter.mDefaultProps.mFeatureLevel = featLevelOut;
+
+                    // Determine root signature size for this gpu driver
+                    DXGI_ADAPTER_DESC adapterDesc;
+                    deviceAdapter.mDx11.pGpu->GetDesc(&adapterDesc);
+                    LOGF(LogLevel::eINFO, "GPU[%u] detected. Vendor ID: %x, Model ID: %x, Revision ID: %x, GPU Name: %S", i,
+                         adapterDesc.VendorId, adapterDesc.DeviceId, adapterDesc.Revision, adapterDesc.Description);
+                  
+                    arrpush(pContext->pAdapters, deviceAdapter);
+
+                    // Default GPU is the first GPU received in EnumAdapters
+                    if (pSettings->mDx11.mUseDefaultGpu)
+                    {
+                        break;
+                    }
+                }
+            }
+   
+        }
+        adapter->Release(); 
+    }
+
+    *ppContext = pContext;
 }
 
 void exitD3D11RendererContext(RendererContext* pContext)

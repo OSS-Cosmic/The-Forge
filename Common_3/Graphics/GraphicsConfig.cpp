@@ -94,7 +94,7 @@ const GPUProperty availableGpuProperties[] = {
     GPU_CONFIG_PROPERTY("suppressinvalidsubresourcestateafterexit", mSuppressInvalidSubresourceStateAfterExit),
 #endif
     GPU_CONFIG_PROPERTY("geometryshadersupported", mGeometryShaderSupported),
-    GPU_CONFIG_PROPERTY("gpupresetlevel", mGpuVendorPreset.mPresetLevel),
+ //   GPU_CONFIG_PROPERTY("gpupresetlevel", mGpuVendorPreset.mPresetLevel),
     GPU_CONFIG_PROPERTY("graphicqueuesupported", mGraphicsQueueSupported),
     GPU_CONFIG_PROPERTY("hdrsupported", mHDRSupported),
 #if defined(VULKAN)

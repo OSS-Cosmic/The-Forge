@@ -12,9 +12,8 @@ enable_language(ASM)
 add_subdirectory(External)
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/External")
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
-
 set(FSL_COMPILER_PY "${CMAKE_CURRENT_SOURCE_DIR}/Common_3/Tools/ForgeShadingLanguage/fsl.py" )
-
+set(THE_FORGE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}" )
 
 add_library(cpu_features OBJECT 
      Common_3/OS/ThirdParty/OpenSource/cpu_features/src/impl_x86_macos.c
@@ -30,14 +29,6 @@ add_library(cpu_features OBJECT
 #add_library(basis_universal STATIC ${BASIS_UNVERSAL_SOURCES})
 #target_include_directories(basis_universal PUBLIC Common_3/Utilities/ThirdParty/OpenSource/basis_universal)
 
-add_library(ags SHARED IMPORTED IMPORTED GLOBAL)
-set_property(TARGET ags PROPERTY IMPORTED_LOCATION
-         Common_3/Graphics/ThirdParty/OpenSource/ags/ags_lib/lib/amd_ags_x64.dll
-        )
-set_property(TARGET ags PROPERTY IMPORTED_IMPLIB
-         Common_3/Graphics/ThirdParty/OpenSource/ags/ags_lib/lib/amd_ags_x64.lib
-        )
-target_include_directories(ags INTERFACE  Common_3/Graphics/ThirdParty/OpenSource/ags)
 
 # add_library(tinyEXR STATIC Common_3/Resources/ResourceLoader/ThirdParty/OpenSource/TinyEXR/tinyexr.cc)
 #target_include_directories(tinyEXR PRIVATE 
@@ -62,11 +53,12 @@ file(GLOB ZSTD_FILESYSTEM_SOURCES
      Common_3/Utilities/ThirdParty/OpenSource/zstd/common/*.c
      Common_3/Utilities/ThirdParty/OpenSource/zstd/compress/*.c
      Common_3/Utilities/ThirdParty/OpenSource/zstd/decompress/*.c
-     Common_3/Utilities/ThirdParty/OpenSource/zstd/decompress/*.S
+    # Common_3/Utilities/ThirdParty/OpenSource/zstd/decompress/*.S
 )
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     list(APPEND ZSTD_FILESYSTEM_SOURCES Common_3/Utilities/ThirdParty/OpenSource/zstd/decompress/huf_decompress_amd64.S)
 endif()
+
 add_library(zstd_filesystem OBJECT ${ZSTD_FILESYSTEM_SOURCES}) 
 target_include_directories(zstd_filesystem   PUBLIC Common_3/Utilities/ThirdParty/OpenSource/zstd)
 
@@ -123,6 +115,7 @@ file(GLOB THE_FORGE_SOURCES
     Common_3/Application/Fonts/FontSystem.cpp
     Common_3/Application/UI/UI.cpp
     Common_3/Application/Profiler/*.cpp
+    Common_3/Application/InputSystem.cpp
     Common_3/OS/WindowSystem/*.cpp
     Common_3/OS/*.cpp
 
@@ -142,13 +135,18 @@ file(GLOB THE_FORGE_SOURCES
     Common_3/Renderer/ShaderServer/Network.c
     Common_3/Renderer/ShaderServer/ShaderServer.cpp
 
-    Common_3/Application/InputSystem.cpp
-    
-    Source/Forge/Core/TF_String.cpp
-
     Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.c
-    
     Common_3/Tools/ThirdParty/OpenSource/meshoptimizer/src/*.cpp
+    
+   Source/Forge/Core/TF_String.cpp
+   Source/Forge/Core/TF_Core.cpp
+   Source/Forge/Core/Mem/TF_Allocators.cpp
+   
+   Source/Forge/Graphics/TF_GPUConfig.cpp
+   Source/Forge/Graphics/TF_Graphics.cpp
+   Source/Forge/Graphics/Vulkan/Vulkan.cpp
+   Source/Forge/Graphics/Vulkan/VulkanRaytracing.cpp 
+   Source/Forge/Graphics/Vulkan/VulkanShaderReflection.cpp
 )
 add_library(TF STATIC ${THE_FORGE_SOURCES})
 
@@ -167,18 +165,19 @@ file(GLOB GAINPUT_SOURCES
         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp   
 )
 
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+if(WIN32)
+    file(GLOB GAINPUT_SOURCES_WINDOWS
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/windows/*.c
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp
+        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp
+    )
+    target_link_libraries(TF PRIVATE XInput)
+    list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_WINDOWS})
+elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     file(GLOB GAINPUT_SOURCES_MACOS
         Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/hidapi/mac/*.c
         Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/gainput/*.mm)
     list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_MACOS})
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    file(GLOB GAINPUT_SOURCES_WINDOWS
-        Common_3/Application/ThirdParts/OpenSource/gainput/lib/source/hidapi/windows/*.c
-        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp
-        Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp
-    )
-    list(APPEND GAINPUT_SOURCES ${GAINPUT_SOURCES_WINDOWS})
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     file(GLOB GAINPUT_SOURCES_LINUX
         Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/linux/*.c)
@@ -207,21 +206,20 @@ target_include_directories(imgui PUBLIC Common_3/ThirdParty/OpenSource/imgui)
 target_compile_definitions(
     TF PRIVATE -DSTB_TRUETYPE_IMPLEMENTATION
 )
-target_link_libraries(TF PUBLIC cpu_features imgui cgltf lz4 zstd_filesystem tinydds tinyimageformat tinyktx )
-target_include_directories(TF PUBLIC ${THE_FORGE_DIR})
 
 target_sources(TF PRIVATE ${GAINPUT_SOURCES})
-IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+
+if(WIN32)
+    file(GLOB THE_FORGE_OS_WINDOWS_SOURCES
+        Common_3/OS/Windows/*.cpp
+        Common_3/OS/Windows/*.c)
+    target_link_libraries(TF PRIVATE Winmm)
+    target_sources(TF PRIVATE ${THE_FORGE_OS_WINDOWS_SOURCES})
+elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     file(GLOB THE_FORGE_OS_DARWIN_SOURCES
         Common_3/OS/Darwin/*.cpp
         Common_3/OS/Darwin/*.c)
     target_sources(TF PRIVATE ${THE_FORGE_OS_DARWIN_SOURCES})
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    file(GLOB THE_FORGE_OS_WINDOWS_SOURCES
-        Common_3/OS/Windows/*.cpp
-        Common_3/OS/Windows/*.c)
-        
-    target_sources(TF PRIVATE ${THE_FORGE_OS_WINDOWS_SOURCES})
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     include(FindPkgConfig)
 
@@ -242,28 +240,36 @@ file(GLOB GRAPHICS_VULKAN_SOURCE
 target_sources(TF PRIVATE ${GRAPHICS_VULKAN_SOURCE})
 target_link_libraries(TF PRIVATE SPIRV_Cross volk)
 
-
 # WinPixEventRuntime
 add_library(WinPixEventRuntime SHARED IMPORTED GLOBAL)
 set_property(TARGET WinPixEventRuntime PROPERTY IMPORTED_LOCATION
-        Common_3/OS/ThirdParty/OpenSource/winpixeventruntime/bin/WinPixEventRuntime.dll)
+        ${CMAKE_CURRENT_SOURCE_DIR}/Common_3/OS/ThirdParty/OpenSource/winpixeventruntime/bin/WinPixEventRuntime.dll)
 set_property(TARGET WinPixEventRuntime PROPERTY IMPORTED_IMPLIB
-        Common_3/OS/ThirdParty/OpenSource/winpixeventruntime/bin/WinPixEventRuntime.lib)
+        ${CMAKE_CURRENT_SOURCE_DIR}/Common_3/OS/ThirdParty/OpenSource/winpixeventruntime/bin/WinPixEventRuntime.lib)
 
 # DirectXShaderCompiler 
 add_library(DirectXShaderCompiler SHARED IMPORTED GLOBAL)
 set_property(TARGET DirectXShaderCompiler PROPERTY IMPORTED_LOCATION
-        Common_3/Graphics/ThirdParty/OpenSource/DirectXShaderCompiler/bin/x64/dxcompiler.dll)
+        ${CMAKE_CURRENT_SOURCE_DIR}/Common_3/Graphics/ThirdParty/OpenSource/DirectXShaderCompiler/bin/x64/dxcompiler.dll)
 set_property(TARGET DirectXShaderCompiler PROPERTY IMPORTED_IMPLIB
-    Common_3/Graphics/ThirdParty/OpenSource/DirectXShaderCompiler/lib/x64/dxcompiler.lib)     
+    ${CMAKE_CURRENT_SOURCE_DIR}/Common_3/Graphics/ThirdParty/OpenSource/DirectXShaderCompiler/lib/x64/dxcompiler.lib)     
 
 # Nvapi
 add_library(Nvapi STATIC IMPORTED)
 set_property(TARGET Nvapi PROPERTY IMPORTED_LOCATION
-    Common_3/Graphics/ThirdParty/OpenSource/nvapi/amd64/nvapi64.lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/Common_3/Graphics/ThirdParty/OpenSource/nvapi/amd64/nvapi64.lib
     )
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+add_library(ags SHARED IMPORTED IMPORTED GLOBAL)
+set_property(TARGET ags PROPERTY IMPORTED_LOCATION
+         ${CMAKE_CURRENT_SOURCE_DIR}/Common_3/Graphics/ThirdParty/OpenSource/ags/ags_lib/lib/amd_ags_x64.dll
+        )
+set_property(TARGET ags PROPERTY IMPORTED_IMPLIB
+         ${CMAKE_CURRENT_SOURCE_DIR}/Common_3/Graphics/ThirdParty/OpenSource/ags/ags_lib/lib/amd_ags_x64.lib
+        )
+target_include_directories(ags INTERFACE  Common_3/Graphics/ThirdParty/OpenSource/ags)
+
+if(WIN32)
     file(GLOB GRAPHICS_D3D12_SOURCE
         "Common_3/Graphics/Direct3D12/*.cpp"
         "Common_3/Graphics/Direct3D11/*.cpp"
@@ -271,7 +277,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_sources(TF PRIVATE ${GRAPHICS_D3D12_SOURCE})
 
     target_include_directories(TF PRIVATE Common_3/Graphics/ThirdParty/OpenSource/D3D12MemoryAllocator)
-    target_link_libraries(TF PRIVATE Nvapi ags)
+    #target_link_libraries(TF PRIVATE Nvapi ags D3D12Agility)
 
     #file(GLOB GRAPHICS_D3D11_SOURCE "Common_3/Graphics/Direct3D11/*.cpp")
     #target_sources(TF PRIVATE ${GRAPHICS_D3D11_SOURCE})
@@ -290,11 +296,11 @@ target_include_directories(TF PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Include")
 target_include_directories(TF PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_include_directories(TF PUBLIC "Common_3/Utilities/ThirdParty/OpenSource/bstrlib")
 target_include_directories(TF PUBLIC "Common_3/Tools/ThirdParty/OpenSource/meshoptimizer/src")
-install (TARGETS TF 
-         ARCHIVE DESTINATION lib
-         LIBRARY DESTINATION lib
-         RUNTIME DESTINATION bin)
 
-add_subdirectory(Test)
+target_link_libraries(TF PUBLIC cpu_features imgui cgltf lz4 zstd_filesystem tinydds tinyimageformat tinyktx Nvapi ags)
+target_include_directories(TF PUBLIC ${THE_FORGE_DIR})
+
+add_definitions(-DD3D12_AGILITY_SDK_VERSION=611)
 add_subdirectory(TFSamples)
+add_subdirectory(Test)
 

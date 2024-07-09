@@ -78,7 +78,6 @@ extern void            hook_dispatch(Cmd* pCmd, uint32_t groupCountX, uint32_t g
 extern HRESULT         hook_signal(Queue* pQueue, ID3D12Fence* pFence, uint64_t fenceValue);
 extern HRESULT         hook_signal_flush(Queue* pQueue, ID3D12Fence* pFence, uint64_t fenceValue);
 
-extern void hook_fill_gpu_desc(ID3D12Device* pDevice, D3D_FEATURE_LEVEL featureLevel, GpuDesc* pInOutDesc);
 extern void hook_modify_descriptor_heap_size(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t* pInOutSize);
 extern void hook_modify_heap_flags(DescriptorType type, D3D12_HEAP_FLAGS* pInOutFlags);
 extern void hook_modify_buffer_resource_desc(const BufferDesc* pBuffer, D3D12_RESOURCE_DESC* pInOutDesc);

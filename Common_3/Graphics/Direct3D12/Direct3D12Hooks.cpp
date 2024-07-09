@@ -286,39 +286,6 @@ HRESULT hook_signal(Queue* pQueue, ID3D12Fence* pFence, uint64_t fenceValue) { r
 
 HRESULT hook_signal_flush(Queue* pQueue, ID3D12Fence* pFence, uint64_t fenceValue) { return hook_signal(pQueue, pFence, fenceValue); }
 
-extern void hook_fill_gpu_desc(ID3D12Device* pDevice, D3D_FEATURE_LEVEL featureLevel, GpuDesc* pInOutDesc)
-{
-    // Query the level of support of Shader Model.
-    D3D12_FEATURE_DATA_D3D12_OPTIONS  featureData = {};
-    D3D12_FEATURE_DATA_D3D12_OPTIONS1 featureData1 = {};
-    // Query the level of support of Wave Intrinsics.
-    pDevice->CheckFeatureSupport((D3D12_FEATURE)D3D12_FEATURE_D3D12_OPTIONS, &featureData, sizeof(featureData));
-    pDevice->CheckFeatureSupport((D3D12_FEATURE)D3D12_FEATURE_D3D12_OPTIONS1, &featureData1, sizeof(featureData1));
-
-    GpuDesc&           gpuDesc = *pInOutDesc;
-    DXGI_ADAPTER_DESC3 desc = {};
-    gpuDesc.pGpu->GetDesc3(&desc);
-
-    gpuDesc.mMaxSupportedFeatureLevel = featureLevel;
-    gpuDesc.mDedicatedVideoMemory = desc.DedicatedVideoMemory;
-    gpuDesc.mFeatureDataOptions = featureData;
-    gpuDesc.mFeatureDataOptions1 = featureData1;
-
-    // save vendor and model Id as string
-    // char hexChar[10];
-    // convert deviceId and assign it
-    gpuDesc.mDeviceId = desc.DeviceId;
-    // convert modelId and assign it
-    gpuDesc.mVendorId = desc.VendorId;
-    // convert Revision Id
-    gpuDesc.mRevisionId = desc.Revision;
-
-    // save gpu name (Some situtations this can show description instead of name)
-    // char sName[MAX_PATH];
-    size_t numConverted = 0;
-    wcstombs_s(&numConverted, gpuDesc.mName, desc.Description, MAX_GPU_VENDOR_STRING_LENGTH);
-}
-
 void hook_modify_descriptor_heap_size(D3D12_DESCRIPTOR_HEAP_TYPE, uint32_t*) {}
 
 void hook_modify_swapchain_desc(DXGI_SWAP_CHAIN_DESC1*) {}
