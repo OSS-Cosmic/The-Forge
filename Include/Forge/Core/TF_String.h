@@ -57,16 +57,16 @@ struct TStrSpan {
 }; 
 
 //static inline struct TStrSpan tfToRef(char* c) { return (struct TStrSpan){ c, strlen(c) }; }
-static inline struct TStrSpan tfToRef(const char* c) { return (struct TStrSpan){ (char*)c, strlen(c) }; }
-static inline struct TStrSpan tfToRef(struct TStr str) { return (struct TStrSpan){ str.buf, str.len }; }
+static inline struct TStrSpan tfToRef(const char* c) { return TStrSpan{ (char*)c, (size_t)strlen(c) }; }
+static inline struct TStrSpan tfToRef(struct TStr str) { return TStrSpan{ str.buf, str.len }; }
 
 static inline struct TStrSpan tfSub(struct TStrSpan slice, size_t a, size_t b) {
-  ASSERT((b - a) <= slice.len);
-  return (struct TStrSpan){slice.buf + a, b - a};
+    ASSERT((b - a) <= slice.len);
+    return TStrSpan{ slice.buf + a, b - a };
 }
 
 static inline size_t tfStrAvailLen(TStr str) { return str.alloc - str.len;}
-static inline TStrSpan tfStrAvailSpan(TStr str) { return (struct TStrSpan){str.buf + str.len, tfStrAvailLen(str)};}
+static inline TStrSpan tfStrAvailSpan(TStr str) { return TStrSpan{str.buf + str.len, tfStrAvailLen(str)};}
 
 /**
  * Creates a string from a slice 

@@ -97,6 +97,7 @@ public:
 
     struct Settings
     {
+        uint32_t mSelectedAPI;
         /// Window width
         int32_t mWidth = -1;
         /// Window height

@@ -450,10 +450,10 @@ bool isUma() { return gUma; }
 #endif
 
 // Can only issue certain resource state barriers on particular queue type
-static inline FORGE_CONSTEXPR bool StrictQueueTypeBarriers()
+static inline FORGE_CONSTEXPR bool StrictQueueTypeBarriers(RendererApi api)
 {
 #if defined(STRICT_QUEUE_TYPE_BARRIERS)
-    if (RENDERER_API_D3D12 == gPlatformParameters.mSelectedRendererApi)
+    if (RENDERER_API_D3D12 == api)
     {
         return true;
     }
@@ -462,16 +462,16 @@ static inline FORGE_CONSTEXPR bool StrictQueueTypeBarriers()
 }
 
 // Need to issue barriers when doing texture copy operations
-static inline bool IssueTextureCopyBarriers()
+static inline bool IssueTextureCopyBarriers(RendererApi api)
 {
 #if defined(DIRECT3D12)
-    if (RENDERER_API_D3D12 == gPlatformParameters.mSelectedRendererApi)
+    if (RENDERER_API_D3D12 == api)
     {
         return true;
     }
 #endif
 #if defined(VULKAN)
-    if (RENDERER_API_VULKAN == gPlatformParameters.mSelectedRendererApi)
+    if (RENDERER_API_VULKAN == api)
     {
         return true;
     }
@@ -480,10 +480,10 @@ static inline bool IssueTextureCopyBarriers()
 }
 
 // Need to issue barriers when doing buffer copy operations
-static inline FORGE_CONSTEXPR bool IssueBufferCopyBarriers() //-V524
+static inline FORGE_CONSTEXPR bool IssueBufferCopyBarriers(RendererApi api) //-V524
 {
 #if defined(DIRECT3D12)
-    if (RENDERER_API_D3D12 == gPlatformParameters.mSelectedRendererApi)
+    if (RENDERER_API_D3D12 == api)
     {
         return true;
     }
@@ -492,10 +492,10 @@ static inline FORGE_CONSTEXPR bool IssueBufferCopyBarriers() //-V524
 }
 
 // All Vulkan resources are created in undefined state. Need to transition to desired layout manually unlike DX12 ResourceStartState
-static inline bool IssueExplicitInitialStateBarrier()
+static inline bool IssueExplicitInitialStateBarrier(RendererApi api)
 {
 #if defined(VULKAN)
-    if (RENDERER_API_VULKAN == gPlatformParameters.mSelectedRendererApi)
+    if (RENDERER_API_VULKAN == api)
     {
         return true;
     }
@@ -704,6 +704,7 @@ struct UpdateRequest
 
 struct ResourceLoader
 {
+    RendererContext* pContext;
     Renderer* ppRenderers[MAX_MULTIPLE_GPUS];
     uint32_t  mGpuCount;
 
@@ -810,11 +811,11 @@ static void freeShaderByteCode(ShaderByteCodeBuffer*, BinaryShaderDesc*) {}
 /************************************************************************/
 
 /// Return a new staging buffer
-static MappedMemoryRange allocateUploadMemory(Renderer* pRenderer, uint64_t memoryRequirement, uint32_t alignment)
+static MappedMemoryRange allocateUploadMemory(ResourceLoader* pLoader, Renderer* pRenderer, uint64_t memoryRequirement, uint32_t alignment)
 {
     Buffer* buffer;
 #if defined(DIRECT3D11)
-    if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_D3D11)
+    if (pLoader->pContext->mApi== RENDERER_API_D3D11)
     {
         // There is no such thing as staging buffer in D3D11
         // To keep code paths unified in update functions, we allocate space for a dummy buffer and the system memory for pCpuMappedAddress
@@ -826,7 +827,7 @@ static MappedMemoryRange allocateUploadMemory(Renderer* pRenderer, uint64_t memo
     else
 #endif
 #if defined(GLES)
-        if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_GLES)
+    if (pLoader->pContext->mApi == RENDERER_API_GLES)
     {
         // There is no such thing as staging buffer in GLES
         // To keep code paths unified in update functions, we allocate space for a dummy buffer and the system memory for pCpuMappedAddress
@@ -853,7 +854,7 @@ static MappedMemoryRange allocateUploadMemory(Renderer* pRenderer, uint64_t memo
     return { (uint8_t*)buffer->pCpuMappedAddress, buffer, 0, memoryRequirement, MAPPED_RANGE_FLAG_TEMP_BUFFER };
 }
 
-static void setupCopyEngine(Renderer* pRenderer, CopyEngineDesc* pDesc, CopyEngine* pCopyEngine)
+static void setupCopyEngine(ResourceLoader* pLoader, Renderer* pRenderer, CopyEngineDesc* pDesc, CopyEngine* pCopyEngine)
 {
     QueueDesc desc = { pDesc->mQueueType, QUEUE_FLAG_NONE, QUEUE_PRIORITY_NORMAL, pDesc->mNodeIndex, pDesc->pQueueName };
     addQueue(pRenderer, &desc, &pCopyEngine->pQueue);
@@ -868,7 +869,7 @@ static void setupCopyEngine(Renderer* pRenderer, CopyEngineDesc* pDesc, CopyEngi
 
         CopyResourceSet& resourceSet = pCopyEngine->resourceSets[i];
 #if defined(DIRECT3D11)
-        if (gPlatformParameters.mSelectedRendererApi != RENDERER_API_D3D11)
+        if (pLoader->pContext->mApi != RENDERER_API_D3D11)
 #endif
             addFence(pRenderer, &resourceSet.pFence);
 
@@ -888,7 +889,7 @@ static void setupCopyEngine(Renderer* pRenderer, CopyEngineDesc* pDesc, CopyEngi
 
         addSemaphore(pRenderer, &resourceSet.pSemaphore);
 
-        resourceSet.mBuffer = allocateUploadMemory(pRenderer, pDesc->mSize, util_get_texture_subresource_alignment(pRenderer)).pBuffer;
+        resourceSet.mBuffer = allocateUploadMemory(pLoader, pRenderer, pDesc->mSize, util_get_texture_subresource_alignment(pRenderer)).pBuffer;
     }
 
     pCopyEngine->bufferSize = pDesc->mSize;
@@ -910,7 +911,7 @@ static void cleanupCopyEngine(Renderer* pRenderer, CopyEngine* pCopyEngine)
         removeCmd(pRenderer, resourceSet.pCmd);
         removeCmdPool(pRenderer, resourceSet.pCmdPool);
 #if defined(DIRECT3D11)
-        if (gPlatformParameters.mSelectedRendererApi != RENDERER_API_D3D11)
+        if (pResourceLoader->pContext->mApi != RENDERER_API_D3D11)
 #endif
         {
             removeFence(pRenderer, resourceSet.pFence);
@@ -923,7 +924,7 @@ static void cleanupCopyEngine(Renderer* pRenderer, CopyEngine* pCopyEngine)
         arrfree(resourceSet.mTempBuffers);
 
 #if defined(STRICT_QUEUE_TYPE_BARRIERS)
-        if (StrictQueueTypeBarriers() && resourceSet.pPostCopyBarrierFence)
+        if (StrictQueueTypeBarriers(pResourceLoader->pContext->mApi) && resourceSet.pPostCopyBarrierFence)
         {
             removeFence(pRenderer, resourceSet.pPostCopyBarrierFence);
             removeCmd(pRenderer, resourceSet.pPostCopyBarrierCmd);
@@ -941,7 +942,7 @@ static void cleanupCopyEngine(Renderer* pRenderer, CopyEngine* pCopyEngine)
 static void waitCopyEngineSet(Renderer* pRenderer, CopyEngine* pCopyEngine)
 {
 #if defined(DIRECT3D11)
-    if (RENDERER_API_D3D11 == gPlatformParameters.mSelectedRendererApi)
+    if (RENDERER_API_D3D11 == pResourceLoader->pContext->mApi)
     {
         return;
     }
@@ -958,7 +959,7 @@ static void waitCopyEngineSet(Renderer* pRenderer, CopyEngine* pCopyEngine)
     }
 
 #if defined(STRICT_QUEUE_TYPE_BARRIERS)
-    if (StrictQueueTypeBarriers() && resourceSet.pPostCopyBarrierFence)
+    if (StrictQueueTypeBarriers(pResourceLoader->pContext->mApi) && resourceSet.pPostCopyBarrierFence)
     {
         getFenceStatus(pRenderer, resourceSet.pPostCopyBarrierFence, &status);
         if (FENCE_STATUS_INCOMPLETE == status)
@@ -1004,7 +1005,7 @@ static Cmd* acquireCmd(CopyEngine* pCopyEngine)
 
 static Cmd* acquirePostCopyBarrierCmd(CopyEngine* pCopyEngine)
 {
-    if (!StrictQueueTypeBarriers() || pCopyEngine->pQueue->mType != QUEUE_TYPE_TRANSFER)
+    if (!StrictQueueTypeBarriers(pResourceLoader->pContext->mApi) || pCopyEngine->pQueue->mType != QUEUE_TYPE_TRANSFER)
     {
         return acquireCmd(pCopyEngine);
     }
@@ -1046,7 +1047,7 @@ static void streamerFlush(CopyEngine* pCopyEngine)
         queueSubmit(pCopyEngine->pQueue, &submitDesc);
 
 #if defined(STRICT_QUEUE_TYPE_BARRIERS)
-        if (StrictQueueTypeBarriers() && resourceSet.mPostCopyBarrierRecording)
+        if (StrictQueueTypeBarriers(pResourceLoader->pContext->mApi) && resourceSet.mPostCopyBarrierRecording)
         {
             endCmd(resourceSet.pPostCopyBarrierCmd);
             submitDesc = {};
@@ -1065,7 +1066,7 @@ static void streamerFlush(CopyEngine* pCopyEngine)
 }
 
 /// Return memory from pre-allocated staging buffer or create a temporary buffer if the streamer ran out of memory
-static MappedMemoryRange allocateStagingMemory(CopyEngine* pCopyEngine, uint64_t memoryRequirement, uint32_t alignment, uint32_t nodeIndex)
+static MappedMemoryRange allocateStagingMemory(ResourceLoader* pLoader, CopyEngine* pCopyEngine, uint64_t memoryRequirement, uint32_t alignment, uint32_t nodeIndex)
 {
     // #NOTE: Call to make sure we dont reset copy engine after staging memory was already allocated
     acquireCmd(pCopyEngine);
@@ -1076,7 +1077,7 @@ static MappedMemoryRange allocateStagingMemory(CopyEngine* pCopyEngine, uint64_t
     memoryRequirement = round_up_64(memoryRequirement, alignment);
     if (memoryRequirement > size)
     {
-        MappedMemoryRange range = allocateUploadMemory(pResourceLoader->ppRenderers[nodeIndex], memoryRequirement, alignment);
+        MappedMemoryRange range = allocateUploadMemory(pLoader, pResourceLoader->ppRenderers[nodeIndex], memoryRequirement, alignment);
         LOADER_LOGF(
             LogLevel::eINFO,
             "Allocating temporary staging buffer. Required allocation size of %llu is larger than the staging buffer capacity of %llu",
@@ -1101,7 +1102,7 @@ static MappedMemoryRange allocateStagingMemory(CopyEngine* pCopyEngine, uint64_t
         {
             ASSERT(pCopyEngine->pFnFlush);
             pCopyEngine->pFnFlush(pCopyEngine);
-            return allocateStagingMemory(pCopyEngine, memoryRequirement, alignment, nodeIndex);
+            return allocateStagingMemory(pLoader, pCopyEngine, memoryRequirement, alignment, nodeIndex);
         }
 
         return {};
@@ -1117,7 +1118,7 @@ static UploadFunctionResult updateBuffer(Renderer* pRenderer, CopyEngine* pCopyE
 
     Cmd* pCmd = acquireCmd(pCopyEngine);
 
-    if (IssueBufferCopyBarriers() && bufUpdateDesc.mCurrentState != RESOURCE_STATE_COPY_DEST)
+    if (IssueBufferCopyBarriers(pResourceLoader->pContext->mApi) && bufUpdateDesc.mCurrentState != RESOURCE_STATE_COPY_DEST)
     {
         BufferBarrier barrier = { bufUpdateDesc.pBuffer, bufUpdateDesc.mCurrentState, RESOURCE_STATE_COPY_DEST };
         cmdResourceBarrier(pCmd, 1, &barrier, 0, NULL, 0, NULL);
@@ -1127,7 +1128,7 @@ static UploadFunctionResult updateBuffer(Renderer* pRenderer, CopyEngine* pCopyE
     cmdUpdateBuffer(pCmd, pBuffer, bufUpdateDesc.mDstOffset, range.pBuffer, range.mOffset,
                     bufUpdateDesc.mSize ? bufUpdateDesc.mSize : range.mSize);
 
-    if (IssueBufferCopyBarriers() && bufUpdateDesc.mCurrentState != RESOURCE_STATE_COPY_DEST)
+    if (IssueBufferCopyBarriers(pResourceLoader->pContext->mApi) && bufUpdateDesc.mCurrentState != RESOURCE_STATE_COPY_DEST)
     {
         BufferBarrier barrier = { bufUpdateDesc.pBuffer, RESOURCE_STATE_COPY_DEST, bufUpdateDesc.mCurrentState };
         cmdResourceBarrier(pCmd, 1, &barrier, 0, NULL, 0, NULL);
@@ -1136,7 +1137,7 @@ static UploadFunctionResult updateBuffer(Renderer* pRenderer, CopyEngine* pCopyE
     return UPLOAD_FUNCTION_RESULT_COMPLETED;
 }
 
-static UploadFunctionResult loadBuffer(Renderer* pRenderer, CopyEngine* pCopyEngine, const UpdateRequest& updateRequest)
+static UploadFunctionResult loadBuffer(ResourceLoader* pLoader, Renderer* pRenderer, CopyEngine* pCopyEngine, const UpdateRequest& updateRequest)
 {
     const BufferLoadDescInternal& loadDesc = updateRequest.bufLoadDesc;
     BufferUpdateDesc              updateDesc = { loadDesc.pBuffer };
@@ -1159,7 +1160,7 @@ static UploadFunctionResult loadBuffer(Renderer* pRenderer, CopyEngine* pCopyEng
     }
     else
     {
-        range = allocateStagingMemory(pCopyEngine, loadDesc.pBuffer->mSize, RESOURCE_BUFFER_ALIGNMENT, pCopyEngine->nodeIndex);
+        range = allocateStagingMemory(pLoader, pCopyEngine, loadDesc.pBuffer->mSize, RESOURCE_BUFFER_ALIGNMENT, pCopyEngine->nodeIndex);
         if (!range.pData)
         {
             return UPLOAD_FUNCTION_RESULT_STAGING_BUFFER_FULL;
@@ -1190,7 +1191,7 @@ static UploadFunctionResult loadBuffer(Renderer* pRenderer, CopyEngine* pCopyEng
     UploadFunctionResult res = updateBuffer(pRenderer, pCopyEngine, updateDesc);
     if (UPLOAD_FUNCTION_RESULT_COMPLETED == res)
     {
-        if (IssueBufferCopyBarriers() && loadDesc.mStartState != RESOURCE_STATE_COPY_DEST)
+        if (IssueBufferCopyBarriers(pResourceLoader->pContext->mApi) && loadDesc.mStartState != RESOURCE_STATE_COPY_DEST)
         {
             BufferBarrier barrier = { loadDesc.pBuffer, RESOURCE_STATE_COPY_DEST, loadDesc.mStartState };
             Cmd*          cmd = acquirePostCopyBarrierCmd(pCopyEngine);
@@ -1201,7 +1202,8 @@ static UploadFunctionResult loadBuffer(Renderer* pRenderer, CopyEngine* pCopyEng
     return res;
 }
 
-static UploadFunctionResult updateTexture(Renderer* pRenderer, CopyEngine* pCopyEngine, const TextureUpdateDescInternal& texUpdateDesc)
+static UploadFunctionResult updateTexture(ResourceLoader* pLoader, Renderer* pRenderer, CopyEngine* pCopyEngine,
+                                          const TextureUpdateDescInternal& texUpdateDesc)
 {
     // When this call comes from updateResource, staging buffer data is already filled
     // All that is left to do is record and execute the Copy commands
@@ -1218,12 +1220,13 @@ static UploadFunctionResult updateTexture(Renderer* pRenderer, CopyEngine* pCopy
                                                         sliceAlignment, texUpdateDesc.mBaseMipLevel, texUpdateDesc.mMipLevels,
                                                         texUpdateDesc.mBaseArrayLayer, texUpdateDesc.mLayerCount);
 
-    MappedMemoryRange upload =
-        dataAlreadyFilled ? texUpdateDesc.mRange : allocateStagingMemory(pCopyEngine, requiredSize, sliceAlignment, texture->mNodeIndex);
+    MappedMemoryRange upload = dataAlreadyFilled
+                                   ? texUpdateDesc.mRange
+                                   : allocateStagingMemory(pLoader, pCopyEngine, requiredSize, sliceAlignment, texture->mNodeIndex);
     uint64_t offset = 0;
 
     Cmd* cmd = texUpdateDesc.pCmd ? texUpdateDesc.pCmd : acquireCmd(pCopyEngine);
-    if (IssueTextureCopyBarriers() && texUpdateDesc.mCurrentState != RESOURCE_STATE_COPY_DEST)
+    if (IssueTextureCopyBarriers(pResourceLoader->pContext->mApi) && texUpdateDesc.mCurrentState != RESOURCE_STATE_COPY_DEST)
     {
         TextureBarrier barrier = { texture, texUpdateDesc.mCurrentState, RESOURCE_STATE_COPY_DEST };
         cmdResourceBarrier(cmd, 0, NULL, 1, &barrier, 0, NULL);
@@ -1330,7 +1333,7 @@ static UploadFunctionResult updateTexture(Renderer* pRenderer, CopyEngine* pCopy
         }
     }
 
-    if (IssueTextureCopyBarriers() && texUpdateDesc.mCurrentState != RESOURCE_STATE_COPY_DEST)
+    if (IssueTextureCopyBarriers(pLoader->pContext->mApi) && texUpdateDesc.mCurrentState != RESOURCE_STATE_COPY_DEST)
     {
         TextureBarrier barrier = { texture, RESOURCE_STATE_COPY_DEST, texUpdateDesc.mCurrentState };
         cmdResourceBarrier(cmd, 0, NULL, 1, &barrier, 0, NULL);
@@ -1344,7 +1347,7 @@ static UploadFunctionResult updateTexture(Renderer* pRenderer, CopyEngine* pCopy
     return UPLOAD_FUNCTION_RESULT_COMPLETED;
 }
 
-static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEngine, const UpdateRequest& pTextureUpdate)
+static UploadFunctionResult loadTexture(ResourceLoader* pLoader, Renderer* pRenderer, CopyEngine* pCopyEngine, const UpdateRequest& pTextureUpdate)
 {
     const TextureLoadDescInternal* pTextureDesc = &pTextureUpdate.texLoadDesc;
 
@@ -1352,7 +1355,7 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
     {
         Texture* texture = *pTextureDesc->ppTexture;
 
-        if (IssueExplicitInitialStateBarrier())
+        if (IssueExplicitInitialStateBarrier(pResourceLoader->pContext->mApi))
         {
             Cmd*           cmd = acquireCmd(pCopyEngine);
             TextureBarrier barrier = { texture, RESOURCE_STATE_UNDEFINED, RESOURCE_STATE_COPY_DEST };
@@ -1364,7 +1367,7 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
         const uint32_t    rowAlignment = util_get_texture_row_alignment(pRenderer);
         const uint64_t    requiredSize = util_get_surface_size(fmt, texture->mWidth, texture->mHeight, texture->mDepth, rowAlignment,
                                                             sliceAlignment, 0, texture->mMipLevels, 0, texture->mArraySizeMinusOne + 1u);
-        MappedMemoryRange range = allocateStagingMemory(pCopyEngine, requiredSize, sliceAlignment, texture->mNodeIndex);
+        MappedMemoryRange range = allocateStagingMemory(pLoader, pCopyEngine, requiredSize, sliceAlignment, texture->mNodeIndex);
         memset(range.pData, 0, range.mSize);
 
         // Zero out all subresources
@@ -1374,9 +1377,9 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
         updateDesc.pTexture = texture;
         updateDesc.mRange = range;
         updateDesc.mCurrentState = RESOURCE_STATE_COPY_DEST;
-        updateTexture(pRenderer, pCopyEngine, updateDesc);
+        updateTexture(pLoader, pRenderer, pCopyEngine, updateDesc);
 
-        if (IssueTextureCopyBarriers() && pTextureDesc->mStartState != RESOURCE_STATE_COPY_DEST)
+        if (IssueTextureCopyBarriers(pResourceLoader->pContext->mApi) && pTextureDesc->mStartState != RESOURCE_STATE_COPY_DEST)
         {
             TextureBarrier barrier = { texture, RESOURCE_STATE_COPY_DEST, pTextureDesc->mStartState };
             Cmd*           cmd = acquirePostCopyBarrierCmd(pCopyEngine);
@@ -1522,16 +1525,16 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
             updateDesc.mLayerCount = textureDesc.mArraySize;
             updateDesc.mCurrentState = RESOURCE_STATE_COPY_DEST;
 
-            if (IssueExplicitInitialStateBarrier())
+            if (IssueExplicitInitialStateBarrier(pResourceLoader->pContext->mApi))
             {
                 TextureBarrier barrier = { updateDesc.pTexture, RESOURCE_STATE_UNDEFINED, RESOURCE_STATE_COPY_DEST };
                 Cmd*           cmd = acquireCmd(pCopyEngine);
                 cmdResourceBarrier(cmd, 0, NULL, 1, &barrier, 0, NULL);
             }
 
-            UploadFunctionResult res = updateTexture(pRenderer, pCopyEngine, updateDesc);
+            UploadFunctionResult res = updateTexture(pLoader, pRenderer, pCopyEngine, updateDesc);
 
-            if (IssueTextureCopyBarriers() && UPLOAD_FUNCTION_RESULT_COMPLETED == res)
+            if (IssueTextureCopyBarriers(pResourceLoader->pContext->mApi) && UPLOAD_FUNCTION_RESULT_COMPLETED == res)
             {
                 TextureBarrier barrier = { *pTextureDesc->ppTexture, RESOURCE_STATE_COPY_DEST, RESOURCE_STATE_SHADER_RESOURCE };
                 Cmd*           cmd = acquirePostCopyBarrierCmd(pCopyEngine);
@@ -1914,7 +1917,7 @@ static UploadFunctionResult loadGeometryCustomMeshFormat(Renderer* pRenderer, Co
     return UPLOAD_FUNCTION_RESULT_COMPLETED;
 }
 
-static UploadFunctionResult loadGeometry(Renderer* pRenderer, CopyEngine* pCopyEngine, UpdateRequest& pGeometryLoad)
+static UploadFunctionResult loadGeometry(ResourceLoader* pLoader, Renderer* pRenderer, CopyEngine* pCopyEngine, UpdateRequest& pGeometryLoad)
 {
     GeometryLoadDesc* pDesc = &pGeometryLoad.geomLoadDesc;
 
@@ -1934,7 +1937,7 @@ static UploadFunctionResult loadGeometry(Renderer* pRenderer, CopyEngine* pCopyE
     {
         indexUpdateDesc.mCurrentState = gUma ? indexUpdateDesc.mCurrentState : RESOURCE_STATE_COPY_DEST;
         indexUpdateDesc.mInternal.mMappedRange =
-            allocateStagingMemory(pCopyEngine, indexUpdateDesc.mSize, RESOURCE_BUFFER_ALIGNMENT, pDesc->mNodeIndex);
+            allocateStagingMemory(pLoader, pCopyEngine, indexUpdateDesc.mSize, RESOURCE_BUFFER_ALIGNMENT, pDesc->mNodeIndex);
         ASSERT(indexUpdateDesc.pMappedData);
         memcpy(indexUpdateDesc.mInternal.mMappedRange.pData, indexUpdateDesc.pMappedData, indexUpdateDesc.mSize);
         tf_free(indexUpdateDesc.pMappedData);
@@ -1956,7 +1959,7 @@ static UploadFunctionResult loadGeometry(Renderer* pRenderer, CopyEngine* pCopyE
             {
                 vertexUpdateDesc[i].mCurrentState = gUma ? vertexUpdateDesc[i].mCurrentState : RESOURCE_STATE_COPY_DEST;
                 vertexUpdateDesc[i].mInternal.mMappedRange =
-                    allocateStagingMemory(pCopyEngine, vertexUpdateDesc[i].mSize, RESOURCE_BUFFER_ALIGNMENT, pDesc->mNodeIndex);
+                    allocateStagingMemory(pLoader, pCopyEngine, vertexUpdateDesc[i].mSize, RESOURCE_BUFFER_ALIGNMENT, pDesc->mNodeIndex);
                 ASSERT(vertexUpdateDesc[i].pMappedData);
                 memcpy(vertexUpdateDesc[i].mInternal.mMappedRange.pData, vertexUpdateDesc[i].pMappedData, vertexUpdateDesc[i].mSize);
                 tf_free(vertexUpdateDesc[i].pMappedData);
@@ -1971,7 +1974,7 @@ static UploadFunctionResult loadGeometry(Renderer* pRenderer, CopyEngine* pCopyE
         }
     }
 
-    if (!gUma && IssueBufferCopyBarriers())
+    if (!gUma && IssueBufferCopyBarriers(pResourceLoader->pContext->mApi))
     {
         Cmd* cmd = acquirePostCopyBarrierCmd(pCopyEngine);
         cmdResourceBarrier(cmd, barrierCount, barriers, 0, NULL, 0, NULL);
@@ -1980,7 +1983,7 @@ static UploadFunctionResult loadGeometry(Renderer* pRenderer, CopyEngine* pCopyE
     return uploadResult;
 }
 
-static UploadFunctionResult copyTexture(Renderer* pRenderer, CopyEngine* pCopyEngine, TextureCopyDesc& pTextureCopy)
+static UploadFunctionResult copyTexture(ResourceLoader* pLoader, Renderer* pRenderer, CopyEngine* pCopyEngine, TextureCopyDesc& pTextureCopy)
 {
     UNREF_PARAM(pRenderer);
     Texture*              texture = pTextureCopy.pTexture;
@@ -2131,16 +2134,16 @@ static void streamerThreadFunc(void* pThreadData)
                     result = UPLOAD_FUNCTION_RESULT_COMPLETED;
                     break;
                 case UPDATE_REQUEST_LOAD_BUFFER:
-                    result = loadBuffer(pRenderer, pCopyEngine, updateState);
+                    result = loadBuffer(pLoader, pRenderer, pCopyEngine, updateState);
                     break;
                 case UPDATE_REQUEST_LOAD_TEXTURE:
-                    result = loadTexture(pRenderer, pCopyEngine, updateState);
+                    result = loadTexture(pLoader, pRenderer, pCopyEngine, updateState);
                     break;
                 case UPDATE_REQUEST_LOAD_GEOMETRY:
-                    result = loadGeometry(pRenderer, pCopyEngine, updateState);
+                    result = loadGeometry(pLoader, pRenderer, pCopyEngine, updateState);
                     break;
                 case UPDATE_REQUEST_COPY_TEXTURE:
-                    result = copyTexture(pRenderer, pCopyEngine, updateState.texCopyDesc);
+                    result = copyTexture(pLoader, pRenderer, pCopyEngine, updateState.texCopyDesc);
                     break;
                 case UPDATE_REQUEST_INVALID:
                     break;
@@ -2197,9 +2200,9 @@ static void streamerThreadFunc(void* pThreadData)
     {
         streamerFlush(&pLoader->pCopyEngines[nodeIndex]);
 #if defined(DIRECT3D11)
-        const bool wait = gPlatformParameters.mSelectedRendererApi != RENDERER_API_D3D11;
+        const bool wait = pResourceLoader->pContext->mApi != RENDERER_API_D3D11;
 #elif defined(GLES)
-        const bool wait = gPlatformParameters.mSelectedRendererApi != RENDERER_API_GLES;
+        const bool wait = pResourceLoader->pContext->mApi != RENDERER_API_GLES;
 #else
         const bool wait = true;
 #endif
@@ -2212,7 +2215,7 @@ static void streamerThreadFunc(void* pThreadData)
     }
 
 #if defined(GLES)
-    if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_GLES)
+    if (pResourceLoader->pContext->mApi == RENDERER_API_GLES)
     {
         if (!pResourceLoader->mDesc.mSingleThreaded)
             removeGLContext(&localContext);
@@ -2257,12 +2260,13 @@ static void initResourceLoader(Renderer** ppRenderers, uint32_t rendererCount, R
         ASSERT(rendererCount == 1);
         gpuCount = ppRenderers[0]->mLinkedNodeCount;
     }
-
     pLoader->mGpuCount = gpuCount;
+    pLoader->pContext = ppRenderers[0]->pContext;
 
     for (uint32_t i = 0; i < gpuCount; ++i)
     {
         ASSERT(rendererCount == 1 || ppRenderers[i]->mGpuMode == GPU_MODE_UNLINKED);
+        ASSERT(ppRenderers[i]->pContext == pLoader->pContext);
         // Replicate single renderer in linked mode, for uniform handling of linked and unlinked multi gpu.
         pLoader->ppRenderers[i] = (rendererCount > 1) ? ppRenderers[i] : ppRenderers[0];
     }
@@ -2289,7 +2293,7 @@ static void initResourceLoader(Renderer** ppRenderers, uint32_t rendererCount, R
         desc.mQueueType = QUEUE_TYPE_GRAPHICS;
         desc.mSize = pLoader->mDesc.mBufferSize;
         desc.pQueueName = "UPLOAD";
-        setupCopyEngine(pLoader->ppRenderers[i], &desc, &pLoader->pUploadEngines[i]);
+        setupCopyEngine(pLoader, pLoader->ppRenderers[i], &desc, &pLoader->pUploadEngines[i]);
 
         desc = {};
         desc.mBufferCount = pLoader->mDesc.mBufferCount;
@@ -2297,14 +2301,14 @@ static void initResourceLoader(Renderer** ppRenderers, uint32_t rendererCount, R
         desc.mQueueType = QUEUE_TYPE_TRANSFER;
         desc.mSize = pLoader->mDesc.mBufferSize;
         desc.pQueueName = "COPY";
-        setupCopyEngine(pLoader->ppRenderers[i], &desc, &pLoader->pCopyEngines[i]);
+        setupCopyEngine(pLoader, pLoader->ppRenderers[i], &desc, &pLoader->pCopyEngines[i]);
 
         CopyEngine* copyEngine = &pLoader->pCopyEngines[i];
         copyEngine->flushOnOverflow = true;
         copyEngine->pFnFlush = CopyEngineFlush;
 
 #if defined(STRICT_QUEUE_TYPE_BARRIERS)
-        if (StrictQueueTypeBarriers())
+        if (StrictQueueTypeBarriers(pLoader->pContext->mApi))
         {
             for (uint32_t b = 0; b < pDesc->mBufferCount; ++b)
             {
@@ -2337,12 +2341,12 @@ static void initResourceLoader(Renderer** ppRenderers, uint32_t rendererCount, R
 #endif
 
 #if defined(DIRECT3D11)
-    if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_D3D11)
+    if (pLoader->pContext->mApi == RENDERER_API_D3D11)
         pLoader->mDesc.mSingleThreaded = true;
 #endif
 
 #if defined(ANDROID) && defined(USE_MULTIPLE_RENDER_APIS)
-    gUma = gPlatformParameters.mSelectedRendererApi == RENDERER_API_VULKAN;
+    gUma = pLoader->pContext->mApi == RENDERER_API_VULKAN;
 #endif
 
     // Create dedicated resource loader thread.
@@ -2371,9 +2375,9 @@ static void exitResourceLoader(ResourceLoader* pLoader)
     for (uint32_t nodeIndex = 0; nodeIndex < pLoader->mGpuCount; ++nodeIndex)
     {
 #if defined(DIRECT3D11)
-        const bool wait = gPlatformParameters.mSelectedRendererApi != RENDERER_API_D3D11;
+        const bool wait = pResourceLoader->pContext->mApi != RENDERER_API_D3D11;
 #elif defined(GLES)
-        const bool wait = gPlatformParameters.mSelectedRendererApi != RENDERER_API_GLES;
+        const bool wait = pResourceLoader->pContext->mApi != RENDERER_API_GLES;
 #else
         const bool wait = true;
 #endif
@@ -3331,7 +3335,7 @@ void addResource(TextureLoadDesc* pTextureDesc, SyncToken* token)
             return;
         }
 
-        if (IssueExplicitInitialStateBarrier())
+        if (IssueExplicitInitialStateBarrier(pResourceLoader->pContext->mApi))
         {
             ResourceState startState = pTextureDesc->pDesc->mStartState;
             // Check whether this is required (user specified a state other than undefined / common)
@@ -3746,10 +3750,10 @@ void beginUpdateResource(BufferUpdateDesc* pBufferUpdate)
         MutexLock         lock(pResourceLoader->mUploadEngineMutex);
         const uint32_t    nodeIndex = pBufferUpdate->pBuffer->mNodeIndex;
         CopyEngine*       pCopyEngine = &pResourceLoader->pUploadEngines[nodeIndex];
-        MappedMemoryRange range = allocateStagingMemory(pCopyEngine, size, RESOURCE_BUFFER_ALIGNMENT, nodeIndex);
+        MappedMemoryRange range = allocateStagingMemory(pResourceLoader, pCopyEngine, size, RESOURCE_BUFFER_ALIGNMENT, nodeIndex);
         if (!range.pData)
         {
-            range = allocateUploadMemory(pRenderer, size, RESOURCE_BUFFER_ALIGNMENT);
+            range = allocateUploadMemory(pResourceLoader, pRenderer, size, RESOURCE_BUFFER_ALIGNMENT);
             arrpush(pCopyEngine->resourceSets[pCopyEngine->activeSet].mTempBuffers, range.pBuffer);
         }
 
@@ -3832,10 +3836,10 @@ void beginUpdateResource(TextureUpdateDesc* pTextureUpdate)
     MutexLock         lock(pResourceLoader->mUploadEngineMutex);
     const uint32_t    nodeIndex = pTextureUpdate->pTexture->mNodeIndex;
     CopyEngine*       pCopyEngine = &pResourceLoader->pUploadEngines[nodeIndex];
-    MappedMemoryRange range = allocateStagingMemory(pCopyEngine, requiredSize, sliceAlignment, texture->mNodeIndex);
+    MappedMemoryRange range = allocateStagingMemory(pResourceLoader, pCopyEngine, requiredSize, sliceAlignment, texture->mNodeIndex);
     if (!range.pData)
     {
-        range = allocateUploadMemory(pRenderer, requiredSize, sliceAlignment);
+        range = allocateUploadMemory(pResourceLoader, pRenderer, requiredSize, sliceAlignment);
         arrpush(pCopyEngine->resourceSets[pCopyEngine->activeSet].mTempBuffers, range.pBuffer);
     }
 
@@ -3873,7 +3877,7 @@ void endUpdateResource(TextureUpdateDesc* pTextureUpdate)
     MutexLock      lock(pResourceLoader->mUploadEngineMutex);
     const uint32_t nodeIndex = pTextureUpdate->pTexture->mNodeIndex;
     CopyEngine*    pCopyEngine = &pResourceLoader->pUploadEngines[nodeIndex];
-    updateTexture(pResourceLoader->ppRenderers[nodeIndex], pCopyEngine, desc);
+    updateTexture(pResourceLoader, pResourceLoader->ppRenderers[nodeIndex], pCopyEngine, desc);
 
     // Restore the state to before the beginUpdateResource call.
     pTextureUpdate->mInternal = {};
@@ -4036,7 +4040,7 @@ static bool load_shader_stage_byte_code(Renderer* pRenderer, const char* name, S
         uint64_t derivativeHash = 0;
 
 #if defined(VULKAN)
-        if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_VULKAN)
+        if (pResourceLoader->pContext->mApi == RENDERER_API_VULKAN)
         {
             // Needs to match with the way we set the derivatives in FSL scripts (vulkan.py, compilers.py)
             derivativeHash = (uint64_t)pRenderer->pAdapter->mVk.mShaderSampledImageArrayDynamicIndexingSupported |
@@ -4059,7 +4063,7 @@ static bool load_shader_stage_byte_code(Renderer* pRenderer, const char* name, S
 
 #if defined(GLES)
 #if defined(USE_MULTIPLE_RENDER_APIS)
-                if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_GLES)
+                if (pResourceLoader->pContext->mApi == RENDERER_API_GLES)
 #endif
                 {
                     char* code = (char*)tf_malloc(size + 1);
@@ -4103,7 +4107,7 @@ static bool load_shader_stage_byte_code(Renderer* pRenderer, const char* name, S
 
 const char* getShaderPlatformName()
 {
-    switch (gPlatformParameters.mSelectedRendererApi)
+    switch (pResourceLoader->pContext->mApi)
     {
 #if defined(DIRECT3D12)
 #if defined(SCARLETT)
@@ -4342,7 +4346,7 @@ void loadPipelineCache(Renderer* pRenderer, const PipelineCacheLoadDesc* pDesc, 
 
     char rendererApi[FS_MAX_PATH] = {};
 #if defined(USE_MULTIPLE_RENDER_APIS)
-    switch (gPlatformParameters.mSelectedRendererApi)
+    switch (pRenderer->pContext->mApi)
     {
 #if defined(DIRECT3D12)
     case RENDERER_API_D3D12:
@@ -4398,7 +4402,7 @@ void savePipelineCache(Renderer* pRenderer, PipelineCache* pPipelineCache, Pipel
 
     char rendererApi[FS_MAX_PATH] = {};
 #if defined(USE_MULTIPLE_RENDER_APIS)
-    switch (gPlatformParameters.mSelectedRendererApi)
+    switch (pResourceLoader->pContext->mApi)
     {
 #if defined(DIRECT3D12)
     case RENDERER_API_D3D12:

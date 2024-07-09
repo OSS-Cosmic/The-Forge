@@ -251,7 +251,7 @@ typedef enum ResourceMemoryUsage
 typedef struct PlatformParameters
 {
     // RendererAPI
-    RendererApi mSelectedRendererApi;
+    // RendererApi mSelectedRendererApi;
     // Available GPU capabilities
     char        ppAvailableGpuNames[MAX_MULTIPLE_GPUS][MAX_GPU_VENDOR_STRING_LENGTH];
     uint32_t    pAvailableGpuIds[MAX_MULTIPLE_GPUS];
@@ -3263,7 +3263,6 @@ typedef struct DEFINE_ALIGNED(Renderer, 64)
     GpuProperties*               pProperties;
 
     const char*             pName;
-    RendererApi             mRendererApi;
     uint32_t                mLinkedNodeCount : 4;
     uint32_t                mUnlinkedRendererIndex : 4;
     uint32_t                mGpuMode : 3;

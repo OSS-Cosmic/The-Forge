@@ -89,7 +89,7 @@ static uint32_t  gSelectedApiIndex = 0;
 
 // PickRenderingAPI.cpp
 extern PlatformParameters gPlatformParameters;
-extern bool               gD3D11Unsupported;
+//extern bool               gD3D11Unsupported;
 
 // WindowsWindow.cpp
 extern IApp*        pWindowAppRef;
@@ -147,7 +147,7 @@ void getOsVersion(ULONG& majorVersion, ULONG& minorVersion, ULONG& buildNumber)
     void(WINAPI * pfnRtlGetNtVersionNumbers)(__out_opt ULONG * pNtMajorVersion, __out_opt ULONG * pNtMinorVersion,
                                              __out_opt ULONG * pNtBuildNumber);
 
-    (FARPROC&)pfnRtlGetNtVersionNumbers = GetProcAddress(GetModuleHandle(L"ntdll.dll"), "RtlGetNtVersionNumbers");
+    (FARPROC&)pfnRtlGetNtVersionNumbers = GetProcAddress(GetModuleHandle(TEXT("ntdll.dll")), "RtlGetNtVersionNumbers");
 
     if (pfnRtlGetNtVersionNumbers)
     {
@@ -255,7 +255,7 @@ void exitBaseSubsystems()
 // Must be called after Graphics::initRenderer()
 void setupPlatformUI(const IApp::Settings* pSettings)
 {
-    gSelectedApiIndex = gPlatformParameters.mSelectedRendererApi;
+    gSelectedApiIndex = pSettings->mSelectedAPI;
 
 #ifdef ENABLE_FORGE_UI
 
@@ -305,13 +305,13 @@ void setupPlatformUI(const IApp::Settings* pSettings)
     DropdownWidget selectApUIWidget = {};
     selectApUIWidget.pData = &gSelectedApiIndex;
 
-    uint32_t apiCount = RENDERER_API_COUNT;
-#ifdef DIRECT3D11
-    if (gD3D11Unsupported)
-    {
-        --apiCount;
-    }
-#endif
+    //uint32_t apiCount = RENDERER_API_COUNT;
+    uint32_t apiCount = 0;
+    for(uint32_t j = avaliableAPIs(); j > 0; j >>= 1)
+	{
+		apiCount += j & 1;
+	}
+
     ASSERT(apiCount != 0 && "No supported Graphics API available!");
     selectApUIWidget.pNames = pApiNames;
     selectApUIWidget.mCount = apiCount;
@@ -481,6 +481,8 @@ int WindowsMain(int argc, char** argv, IApp* app)
 
     pApp->pCommandLine = GetCommandLineA();
 
+    
+
 #ifdef AUTOMATED_TESTING
     bool paramRenderingAPIFound = false;
     char benchmarkOutput[1024] = { "\0" };
@@ -520,7 +522,7 @@ int WindowsMain(int argc, char** argv, IApp* app)
                 ASSERT(false);
                 return -1;
             }
-            gPlatformParameters.mSelectedRendererApi = RENDERER_API_D3D11;
+            pSettings->mSelectedAPI = RENDERER_API_D3D11;
             paramRenderingAPIFound = true;
         }
 #endif
@@ -533,7 +535,7 @@ int WindowsMain(int argc, char** argv, IApp* app)
                 ASSERT(false);
                 return -1;
             }
-            gPlatformParameters.mSelectedRendererApi = RENDERER_API_D3D12;
+            pSettings->mSelectedAPI = RENDERER_API_D3D12;
             paramRenderingAPIFound = true;
         }
 #endif
@@ -546,7 +548,7 @@ int WindowsMain(int argc, char** argv, IApp* app)
                 ASSERT(false);
                 return -1;
             }
-            gPlatformParameters.mSelectedRendererApi = RENDERER_API_VULKAN;
+            pSettings->mSelectedAPI = RENDERER_API_VULKAN;
             paramRenderingAPIFound = true;
         }
 #endif
@@ -642,7 +644,8 @@ int WindowsMain(int argc, char** argv, IApp* app)
             pApp->Unload(&gReloadDescriptor);
             pApp->Exit();
 
-            gPlatformParameters.mSelectedRendererApi = (RendererApi)gSelectedApiIndex;
+            
+            pSettings->mSelectedAPI = (RendererApi)gSelectedApiIndex;
             pSettings->mInitialized = false;
 
             closeWindow(app->pWindow);

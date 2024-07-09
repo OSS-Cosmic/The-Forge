@@ -5,10 +5,9 @@
 UTEST(Core, scratchAlloc_1)
 {
   struct TFScratchAllocator testAlloc = {0};
-  struct TFScratchAllocDesc desc = {
-    .blockSize = 1024,
-    .alignment = 16
-  };
+  struct TFScratchAllocDesc desc = {0};
+  desc.blockSize = 1024;
+  desc.alignment = 16;
   tfAddScratchAllocator(&testAlloc, &desc);
   tfScratchAlloc(&testAlloc, 128);
   tfScratchAlloc(&testAlloc, 128);
@@ -24,18 +23,18 @@ UTEST(Core, scratchAlloc_1)
 
 UTEST(TF, scratchAlloc_2)
 {
-  struct TFScratchAllocator testAlloc = {0};
-  struct TFScratchAllocDesc desc = {
-    .blockSize = 1024,
-    .alignment = 16
-  };
-  tfAddScratchAllocator(&testAlloc, &desc);
-  tfScratchAlloc(&testAlloc, 128);
-  tfScratchAlloc(&testAlloc, 128);
-  tfScratchAlloc(&testAlloc, 128);
-  void* data = tfScratchAlloc(&testAlloc, 2048);
-  EXPECT_EQ(((size_t)data) % 16, 0);
-  tfFreeScratchAllocator(&testAlloc);
+    struct TFScratchAllocator testAlloc = { 0 };
+    struct TFScratchAllocDesc desc = { 0 };
+    desc.blockSize = 1024;
+    desc.alignment = 16;
+
+    tfAddScratchAllocator(&testAlloc, &desc);
+    tfScratchAlloc(&testAlloc, 128);
+    tfScratchAlloc(&testAlloc, 128);
+    tfScratchAlloc(&testAlloc, 128);
+    void* data = tfScratchAlloc(&testAlloc, 2048);
+    EXPECT_EQ(((size_t)data) % 16, 0);
+    tfFreeScratchAllocator(&testAlloc);
 }
 
 

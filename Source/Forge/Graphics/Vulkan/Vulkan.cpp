@@ -3166,7 +3166,7 @@ void InitializeImageCreateInfo(Renderer* pRenderer, const TextureDesc* pDesc, Vk
     mem_reqs.usage = (VmaMemoryUsage)VMA_MEMORY_USAGE_GPU_ONLY;
 
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-    if (pRenderer->pPhysicalDevice->mVk.mExternalMemoryExtension && pDesc->mFlags & TEXTURE_CREATION_FLAG_IMPORT_BIT)
+    if (pRenderer->pAdapter->mVk.mExternalMemoryExtension && pDesc->mFlags & TEXTURE_CREATION_FLAG_IMPORT_BIT)
     {
         struct ImportHandleInfo
         {
@@ -3188,7 +3188,7 @@ void InitializeImageCreateInfo(Renderer* pRenderer, const TextureDesc* pDesc, Vk
         // Memory Allocator
         mem_reqs.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
     }
-    else if (pRenderer->pPhysicalDevice->mVk.mExternalMemoryExtension && pDesc->mFlags & TEXTURE_CREATION_FLAG_EXPORT_BIT)
+    else if (pRenderer->pAdapter->mVk.mExternalMemoryExtension && pDesc->mFlags & TEXTURE_CREATION_FLAG_EXPORT_BIT)
     {
         pExtras->mExportMemoryInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
         pExtras->mExportMemoryInfo.pNext = NULL;
@@ -3575,7 +3575,6 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
     ASSERT(mem);
     
     Renderer* pRenderer = (Renderer*)mem;
-    pRenderer->mRendererApi = RENDERER_API_VULKAN;
     pRenderer->mGpuMode = pDesc->mGpuMode;
     pRenderer->mShaderTarget = pDesc->mShaderTarget;
     pRenderer->pNullDescriptors = (NullDescriptors*)(mem + sizeof(Renderer));
@@ -9846,7 +9845,7 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
     }
 
     RendererContext* pContext = (RendererContext*)tf_calloc_memalign(1, alignof(RendererContext), sizeof(RendererContext));
-    pContext->mApi = pSettings->mApi;
+    pContext->mApi = RendererApi::RENDERER_API_VULKAN;
 
     CreateInstance(appName, pSettings, instanceLayerCount, instanceLayers, pContext);
 #endif
@@ -10137,12 +10136,12 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
             device.mVk.mDeviceFaultSupported = deviceFaultSupported;
 
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-            pGpu->mVk.mExternalMemoryExtension = pGpu->mVk.mExternalMemoryExtension && pGpu->mVk.mExternalMemoryWin32Extension;
+            device.mVk.mExternalMemoryExtension = device.mVk.mExternalMemoryExtension && device.mVk.mExternalMemoryWin32Extension;
 #endif
 
 #if defined(ENABLE_NSIGHT_AFTERMATH)
-            pGpu->mVk.mAftermathSupport =
-                pGpu->mVk.mNVDeviceDiagnosticsCheckpointExtension && pGpu->mVk.mNVDeviceDiagnosticsConfigExtension;
+            device.mVk.mAftermathSupport =
+                device.mVk.mNVDeviceDiagnosticsCheckpointExtension && device.mVk.mNVDeviceDiagnosticsConfigExtension;
 #endif
 
             device.mDefaultProps.mUniformBufferAlignment = (uint32_t)gpuProperties.properties.limits.minUniformBufferOffsetAlignment;
@@ -10223,7 +10222,7 @@ void initVulkanRendererContext(const char* appName, const RendererContextDesc* p
             device.mVk.mShaderSampledImageArrayDynamicIndexingSupported = gpuFeatures2.features.shaderSampledImageArrayDynamicIndexing;
             device.mVk.mFillModeNonSolid = gpuFeatures2.features.fillModeNonSolid;
 #if defined(AMDAGS)
-            pGpu->mSettings.mAmdAsicFamily = agsGetAsicFamily(gpuProperties.properties.deviceID);
+            device.mDefaultProps.mAmdAsicFamily = agsGetAsicFamily(gpuProperties.properties.deviceID);
 #endif
             device.mVendorId = gpuProperties.properties.vendorID;
             device.mModelId = gpuProperties.properties.deviceID;

@@ -36,14 +36,14 @@ void tfAddScratchAllocator(struct TFScratchAllocator* alloc, TFScratchAllocDesc*
     alloc->alignment = max(desc->alignment, sizeof(uint16_t));
 }
 
-void tfAddStackAllocator(struct TFStackAllocator* alloc, struct TFStackAllocDesc* desc)
-{
-    ASSERT(alloc);
-    ASSERT(desc);
-    memset(alloc, 0, sizeof(struct TFStackAllocator));
-    alloc->mBlockSize = desc->mBlockSize;
-    alloc->mAlignment = max(desc->mAlignment, sizeof(uint16_t));
-}
+//void tfAddStackAllocator(struct TFStackAllocator* alloc, struct TFStackAllocDesc* desc)
+//{
+//    ASSERT(alloc);
+//    ASSERT(desc);
+//    memset(alloc, 0, sizeof(struct TFStackAllocator));
+//    alloc->mBlockSize = desc->mBlockSize;
+//    alloc->mAlignment = max(desc->mAlignment, sizeof(uint16_t));
+//}
 
 void* tfScratchAlloc(TFScratchAllocator* alloc, size_t size)
 {
@@ -88,153 +88,153 @@ void* tfFixedBufferAlloc(struct TFFixedBufferAllocator* alloc, size_t size)
     return result;
 }
 
-void* tfStackAlloc(struct TFStackAllocator* alloc, size_t size)
-{
-    const size_t reqSize = round_up_64(size, alloc->mAlignment);
-    if (reqSize > alloc->mBlockSize)
-    {
-        struct TFStackAllocBlock* block = (struct TFStackAllocBlock*)tf_malloc(sizeof(struct TFStackAllocBlock) + size + alloc->mAlignment);
-        block->mSize = size + alloc->mAlignment;
-        block->mNext = alloc->mTail;
-        alloc->mTail = block;
-        if (alloc->mHead == NULL)
-        {
-            alloc->mHead = block;
-            alloc->mPos = block->mSize;
-        }
-        alloc->mTotalAllocated += block->mSize;
-        size_t offset = ((size_t)block->mData) % alloc->mAlignment;
-        return ((uint8_t*)block->mData) + offset;
-    }
+//void* tfStackAlloc(struct TFStackAllocator* alloc, size_t size)
+//{
+//    const size_t reqSize = round_up_64(size, alloc->mAlignment);
+//    if (reqSize > alloc->mBlockSize)
+//    {
+//        struct TFStackAllocBlock* block = (struct TFStackAllocBlock*)tf_malloc(sizeof(struct TFStackAllocBlock) + size + alloc->mAlignment);
+//        block->mSize = size + alloc->mAlignment;
+//        block->mNext = alloc->mTail;
+//        alloc->mTail = block;
+//        if (alloc->mHead == NULL)
+//        {
+//            alloc->mHead = block;
+//            alloc->mPos = block->mSize;
+//        }
+//        alloc->mTotalAllocated += block->mSize;
+//        size_t offset = ((size_t)block->mData) % alloc->mAlignment;
+//        return ((uint8_t*)block->mData) + offset;
+//    }
+//
+//    if (alloc->mHead && (alloc->mPos + reqSize) > alloc->mHead->mSize)
+//    {
+//        if (alloc->mFreeBlocks)
+//        {
+//            struct TFStackAllocBlock* block = alloc->mFreeBlocks;
+//            alloc->mFreeBlocks = alloc->mFreeBlocks->mNext;
+//            alloc->mPos = ((size_t)block->mData) % alloc->mAlignment;
+//
+//            alloc->mHead->mNext = block;
+//            alloc->mHead = block;
+//            if (alloc->mTail == NULL)
+//                alloc->mTail = block;
+//        }
+//        else
+//        {
+//            struct TFStackAllocBlock* block =
+//                (struct TFStackAllocBlock*)tf_malloc(sizeof(struct TFAllocScratchBlock) + alloc->mBlockSize + alloc->mAlignment);
+//            block->mSize = alloc->mBlockSize + alloc->mAlignment;
+//            alloc->mTotalAllocated += block->mSize;
+//            alloc->mPos = ((size_t)block->mData) % alloc->mAlignment;
+//
+//            alloc->mHead->mNext = block;
+//            alloc->mHead = block;
+//            if (alloc->mTail == NULL)
+//                alloc->mTail = block;
+//        }
+//    }
+//    void* result = ((uint8_t*)alloc->mHead->mData) + alloc->mPos;
+//    alloc->mPos += reqSize;
+//    return result;
+//}
 
-    if (alloc->mHead && (alloc->mPos + reqSize) > alloc->mHead->mSize)
-    {
-        if (alloc->mFreeBlocks)
-        {
-            struct TFStackAllocBlock* block = alloc->mFreeBlocks;
-            alloc->mFreeBlocks = alloc->mFreeBlocks->mNext;
-            alloc->mPos = ((size_t)block->mData) % alloc->mAlignment;
+//struct TFStackAllocatorCheckpoint tfStackAllocGetCheckpoint(struct TFStackAllocator* alloc)
+//{
+//    struct TFStackAllocatorCheckpoint checkpoint = {alloc->mHead, alloc->mPos };
+//    return checkpoint;
+//}
 
-            alloc->mHead->mNext = block;
-            alloc->mHead = block;
-            if (alloc->mTail == NULL)
-                alloc->mTail = block;
-        }
-        else
-        {
-            struct TFStackAllocBlock* block =
-                (struct TFStackAllocBlock*)tf_malloc(sizeof(struct TFAllocScratchBlock) + alloc->mBlockSize + alloc->mAlignment);
-            block->mSize = alloc->mBlockSize + alloc->mAlignment;
-            alloc->mTotalAllocated += block->mSize;
-            alloc->mPos = ((size_t)block->mData) % alloc->mAlignment;
+//void tfStackAllocRestoreCheckpoint(struct TFStackAllocator* alloc, struct TFStackAllocatorCheckpoint* checkpoint)
+//{
+//    if (checkpoint->mTop == NULL)
+//    {
+//        return;
+//    }
+//    alloc->mHead = checkpoint->mTop;
+//    alloc->mPos = checkpoint->mPos;
+//    if (checkpoint->mTop->mNext)
+//    {
+//        TFStackAllocBlock* blk = checkpoint->mTop->mNext;
+//        while (blk)
+//        {
+//            struct TFStackAllocBlock* current = blk;
+//            blk = blk->mNext;
+//            current->mNext = alloc->mFreeBlocks;
+//            alloc->mFreeBlocks = current;
+//        }
+//    }
+//}
 
-            alloc->mHead->mNext = block;
-            alloc->mHead = block;
-            if (alloc->mTail == NULL)
-                alloc->mTail = block;
-        }
-    }
-    void* result = ((uint8_t*)alloc->mHead->mData) + alloc->mPos;
-    alloc->mPos += reqSize;
-    return result;
-}
+//void tfFreeStackAllocator(struct TFStackAllocator* alloc)
+//{
+//    struct TFStackAllocBlock* blk = alloc->mTail;
+//    while (blk)
+//    {
+//        struct TFStackAllocBlock* current = blk;
+//        blk = blk->mNext;
+//        tf_free(current);
+//    }
+//    blk = alloc->mFreeBlocks;
+//    while (blk)
+//    {
+//        struct TFStackAllocBlock* current = blk;
+//        blk = blk->mNext;
+//        tf_free(current);
+//    }
+//}
 
-struct TFStackAllocatorCheckpoint tfStackAllocGetCheckpoint(struct TFStackAllocator* alloc)
-{
-    struct TFStackAllocatorCheckpoint checkpoint = { .mTop = alloc->mHead, .mPos = alloc->mPos };
-    return checkpoint;
-}
-
-void tfStackAllocRestoreCheckpoint(struct TFStackAllocator* alloc, struct TFStackAllocatorCheckpoint* checkpoint)
-{
-    if (checkpoint->mTop == NULL)
-    {
-        return;
-    }
-    alloc->mHead = checkpoint->mTop;
-    alloc->mPos = checkpoint->mPos;
-    if (checkpoint->mTop->mNext)
-    {
-        TFStackAllocBlock* blk = checkpoint->mTop->mNext;
-        while (blk)
-        {
-            struct TFStackAllocBlock* current = blk;
-            blk = blk->mNext;
-            current->mNext = alloc->mFreeBlocks;
-            alloc->mFreeBlocks = current;
-        }
-    }
-}
-
-void tfFreeStackAllocator(struct TFStackAllocator* alloc)
-{
-    struct TFStackAllocBlock* blk = alloc->mTail;
-    while (blk)
-    {
-        struct TFStackAllocBlock* current = blk;
-        blk = blk->mNext;
-        tf_free(current);
-    }
-    blk = alloc->mFreeBlocks;
-    while (blk)
-    {
-        struct TFStackAllocBlock* current = blk;
-        blk = blk->mNext;
-        tf_free(current);
-    }
-}
-
-void tfStackAllocCompaction(struct TFStackAllocator* alloc, size_t reserveSize)
-{
-    struct TFStackAllocBlock* freeBlocks = NULL;
-    struct TFStackAllocBlock* blk = alloc->mFreeBlocks;
-    while (blk)
-    {
-        struct TFStackAllocBlock* current = blk;
-        blk = blk->mNext;
-        if (alloc->mTotalAllocated > reserveSize)
-        {
-            alloc->mTotalAllocated -= current->mSize;
-            tf_free(current);
-        }
-        else
-        {
-            current->mNext = freeBlocks;
-            freeBlocks = current;
-        }
-    }
-    alloc->mFreeBlocks = freeBlocks;
-}
-
-
-void tfStackAllocReset(struct TFStackAllocator* alloc)
-{
-    struct TFStackAllocBlock* freeBlocks = NULL;
-    size_t                    calcSize = 0;
-    struct TFStackAllocBlock* blk = alloc->mTail;
-    while (blk)
-    {
-        struct TFStackAllocBlock* current = blk;
-        blk = blk->mNext;
-        calcSize += current->mSize;
-
-        current->mNext = freeBlocks;
-        freeBlocks = current;
-    }
-    blk = alloc->mFreeBlocks;
-    while (blk)
-    {
-        struct TFStackAllocBlock* current = blk;
-        blk = blk->mNext;
-        calcSize += current->mSize;
-
-        current->mNext = freeBlocks;
-        freeBlocks = current;
-    }
-    alloc->mFreeBlocks = freeBlocks;
-    alloc->mTail = NULL;
-    alloc->mHead = NULL;
-}
+//void tfStackAllocCompaction(struct TFStackAllocator* alloc, size_t reserveSize)
+//{
+//    struct TFStackAllocBlock* freeBlocks = NULL;
+//    struct TFStackAllocBlock* blk = alloc->mFreeBlocks;
+//    while (blk)
+//    {
+//        struct TFStackAllocBlock* current = blk;
+//        blk = blk->mNext;
+//        if (alloc->mTotalAllocated > reserveSize)
+//        {
+//            alloc->mTotalAllocated -= current->mSize;
+//            tf_free(current);
+//        }
+//        else
+//        {
+//            current->mNext = freeBlocks;
+//            freeBlocks = current;
+//        }
+//    }
+//    alloc->mFreeBlocks = freeBlocks;
+//}
+//
+//
+//void tfStackAllocReset(struct TFStackAllocator* alloc)
+//{
+//    struct TFStackAllocBlock* freeBlocks = NULL;
+//    size_t                    calcSize = 0;
+//    struct TFStackAllocBlock* blk = alloc->mTail;
+//    while (blk)
+//    {
+//        struct TFStackAllocBlock* current = blk;
+//        blk = blk->mNext;
+//        calcSize += current->mSize;
+//
+//        current->mNext = freeBlocks;
+//        freeBlocks = current;
+//    }
+//    blk = alloc->mFreeBlocks;
+//    while (blk)
+//    {
+//        struct TFStackAllocBlock* current = blk;
+//        blk = blk->mNext;
+//        calcSize += current->mSize;
+//
+//        current->mNext = freeBlocks;
+//        freeBlocks = current;
+//    }
+//    alloc->mFreeBlocks = freeBlocks;
+//    alloc->mTail = NULL;
+//    alloc->mHead = NULL;
+//}
 
 void tfFreeScratchAllocator(TFScratchAllocator* alloc)
 {

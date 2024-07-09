@@ -12,38 +12,55 @@ macro(tf_set_output_dir name dir)
 endmacro()
 
 
-function(tf_fsl_compile target)
-    IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
-        add_custom_command(
-            TARGET ${target}
-            MAIN_DEPENDENCY
-            COMMAND ${CMAKE_COMMAND} -E env  "python3" "${FSL_COMPILER_PY}"
-            -l DIRECT3D12 
-            -d "$<TARGET_FILE_DIR:${target}>/Shaders"
-            --verbose 
-            -b  "$<TARGET_FILE_DIR:${target}>/CompiledShaders"
-            --incremental 
-           ${ARGN} 
-        )
-    else()
-        add_custom_command(
-            TARGET ${target}
-            MAIN_DEPENDENCY
-            COMMAND ${CMAKE_COMMAND} -E env "VULKAN_SDK=$ENV{VULKAN_SDK}" "python3" "${FSL_COMPILER_PY}"
-            -l VULKAN 
-            -d "$<TARGET_FILE_DIR:${target}>/Shaders"
-            --verbose 
-            -b  "$<TARGET_FILE_DIR:${target}>/CompiledShaders"
-            --incremental 
-            ${ARGN} 
-        )
-    endif()
+function(tf_fsl_compile target API)
+    add_custom_command(
+        TARGET ${target}
+        MAIN_DEPENDENCY
+        COMMAND ${CMAKE_COMMAND} -E env  "python3" "${FSL_COMPILER_PY}"
+         -l ${API} 
+        -d "$<TARGET_FILE_DIR:${target}>/Shaders"
+        --verbose 
+        -b  "$<TARGET_FILE_DIR:${target}>/CompiledShaders"
+        --incremental 
+        ${ARGN})
 endfunction()
-macro(tf_prepare_resources target) 
-    tf_fsl_compile(${target} 
-      --compile "${RESOURCES_DIR}/UI/Shaders/FSL/UI_ShaderList.fsl" ) 
-    tf_fsl_compile(${target} 
-      --compile "${RESOURCES_DIR}/Fonts/Shaders/FSL/Fonts_ShaderList.fsl" ) 
+
+macro(tf_configure target) 
+    if (WIN32)
+      add_custom_command( TARGET 01_Transformations POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:01_Transformations> $<TARGET_FILE_DIR:01_Transformations>
+  
+        # Direct3d12AgilitySDK
+        COMMAND ${CMAKE_COMMAND} -E copy ${THE_FORGE_ROOT}/Common_3/Graphics/ThirdParty/OpenSource/Direct3d12Agility/bin/x64/D3D12Core.dll $<TARGET_FILE_DIR:01_Transformations>
+        COMMAND ${CMAKE_COMMAND} -E copy  ${THE_FORGE_ROOT}/Common_3/Graphics/ThirdParty/OpenSource/Direct3d12Agility/bin/x64/d3d12SDKLayers.dll $<TARGET_FILE_DIR:01_Transformations>
+        
+        COMMAND_EXPAND_LISTS
+      )
+      tf_fsl_compile(${target} 
+          DIRECT3D11
+          --compile "${RESOURCES_DIR}/UI/Shaders/FSL/UI_ShaderList.fsl" ) 
+      tf_fsl_compile(${target} 
+          DIRECT3D11
+          --compile "${RESOURCES_DIR}/Fonts/Shaders/FSL/Fonts_ShaderList.fsl" )
+
+      tf_fsl_compile(${target} 
+          DIRECT3D12
+          --compile "${RESOURCES_DIR}/UI/Shaders/FSL/UI_ShaderList.fsl" ) 
+      tf_fsl_compile(${target} 
+          DIRECT3D12
+          --compile "${RESOURCES_DIR}/Fonts/Shaders/FSL/Fonts_ShaderList.fsl" )
+    elseif(UNIX)
+    
+      tf_fsl_compile(${target} 
+          VULKAN
+          --compile "${RESOURCES_DIR}/UI/Shaders/FSL/UI_ShaderList.fsl" ) 
+      tf_fsl_compile(${target} 
+          VULKAN
+          --compile "${RESOURCES_DIR}/Fonts/Shaders/FSL/Fonts_ShaderList.fsl" )
+
+    endif ()
+
+   
 endmacro()
 
 

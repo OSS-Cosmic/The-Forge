@@ -106,7 +106,7 @@ void mapRenderTarget(Renderer* pRenderer, Queue* pQueue, Cmd* pCmd, RenderTarget
     ASSERT(pRenderer);
 
 #if defined(VULKAN)
-    if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_VULKAN)
+    if (pRenderer->pContext->mApi == RENDERER_API_VULKAN)
     {
         DECLARE_RENDERER_FUNCTION(void, addBuffer, Renderer* pRenderer, const BufferDesc* pDesc, Buffer** pp_buffer)
         DECLARE_RENDERER_FUNCTION(void, removeBuffer, Renderer* pRenderer, Buffer* pBuffer)
@@ -172,7 +172,7 @@ void mapRenderTarget(Renderer* pRenderer, Queue* pQueue, Cmd* pCmd, RenderTarget
     }
 #endif
 #if defined(DIRECT3D11)
-    if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_D3D11)
+    if (pRenderer->pContext->mApi == RENDERER_API_D3D11)
     {
         // Add a staging texture.
         ID3D11Texture2D* pNewTexture = NULL;
@@ -218,7 +218,7 @@ void mapRenderTarget(Renderer* pRenderer, Queue* pQueue, Cmd* pCmd, RenderTarget
     }
 #endif
 #if defined(DIRECT3D12)
-    if (gPlatformParameters.mSelectedRendererApi == RENDERER_API_D3D12)
+    if (pRenderer->pContext->mApi == RENDERER_API_D3D12)
     {
         DECLARE_RENDERER_FUNCTION(void, addBuffer, Renderer* pRenderer, const BufferDesc* pDesc, Buffer** pp_buffer)
         DECLARE_RENDERER_FUNCTION(void, removeBuffer, Renderer* pRenderer, Buffer* pBuffer)

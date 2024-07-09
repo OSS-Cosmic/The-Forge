@@ -69,7 +69,7 @@ UTEST(Core, tfDuplicate)
 UTEST(Core, tfIterateRev)
 {
     struct TStrSpan           buf = tfToRef("one two three four five");
-    struct TFStrSplitIterable iterable = { .buffer = buf, .delim = tfToRef(" "), .cursor = buf.len };
+    struct TFStrSplitIterable iterable = { buf, tfToRef(" "), buf.len };
     struct TStrSpan           s = { 0 };
     s = tfStrSplitRevIter(&iterable);
     EXPECT_EQ(tfStrEmpty(s), 0);
@@ -106,7 +106,7 @@ UTEST(Core, tfReadu32)
 
 UTEST(Core, tfIterateWhiteSpace)
 {
-    struct TFStrSplitIterable iterable = { .buffer = tfToRef("one  two"), .delim = tfToRef(" "), .cursor = 0 };
+    struct TFStrSplitIterable iterable = { tfToRef("one  two"), tfToRef(" "), 0 };
     struct TStrSpan           s = { 0 };
 
     s = tfStrSplitIter(&iterable);
@@ -126,7 +126,7 @@ UTEST(Core, tfIterateWhiteSpace)
 UTEST(Core, tfIterateCount)
 {
     {
-        struct TFStrSplitIterable iterable = { .buffer = tfToRef("one two three four five"), .delim = tfToRef(" "), .cursor = 0 };
+        struct TFStrSplitIterable iterable = { tfToRef("one two three four five"), tfToRef(" "), 0 };
         struct TStrSpan           slices[] = {
             tfToRef("one"), tfToRef("two"), tfToRef("three"), tfToRef("four"), tfToRef("five"),
         };
@@ -138,7 +138,7 @@ UTEST(Core, tfIterateCount)
         }
     }
     {
-        struct TFStrSplitIterable iterable = { .buffer = tfToRef("one   two"), .delim = tfToRef(" "), .cursor = 0 };
+        struct TFStrSplitIterable iterable = { tfToRef("one   two"), tfToRef(" "), 0 };
         struct TStrSpan           slices[] = {
             tfToRef("one"),
             tfToRef(""),
@@ -156,7 +156,7 @@ UTEST(Core, tfIterateCount)
 
 UTEST(Core, tfIterate)
 {
-    struct TFStrSplitIterable iterable = { .buffer = tfToRef("one two three four five"), .delim = tfToRef(" "), .cursor = 0 };
+    struct TFStrSplitIterable iterable = { tfToRef("one two three four five"), tfToRef(" "),  0 };
 
     struct TStrSpan s = { 0 };
     s = tfStrSplitIter(&iterable);
@@ -181,9 +181,9 @@ UTEST(Core, tfIterate)
 UTEST(Core, tffmtWriteLongLong)
 {
     char   test_buffer[TFSTR_LLSTR_SIZE];
-    size_t len = tfstrfmtll((struct TStrSpan){ .buf = test_buffer, .len = TFSTR_LLSTR_SIZE }, 12481);
+    size_t len = tfstrfmtll(TStrSpan{  test_buffer, TFSTR_LLSTR_SIZE }, 12481);
     EXPECT_EQ(len, 5);
-    EXPECT_EQ(tfStrEqual(tfToRef("12481"), (struct TStrSpan){ .buf = test_buffer, .len = len }), true);
+    EXPECT_EQ(tfStrEqual(tfToRef("12481"), TStrSpan{ test_buffer, len }), true);
 }
 
 UTEST(Core, tfCaselessEq)
@@ -246,10 +246,7 @@ UTEST(Core, tfcatprintf)
 
     tfStrSetLen(&buf, 0);
     EXPECT_EQ(tfstrcatprintf(&buf, "a%cb", 0), true);
-    EXPECT_EQ(tfStrEqual(tfToRef(buf), (struct TStrSpan){ .buf = "a\0"
-                                                                "b",
-                                                         .len = 3 }),
-              1);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), TStrSpan{ "a\0" "b",3 }), 1);
     tfStrFree(&buf);
 }
 

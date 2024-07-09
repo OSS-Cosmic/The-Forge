@@ -53,17 +53,17 @@ struct TStrSpan tfStrTrim(struct TStrSpan slice) { return tfStrLTrim(tfStrRTrim(
 struct TStrSpan tfStrRTrim(struct TStrSpan slice)
 {
     if (tfStrEmpty(slice))
-        return (struct TStrSpan){ slice.buf, 0 };
+        return TStrSpan{ slice.buf, 0 };
     for (size_t i = slice.len - 1;; i--)
     {
         if (!isspace(slice.buf[i]))
         {
-            return (struct TStrSpan){ slice.buf, i + 1 };
+            return TStrSpan{ slice.buf, i + 1 };
         }
         if (i == 0)
             break;
     }
-    return (struct TStrSpan){ slice.buf, 0 };
+    return TStrSpan{ slice.buf, 0 };
 }
 
 struct TStrSpan tfStrLTrim(struct TStrSpan slice)
@@ -571,7 +571,7 @@ bool tfstrcatvprintf(struct TStr* str, const char* fmt, va_list ap)
     }
 
     /* Finally concat the obtained string to the bstr string and return it. */
-    tfStrAppendSlice(str, (struct TStrSpan){ .buf = buf, .len = (size_t)bufstrlen });
+    tfStrAppendSlice(str, TStrSpan{ buf, (size_t)bufstrlen });
     if (buf != staticbuf)
         tf_free(buf);
     return true;
@@ -601,11 +601,13 @@ bool bstrInserSlice(struct TStr* str, size_t offset, const struct TStrSpan slice
     return true;
 }
 
-bool bstrAppendChar(struct TStr* str, char b) { return tfStrAppendSlice(str, (struct TStrSpan){ .buf = &b, .len = 1 }); }
+bool bstrAppendChar(struct TStr* str, char b) {
+    return tfStrAppendSlice(str, TStrSpan{ &b,  1 }); 
+}
 
 bool bstrInsertChar(struct TStr* str, size_t i, char b)
 {
-    return bstrInserSlice(str, i, (struct TStrSpan){ .buf = &b, .len = 1 });
+    return bstrInserSlice(str, i, TStrSpan{ &b,  1 });
 }
 
 bool tfStrMakeRoomFor(struct TStr* str, size_t addlen)
@@ -635,7 +637,7 @@ struct TStrSpan tfStrSplitIter(struct TFStrSplitIterable* iterable)
     ASSERT(!tfStrEmpty(iterable->buffer));
     ASSERT(!tfStrEmpty(iterable->delim));
     if (iterable->cursor == iterable->buffer.len)
-        return (struct TStrSpan){ 0 };
+        return TStrSpan{ 0 };
 
     const int offset = tfStrIndexOfOffset(iterable->buffer, iterable->cursor, iterable->delim);
     if (offset == -1)
@@ -654,7 +656,7 @@ struct TStrSpan tfStrSplitRevIter(struct TFStrSplitIterable* iterable)
     ASSERT(!tfStrEmpty(iterable->buffer));
     ASSERT(!tfStrEmpty(iterable->delim));
     if (iterable->cursor == 0)
-        return (struct TStrSpan){ 0 };
+        return TStrSpan { 0 };
 
     const int offset = tfStrLastIndexOfOffset(iterable->buffer, iterable->cursor - 1, iterable->delim);
     if (offset == -1)
@@ -765,7 +767,7 @@ static inline int tfStrIndexOfCmp(const struct TStrSpan haystack, size_t offset,
         {
             for (size_t j = 0; j < needle.len; j++)
             {
-                if (handle((struct TStrSpan){ .buf = haystack.buf + i, .len = needle.len }, needle))
+                if (handle(TStrSpan{  haystack.buf + i, needle.len }, needle))
                 {
                     return i;
                 }
@@ -788,7 +790,7 @@ static inline int tfStrIndexOfCmp(const struct TStrSpan haystack, size_t offset,
     size_t i = offset;
     while (i <= haystack.len - needle.len)
     {
-        if (tfStrEqual((struct TStrSpan){ .buf = haystack.buf + i, .len = needle.len }, needle))
+        if (tfStrEqual(TStrSpan{ haystack.buf + i,  needle.len }, needle))
         {
             return i;
         }
@@ -813,7 +815,7 @@ static inline int bstrLastIndexOfCmp(const struct TStrSpan haystack, size_t offs
             ASSERT(i < haystack.len);
             for (size_t j = 0; j < needle.len; j++)
             {
-                if (handle((struct TStrSpan){ .buf = haystack.buf + i, .len = needle.len }, needle))
+                if (handle({ haystack.buf + i, needle.len }, needle))
                 {
                     return i;
                 }
@@ -842,7 +844,7 @@ static inline int bstrLastIndexOfCmp(const struct TStrSpan haystack, size_t offs
     size_t i = startIndex;
     while (1)
     {
-        if (handle((struct TStrSpan){ .buf = haystack.buf + i, .len = needle.len }, needle))
+        if (handle({ haystack.buf + i, needle.len }, needle))
         {
             return i;
         }

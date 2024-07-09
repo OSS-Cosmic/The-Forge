@@ -288,26 +288,6 @@ RendererApiFlags FORGE_CALLCONV avaliableAPIs()
     return flags;
 }
 
-static bool apiIsUnsupported(const RendererApi api)
-{
-#if defined(GLES)
-    if (api == RENDERER_API_GLES && gGLESUnsupported)
-        return true;
-#endif
-
-#if defined(DIRECT3D11)
-    if (api == RENDERER_API_D3D11 && (gD3D11Unsupported || !d3d11dll_init()))
-        return true;
-#endif
-#if defined(DIRECT3D12)
-
-    if (api == RENDERER_API_D3D12 && !d3d12dll_init())
-        return true;
-#endif
-
-    return false;
-}
-
 void setRendererInitializationError(const char* reason)
 {
     gRendererUnsupported = true;
@@ -402,21 +382,6 @@ void initRendererContext(const char* appName, const RendererContextDesc* pSettin
         break;
     }
 
-
-
-#if defined(USE_MULTIPLE_RENDER_APIS)
-    // Fallback on other available APIs
-    for (int32_t i = 0; i < RENDERER_API_COUNT && !*ppContext; ++i)
-    {
-        if (i == gPlatformParameters.mSelectedRendererApi || apiIsUnsupported((RendererApi)i))
-            continue;
-
-        gPlatformParameters.mSelectedRendererApi = (RendererApi)i;
-        initRendererContextAPI(appName, pSettings, ppContext, gPlatformParameters.mSelectedRendererApi);
-    }
-#endif
-
-    removeGPUConfigurationRules();
 }
 
 void exitRendererContext(RendererContext* pContext)
@@ -505,40 +470,14 @@ void initRenderer(const char* appName, const RendererDesc* pSettings, Renderer**
         LOGF(LogLevel::eERROR, "No Renderer API defined!");
         break;
     }
-    // else
-    // {
-    //     LOGF(LogLevel::eWARNING, "Requested Graphics API has been marked as disabled and/or not supported in the Renderer's
-    //     descriptor!"); LOGF(LogLevel::eWARNING, "Falling back to the first available API...");
-    // }
 
-#if defined(USE_MULTIPLE_RENDER_APIS)
-    // Fallback on other available APIs
-    for (int32_t i = 0; i < RENDERER_API_COUNT && !*ppRenderer; ++i)
-    {
-        if (i == gPlatformParameters.mSelectedRendererApi || apiIsUnsupported((RendererApi)i))
-            continue;
-
-        gPlatformParameters.mSelectedRendererApi = (RendererApi)i;
-        initRendererAPI(appName, pSettings, ppRenderer, gPlatformParameters.mSelectedRendererApi);
-    }
-#endif
-
-    // set available gpus and renderer api
-    //setupPlatformParameters(*ppRenderer);
-    // configure the user's settings using the newly created device
-   // if (pSettings->pExtendedSettings && *ppRenderer)
-   // {
-   //     setupExtendedSettings(pSettings->pExtendedSettings, &(*ppRenderer)->pGpu->mSettings);
-   // }
-
-    removeGPUConfigurationRules();
 }
 
 void exitRenderer(Renderer* pRenderer)
 {
     ASSERT(pRenderer);
 
-    exitRendererAPI(pRenderer, pRenderer->mRendererApi);
+    exitRendererAPI(pRenderer, pRenderer->pContext->mApi);
     gPlatformParameters.mAvailableGpuCount = 0;
     gPlatformParameters.mSelectedGpuIndex = 0;
 }
