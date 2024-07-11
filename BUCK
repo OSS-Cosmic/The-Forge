@@ -1,4 +1,5 @@
 
+load("//:rules.bzl", "fsl_build")
 load("@prelude//paths.bzl", "paths")
 load("@prelude//third-party:pkgconfig.bzl", "external_pkgconfig_library")
 
@@ -8,6 +9,25 @@ export_file(
     src = "Common_3/Tools/ForgeShadingLanguage/fsl.py",
     visibility = ["PUBLIC"],
 )
+
+export_file(
+    name = "UI_ShaderList",
+    mode = "reference",
+    src = "Resources/UI/Shaders/FSL/UI_ShaderList.fsl",
+    visibility = ['PUBLIC']
+)
+
+export_file(
+    name = "Font_ShaderList",
+    mode = "reference",
+    src = "Resources/Fonts/Shaders/FSL/Fonts_ShaderList.fsl",
+    visibility = ['PUBLIC']
+)
+#fsl_build(
+#    name = "font_fsl",
+#    input = "Resources/UI/Shaders/FSL/Fonts_ShaderList.fsl",
+#    visibility = ['PUBLIC']
+#)
 
 external_pkgconfig_library(name = "gtk+-3.0")
 external_pkgconfig_library(name = "libudev")

@@ -7,12 +7,12 @@ cxx_binary(
     deps = [
         "//:TF",
     ],
-  visibility = ['//TFSamples:']
+  visibility = ['//Samples:']
 )
 fsl_build(
     name = "fsl",
-    input = "Shaders/FSL/ShaderList.fsl",
-  visibility = ['//TFSamples:']
+    srcs = ["Shaders/FSL/ShaderList.fsl", "//:UI_ShaderList", "//:Font_ShaderList"],
+    visibility = ['//Samples:']
 )
 
 
