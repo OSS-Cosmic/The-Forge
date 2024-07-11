@@ -308,7 +308,7 @@ CREDITS
 #ifndef INCLUDE_STB_DS_H
 #define INCLUDE_STB_DS_H
 
-#include "../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #define STB_DS_API FORGE_API
 
@@ -405,7 +405,7 @@ struct bstring;
 
 #ifndef STB_DS_IMPLEMENTATION
 #define IMEMORY_FROM_HEADER
-#include "../../../Interfaces/IMemory.h"
+#include "Common_3/Utilities/Interfaces/IMemory.h"
 #endif
 
 #ifdef _MSC_VER

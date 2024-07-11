@@ -1,0 +1,19 @@
+load("//:rules.bzl", "package_app")
+#package_app(
+#    name = "package",
+#    resources = [ 
+#        "//TFSamples/Unit_Tests/01_Transformations:01_Transformations",
+#        "//TFSamples/Unit_Tests/01_Transformations:fsl", 
+#    ],
+#) 
+
+package_app(
+    name = "01_Transformation",
+    resources = [ 
+        "//TFSamples/Unit_Tests/01_Transformations:01_Transformations",
+        "//TFSamples/Unit_Tests/01_Transformations:fsl",
+  ],
+  files =  {file: file for file in glob(["TFSamples-Media/UnitTestResources/Textures/dds/circlepad.tex"])}
+) 
+
+

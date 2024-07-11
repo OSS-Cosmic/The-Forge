@@ -60,7 +60,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 add_library(zstd_filesystem OBJECT ${ZSTD_FILESYSTEM_SOURCES}) 
-target_include_directories(zstd_filesystem   PUBLIC Common_3/Utilities/ThirdParty/OpenSource/zstd)
+target_include_directories(zstd_filesystem PUBLIC Common_3/Utilities/ThirdParty/OpenSource/zstd)
 
 # VulkanMemoryAllocator
 add_library(VulkanMemoryAllocator INTERFACE)

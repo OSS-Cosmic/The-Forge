@@ -1,0 +1,42 @@
+load("@prelude//toolchains:genrule.bzl", "system_genrule_toolchain")
+load("@prelude//toolchains:python.bzl", "system_python_bootstrap_toolchain", "system_python_toolchain")
+load("@prelude//toolchains/msvc:tools.bzl", "find_msvc_tools")
+load("@prelude//toolchains/cxx/clang:tools.bzl", "path_clang_tools")
+load("@prelude//toolchains:cxx.bzl", "cxx_tools_info_toolchain")
+
+
+find_msvc_tools(
+    name = "msvc_tools",
+    target_compatible_with = ["config//os:windows"],
+    visibility = ["PUBLIC"],
+)
+
+path_clang_tools(
+    name = "clang_tools",
+    target_compatible_with = ["config//os:linux"],
+    visibility = ["PUBLIC"],
+)
+
+system_python_toolchain(
+    name = "python",
+    visibility = ["PUBLIC"],
+)
+
+cxx_tools_info_toolchain(
+    name = "cxx",
+    cxx_tools_info = select({
+        "config//os:linux": ":clang_tools",
+        "config//os:windows": ":msvc_tools",
+    }),
+    visibility = ["PUBLIC"],
+)
+
+system_genrule_toolchain(
+    name = "genrule",
+    visibility = ["PUBLIC"],
+)
+
+system_python_bootstrap_toolchain(
+    name = "python_bootstrap",
+    visibility = ["PUBLIC"],
+)

@@ -1,0 +1,21 @@
+load("//:rules.bzl", "fsl_build", "package_app")
+
+cxx_binary(
+    name = "01_Transformations",
+    srcs = ["01_Transformations.cpp"],
+    link_style = "static",
+    deps = [
+        "//:TF",
+    ],
+  visibility = ['//TFSamples:']
+)
+fsl_build(
+    name = "fsl",
+    input = "Shaders/FSL/ShaderList.fsl",
+  visibility = ['//TFSamples:']
+)
+
+
+
+
+

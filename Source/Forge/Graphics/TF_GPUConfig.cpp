@@ -1,5 +1,4 @@
 #include "Forge/Graphics/TF_GPUConfig.h"
-
 #include "Forge/Config.h"
 
 #include <cstdint>
