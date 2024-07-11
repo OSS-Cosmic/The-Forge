@@ -1,7 +1,6 @@
-
-load("//:rules.bzl", "fsl_build")
 load("@prelude//paths.bzl", "paths")
 load("@prelude//third-party:pkgconfig.bzl", "external_pkgconfig_library")
+load("//:rules.bzl", "subpath_export_files")
 
 export_file(
     name = "fsl",
@@ -10,6 +9,7 @@ export_file(
     visibility = ["PUBLIC"],
 )
 
+
 export_file(
     name = "UI_ShaderList",
     mode = "reference",
@@ -17,17 +17,19 @@ export_file(
     visibility = ['PUBLIC']
 )
 
+
 export_file(
     name = "Font_ShaderList",
     mode = "reference",
     src = "Resources/Fonts/Shaders/FSL/Fonts_ShaderList.fsl",
     visibility = ['PUBLIC']
 )
-#fsl_build(
-#    name = "font_fsl",
-#    input = "Resources/UI/Shaders/FSL/Fonts_ShaderList.fsl",
-#    visibility = ['PUBLIC']
-#)
+subpath_export_files("Resources/GPUData", [
+  "pc_gpu.data",
+  "steamdeck_gpu.data",
+  "apple_gpu.data",
+  "android_gpu.data"
+])
 
 external_pkgconfig_library(name = "gtk+-3.0")
 external_pkgconfig_library(name = "libudev")

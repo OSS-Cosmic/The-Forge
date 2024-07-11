@@ -1,4 +1,4 @@
-load("//:rules.bzl", "fsl_build", "package_app")
+load("//:rules.bzl", "fsl_compile")
 
 cxx_binary(
     name = "01_Transformations",
@@ -9,13 +9,18 @@ cxx_binary(
     ],
   visibility = ['//Samples:']
 )
-fsl_build(
+fsl_compile(
     name = "fsl",
     srcs = ["Shaders/FSL/ShaderList.fsl", "//:UI_ShaderList", "//:Font_ShaderList"],
     visibility = ['//Samples:']
 )
 
-
+export_file(
+    name = "gpu.cfg",
+    mode = "reference",
+    src = "GPUCfg/gpu.cfg",
+    visibility = ['PUBLIC']
+)
 
 
 

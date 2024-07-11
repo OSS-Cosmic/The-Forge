@@ -1,7 +1,7 @@
 load("@prelude//python:toolchain.bzl", "PythonToolchainInfo")
 load("@prelude//paths.bzl", "paths")
 
-def _fsl_impl(ctx: AnalysisContext) -> list[Provider]:
+def _fsl_compile(ctx: AnalysisContext) -> list[Provider]:
     #sources = ctx.attrs.srcs
     #extension = ".exe" if host_info().os.is_windows else ""
     #out = ctx.actions.declare_output("main" + extension)
@@ -41,8 +41,8 @@ def _fsl_impl(ctx: AnalysisContext) -> list[Provider]:
         )
     ]
 
-fsl_build = rule(
-    impl = _fsl_impl,
+fsl_compile = rule(
+    impl = _fsl_compile,
     attrs = {
         "srcs": attrs.list(attrs.source(), default=[]),
         "_python_toolchain": attrs.toolchain_dep(default = "toolchains//:python" , providers = [PythonToolchainInfo]),
@@ -50,14 +50,25 @@ fsl_build = rule(
     },
 )
 
+
+def subpath_export_files(base: str,paths: list[str]):
+  for p in paths:
+    native.export_file(
+      name = p,
+      mode = "reference",
+      src = "{}/{}".format(base, p),
+      visibility = ['PUBLIC']
+    )
+
 def _package_app(ctx: AnalysisContext) -> list[Provider]:
-    files = ctx.attrs.files
     artifacts = []
+    
+    files = ctx.attrs.files
     for f in files:
         dest = ctx.actions.declare_output(f)
         artifacts.append(dest)
         ctx.actions.copy_file(dest, files[f])
-      
+    
     for res in ctx.attrs.resources:
         info = res[DefaultInfo]
         for f in info.default_outputs:
