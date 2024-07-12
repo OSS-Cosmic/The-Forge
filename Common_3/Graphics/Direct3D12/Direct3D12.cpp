@@ -85,7 +85,7 @@
 #error "D3D12 requires C++! Sorry!"
 #endif
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define D3D12_GPU_VIRTUAL_ADDRESS_NULL    ((D3D12_GPU_VIRTUAL_ADDRESS)0)
 #define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN ((D3D12_GPU_VIRTUAL_ADDRESS)-1)

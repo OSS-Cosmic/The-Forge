@@ -42,7 +42,7 @@
 // Math
 #include "../../../../Common_3/Utilities/Math/MathTypes.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 // Remote Control - client functions
 extern void remoteControlConnect(const char* hostName, uint16_t port);

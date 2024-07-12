@@ -51,7 +51,7 @@
 #include "OpenGL/GLES2/gl2.h"
 #include "OpenGL/GLES2/gl2ext.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 extern void gles_createShaderReflection(Shader* pProgram, ShaderReflection* pOutReflection, const BinaryShaderDesc* pDesc);
 

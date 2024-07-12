@@ -56,7 +56,7 @@
 
 #include "../../../Visibility_Buffer/src/SanMiguel.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define NO_FSL_DEFINITIONS
 #include "Shaders/FSL/Shader_Defs.h.fsl"

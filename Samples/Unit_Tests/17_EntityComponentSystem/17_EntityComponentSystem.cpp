@@ -47,9 +47,7 @@
 
 // Math
 #include "Forge/Core/TF_Math.h"
-
-
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h" // Must be the last include in a cpp file
+#include "Forge/Core/Mem/TF_Memory.h"
 
 struct SpriteData
 {

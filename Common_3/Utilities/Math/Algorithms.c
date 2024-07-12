@@ -28,7 +28,7 @@
 
 #include "AlgorithmsImpl.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 // SIMPLE SORT
 // Used for array sizes 0..5

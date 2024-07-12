@@ -44,7 +44,7 @@
 #define STBDS_UNIT_TESTS
 #include "../../../../Common_3/Utilities/Math/BStringHashMap.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 static const char appName[] = "36_AlgorithmsAndContainers";
 

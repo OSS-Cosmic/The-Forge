@@ -30,7 +30,7 @@
 #include "../Utilities/Interfaces/IFileSystem.h"
 #include "Interfaces/IGraphics.h"
 
-#include "../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 ///////////////////////////////////////////////////////////
 // HELPER DECLARATIONS

@@ -38,7 +38,7 @@
 
 #include "Shaders/FSL/shader_defs.h.fsl"
 
-#include "../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define FOREACH_SETTING(X)       \
     X(AddGeometryPassThrough, 0) \

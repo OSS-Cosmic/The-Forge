@@ -51,7 +51,7 @@ bool gIsBstrlibTest = false;
 #include "bstrlib.h"
 
 #include "../../../Interfaces/ILog.h"
-#include "../../../Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 /* Optionally include a mechanism for debugging memory */
 

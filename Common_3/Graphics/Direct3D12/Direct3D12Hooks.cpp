@@ -33,7 +33,7 @@
 
 #include "Direct3D12Hooks.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(p_var) \

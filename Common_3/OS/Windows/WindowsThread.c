@@ -30,7 +30,7 @@
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../Interfaces/IOperatingSystem.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #if defined(ENABLE_THREAD_PERFORMANCE_STATS)
 

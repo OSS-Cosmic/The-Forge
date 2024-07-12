@@ -20,7 +20,7 @@
 #define FONS_H
 
 #define IMEMORY_FROM_HEADER
-#include "../../../../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #ifdef __cplusplus
 extern "C" {

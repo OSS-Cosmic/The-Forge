@@ -52,7 +52,7 @@
 
 #include "samplerBlueNoiseErrorDistribution_128x128_OptimizedFor_2d2d2d2d_2spp.cpp"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define NO_FSL_DEFINITIONS
 #include "Shaders/FSL/Shader_Defs.h.fsl"

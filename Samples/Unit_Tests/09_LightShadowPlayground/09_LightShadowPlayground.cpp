@@ -69,7 +69,7 @@
 #include "../../../Visibility_Buffer/src/SanMiguel.h"
 #include "../../../Visibility_Buffer/src/SanMiguelSDF.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define Epilson                     (1.e-4f)
 

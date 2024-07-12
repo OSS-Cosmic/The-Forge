@@ -27,7 +27,7 @@
 #include "../Utilities/Interfaces/ILog.h"
 #include "Interfaces/IGraphics.h"
 
-#include "../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 // This file contains shader reflection code that is the same for all platforms.
 // We know it's the same for all platforms since it only interacts with the

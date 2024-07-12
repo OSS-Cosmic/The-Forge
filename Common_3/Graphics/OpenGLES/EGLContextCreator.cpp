@@ -33,7 +33,7 @@
 
 #include "GLESContextCreator.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 void*                   gDisplay = EGL_NO_DISPLAY;
 thread_local EGLSurface gPlaceholderSurface = EGL_NO_SURFACE;

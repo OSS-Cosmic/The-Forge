@@ -34,7 +34,7 @@
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/ITime.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define LOG_CALLBACK_MAX_ID FS_MAX_PATH
 #define LOG_MAX_BUFFER      1024

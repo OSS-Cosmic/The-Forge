@@ -39,7 +39,7 @@
 #import "../../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #if defined(MTL_RAYTRACING_AVAILABLE)
 

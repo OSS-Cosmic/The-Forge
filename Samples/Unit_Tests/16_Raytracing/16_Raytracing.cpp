@@ -53,7 +53,7 @@
 #define NO_FSL_DEFINITIONS
 #include "Shaders/FSL/Shared.fsl.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define USE_DENOISER  0
 #define USE_RAY_QUERY 1

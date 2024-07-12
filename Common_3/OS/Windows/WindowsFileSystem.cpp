@@ -41,7 +41,7 @@
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../Interfaces/IOperatingSystem.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 template<typename T>
 static inline T withUTF16Path(const char* path, T (*function)(const wchar_t*))

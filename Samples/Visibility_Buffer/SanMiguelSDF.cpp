@@ -26,7 +26,7 @@
 #include "../../../Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../../Common_3/Utilities/Interfaces/ILog.h"
 
-#include "../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 void loadBakedSDFData(SDFMesh* outMesh, uint32_t startIdx, bool generateSDFVolumeData, SDFVolumeData** sdfVolumeInstances,
                       GenerateVolumeDataFromFileFunc generateVolumeDataFromFileFunc)

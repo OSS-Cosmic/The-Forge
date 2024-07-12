@@ -3,7 +3,7 @@
 #define GAINPUTALLOCATOR_H_
 
 #define IMEMORY_FROM_HEADER
-#include "../../../../../../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 namespace gainput
 {

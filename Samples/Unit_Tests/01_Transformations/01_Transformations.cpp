@@ -49,7 +49,7 @@
 #include "Forge/Core/TF_Math.h"
 #include "Forge/Graphics/TF_GPUConfig.h"
 
-#include "Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 /// Demo structures
 struct PlanetInfoStruct

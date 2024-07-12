@@ -65,7 +65,7 @@
 #include "../../../../Common_3/Utilities/Threading/ThreadSystem.h"
 #include "Shaders/Shared.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h" // Must be the last include in a cpp file
+#include "Forge/Core/Mem/TF_Memory.h"
 #define HAIR_DEV_UI           false
 #define MAX_FILENAME_LENGTH   128
 

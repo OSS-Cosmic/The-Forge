@@ -65,7 +65,7 @@
 #include "MetalCapBuilder.h"
 #include "MetalMemoryAllocatorImpl.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #if defined(AUTOMATED_TESTING)
 #include "IScreenshot.h"

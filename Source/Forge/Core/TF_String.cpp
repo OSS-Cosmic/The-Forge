@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 #include "Common_3/Utilities/Interfaces/ILog.h"
-#include "Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 
 #define   upcase(c) (toupper ((unsigned char) c))

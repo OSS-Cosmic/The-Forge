@@ -66,7 +66,7 @@ extern "C"
     __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #if defined(AUTOMATED_TESTING)
 #include "../../Application/Interfaces/IScreenshot.h"

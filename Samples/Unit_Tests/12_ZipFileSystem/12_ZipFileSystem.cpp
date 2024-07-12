@@ -44,7 +44,7 @@
 // Math
 #include "Forge/Core/TF_Math.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define SIZEOF_ARR(x) sizeof(x) / sizeof(x[0])
 

@@ -68,7 +68,7 @@
 
 #include "../../../Resources/ResourceLoader/TextureContainers.h"
 
-#include "../../../Utilities/Interfaces/IMemory.h" //NOTE: this should be the last include in a .cpp
+#include "Forge/Core/Mem/TF_Memory.h"
 
 extern "C"
 {

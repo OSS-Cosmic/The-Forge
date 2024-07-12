@@ -55,7 +55,7 @@
 
 #import "iOSAppDelegate.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define FORGE_WINDOW_CLASS L"The Forge"
 #define MAX_KEYS           256

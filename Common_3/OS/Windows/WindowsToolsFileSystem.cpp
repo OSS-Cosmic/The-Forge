@@ -35,7 +35,7 @@
 #include "commdlg.h"
 #include "shlobj.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 // static
 template<typename T>

@@ -39,7 +39,7 @@
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_rectpack.h"
 #endif
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #ifndef STB_TRUETYPE_IMPLEMENTATION
 #define STB_TRUETYPE_IMPLEMENTATION

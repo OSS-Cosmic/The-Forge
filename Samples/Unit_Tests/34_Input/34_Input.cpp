@@ -46,7 +46,7 @@
 // Math
 #include "Forge/Core/TF_Math.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #if (defined(TARGET_IOS) || defined(__ANDROID__) || defined(NX64)) && !defined(QUEST_VR)
 #define TOUCH_INPUT 1

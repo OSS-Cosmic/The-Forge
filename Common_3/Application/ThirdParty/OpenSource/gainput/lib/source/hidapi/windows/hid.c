@@ -76,7 +76,7 @@ extern "C" {
 
 #include "../hidapi.h"
 
-#include "../../../../../../../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #undef MIN
 #define MIN(x,y) ((x) < (y)? (x): (y))

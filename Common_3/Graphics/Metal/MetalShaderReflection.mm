@@ -34,7 +34,7 @@
 #include "../../Graphics/Interfaces/IGraphics.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define MAX_REFLECT_STRING_LENGTH 128
 #define MAX_BUFFER_BINDINGS       31

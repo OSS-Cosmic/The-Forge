@@ -31,7 +31,7 @@
 #include "../hidapi.h"
 
 #include "../../../../../../../../Utilities/Interfaces/IThread.h"
-#include "../../../../../../../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 /* As defined in AppKit.h, but we don't need the entire AppKit for a single constant. */
 extern const double NSAppKitVersionNumber;

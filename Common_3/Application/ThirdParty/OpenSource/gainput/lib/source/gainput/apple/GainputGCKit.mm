@@ -28,7 +28,7 @@
 #if defined(GAINPUT_PLATFORM_IOS) || defined(GAINPUT_PLATFORM_MAC)
 
 #include "../../../include/gainput/apple/GainputGCKit.h"
-#include "../../../../../../../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 
 #ifdef GAINPUT_GC_HAPTICS

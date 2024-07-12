@@ -1,4 +1,4 @@
-load("//:rules.bzl", "fsl_compile")
+load("//cfg:fsl.bzl", "fsl_compile")
 
 cxx_binary(
     name = "01_Transformations",
@@ -9,6 +9,7 @@ cxx_binary(
     ],
   visibility = ['//Samples:']
 )
+
 fsl_compile(
     name = "fsl",
     srcs = ["Shaders/FSL/ShaderList.fsl", "//:UI_ShaderList", "//:Font_ShaderList"],
@@ -21,6 +22,4 @@ export_file(
     src = "GPUCfg/gpu.cfg",
     visibility = ['PUBLIC']
 )
-
-
 

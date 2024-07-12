@@ -29,7 +29,7 @@
 #include "TressFXAsset.h"
 
 #include "../../../../../Utilities/Interfaces/ILog.h"
-#include "../../../../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define AMD_TRESSFX_V4 4
 #define AMD_TRESSFX_V3 3

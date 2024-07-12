@@ -58,7 +58,7 @@
 #endif
 #include "../../Utilities/Math/MathTypes.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #ifdef ENABLE_FORGE_STACKTRACE_DUMP
 #include "WindowsStackTraceDump.h"

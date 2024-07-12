@@ -63,7 +63,7 @@
 #include "../../../../Common_3/Utilities/Threading/ThreadSystem.h"
 
 // Memory
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 //--------------------------------------------------------------------------------------------
 // RENDERING PIPELINE DATA

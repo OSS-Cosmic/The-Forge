@@ -55,7 +55,7 @@
 #endif
 #include "../../../../Common_3/Application/ThirdParty/OpenSource/cr/cr.h"
 
-#include "../../../../Common_3/Utilities/Interfaces/IMemory.h" // Must be the last include in a cpp file
+#include "Forge/Core/Mem/TF_Memory.h"
 
 // When we don't have hot-reloading we compile the game code to a static library,
 // we need the foward declaration to call the game code and later the linker will link everything.

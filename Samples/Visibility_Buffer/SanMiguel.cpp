@@ -27,7 +27,7 @@
 #include "../../../Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../../Common_3/Utilities/Interfaces/ILog.h"
 
-#include "../../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define DEFAULT_ALBEDO           "Default"
 #define DEFAULT_NORMAL           "Default_NRM"

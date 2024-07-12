@@ -91,7 +91,7 @@ typedef uint64_t uint64;
 #endif
 
 #define IMEMORY_FROM_HEADER
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #if !defined(_WINDOWS) && !defined(XBOX)
 #include <unistd.h>

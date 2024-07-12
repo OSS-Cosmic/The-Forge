@@ -61,7 +61,7 @@
 #include "../Quest/VrApi.h"
 #endif
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 static IApp*       pApp = NULL;
 static WindowDesc* gWindowDesc = nullptr;

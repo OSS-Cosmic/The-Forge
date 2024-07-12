@@ -488,7 +488,7 @@ UTEST(Core, tfsscanf)
 // }
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 #include "Common_3/Utilities/Interfaces/ILog.h"
 UTEST_STATE();
 TF_UTEST_MAIN("TF_StringTest")

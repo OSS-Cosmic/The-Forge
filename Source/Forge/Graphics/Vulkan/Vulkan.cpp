@@ -93,7 +93,7 @@ extern RenderTarget* pFragmentDensityMask;
 #include "swappy/swappyVk.h"
 #endif
 
-#include "Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #if defined(AUTOMATED_TESTING)
 #include "Common_3/Application/Interfaces/IScreenshot.h"

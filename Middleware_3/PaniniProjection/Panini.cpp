@@ -28,7 +28,7 @@
 #include "../../Common_3/Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "../../Common_3/Utilities/Interfaces/ILog.h"
 
-#include "../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 ResourceDirectory RD_MIDDLEWARE_PANINI = RD_MIDDLEWARE_2;
 /************************************************************************/

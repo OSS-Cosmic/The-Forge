@@ -49,7 +49,7 @@
 #include "../../Common_3/Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "../../Common_3/Utilities/Interfaces/ILog.h"
 
-#include "../../Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 ParallelPrimitives::PipelineComponents::PipelineComponents():
     mNextSetIndex(0), pDescriptorSet(NULL), pShader(NULL), pPipeline(NULL), pRootSignature(NULL)

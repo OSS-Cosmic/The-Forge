@@ -42,7 +42,8 @@
 #include "../hidapi.h"
 
 #define bool int
-#include "../../../../../../../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
+
 
 #ifdef HIDAPI_ALLOW_BUILD_WORKAROUND_KERNEL_2_6_39
 /* This definitions first appeared in Linux Kernel 2.6.39 in linux/hidraw.h.

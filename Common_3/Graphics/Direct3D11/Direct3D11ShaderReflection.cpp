@@ -32,7 +32,7 @@
 #include "../../Utilities/Interfaces/ILog.h"
 #include "../Interfaces/IGraphics.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 static DescriptorType sD3D11_TO_DESCRIPTOR[] = {
     DESCRIPTOR_TYPE_UNIFORM_BUFFER, // D3D_SIT_CBUFFER

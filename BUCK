@@ -1,6 +1,6 @@
 load("@prelude//paths.bzl", "paths")
 load("@prelude//third-party:pkgconfig.bzl", "external_pkgconfig_library")
-load("//:rules.bzl", "subpath_export_files")
+load("//cfg:utils.bzl", "subpath_export_files")
 
 export_file(
     name = "fsl",
@@ -9,14 +9,12 @@ export_file(
     visibility = ["PUBLIC"],
 )
 
-
 export_file(
     name = "UI_ShaderList",
     mode = "reference",
     src = "Resources/UI/Shaders/FSL/UI_ShaderList.fsl",
     visibility = ['PUBLIC']
 )
-
 
 export_file(
     name = "Font_ShaderList",
@@ -35,7 +33,6 @@ external_pkgconfig_library(name = "gtk+-3.0")
 external_pkgconfig_library(name = "libudev")
 external_pkgconfig_library(name = "x11")
 external_pkgconfig_library(name = "xrandr")
-
 cxx_library(
     name = "TF",
     srcs = glob([

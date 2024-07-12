@@ -54,7 +54,7 @@
 #include "../../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "../../../Utilities/ThirdParty/OpenSource/Nothings/stb_image_resize.h"
 
-#include "../../../Utilities/Interfaces/IMemory.h" //NOTE: this should be the last include in a .cpp
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #define IS_POWER_OF_TWO(x) ((x) != 0 && ((x) & ((x)-1)) == 0)
 

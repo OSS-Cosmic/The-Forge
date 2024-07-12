@@ -29,7 +29,7 @@ distribution.
 #include <cstddef>
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "Common_3/Utilities/Interfaces/IMemory.h" //NOTE: this should be the last include in a .cpp
+#include "Forge/Core/Mem/TF_Memory.h"
 
 namespace tinyxml2
 {

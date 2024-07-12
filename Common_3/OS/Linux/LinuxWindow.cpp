@@ -47,7 +47,7 @@
 
 #include "../../Utilities/Math/MathTypes.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 //------------------------------------------------------------------------
 // STATIC STRUCTS

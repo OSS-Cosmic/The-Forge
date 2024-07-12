@@ -31,7 +31,7 @@
 #include "Common_3/Utilities/Interfaces/ILog.h"
 #include "Common_3/Graphics/Interfaces/IGraphics.h"
 
-#include "Common_3/Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 static DescriptorType sSPIRV_TO_DESCRIPTOR[SPIRV_TYPE_COUNT] = {
     DESCRIPTOR_TYPE_UNDEFINED,

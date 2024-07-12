@@ -70,7 +70,7 @@
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUI.h"
 
-#include "../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #ifdef GAINPUT_PLATFORM_GGP
 namespace gainput

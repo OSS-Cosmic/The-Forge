@@ -1,4 +1,4 @@
-load("//:rules.bzl", "package_app")
+load("//cfg:package.bzl", "package_app")
 load("@prelude//paths.bzl", "paths")
 
 package_app(

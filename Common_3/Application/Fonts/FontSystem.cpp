@@ -40,7 +40,7 @@
 
 #include "../../Utilities/RingBuffer.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #ifdef ENABLE_FORGE_FONTS
 

@@ -31,7 +31,7 @@
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/ITime.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 // This macro enables custom ZSTD allocator features
 #define ZSTD_STATIC_LINKING_ONLY

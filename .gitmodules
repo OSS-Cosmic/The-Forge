@@ -1,3 +1,6 @@
 [submodule "External/Vulkan-Headers"]
 	path = External/Vulkan-Headers
 	url = git@github.com:OSS-Cosmic/Vulkan-Headers.git
+[submodule "prelude"]
+	path = prelude
+	url = git@github.com:OSS-Cosmic/buck2-prelude.git

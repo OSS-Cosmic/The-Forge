@@ -51,7 +51,7 @@
 
 #include "TextureContainers.h"
 
-#include "../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 #ifdef NX64
 #include "../../Utilities/ThirdParty/OpenSource/murmurhash3/MurmurHash3_32.h"

@@ -58,7 +58,7 @@
 
 #include "cJSON.h"
 
-#include "../../../Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 
 /* define our own boolean type */
 #ifdef true

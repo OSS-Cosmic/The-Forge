@@ -39,7 +39,7 @@
 
 #define IMEMORY_FROM_HEADER
 
-#include "../../../../Utilities/Interfaces/IMemory.h"
+#include "Forge/Core/Mem/TF_Memory.h"
 #include "../../../../Utilities/Interfaces/ILog.h"
 #include "../../../../Utilities/Interfaces/IThread.h"
 
