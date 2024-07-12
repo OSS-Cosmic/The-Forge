@@ -125,8 +125,6 @@ cxx_library(
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/windows/*.c",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp",
-
-
         ])
     }),
     preprocessor_flags = [ 

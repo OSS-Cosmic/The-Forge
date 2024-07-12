@@ -1,19 +1,19 @@
 load("//cfg:package.bzl", "package_app")
-load("@prelude//paths.bzl", "paths")
+load("//Samples:defs.bzl", "common_unit_test_resources")
+
 
 package_app(
-    name = "01_Transformation",
+    name = "01_Transformations",
     resources = [ 
-        "//Samples/Unit_Tests/01_Transformations:01_Transformations",
-        "//Samples/Unit_Tests/01_Transformations:fsl"
-  ],
-  files =  
-    {paths.join("Textures",paths.basename(file)): file for file in glob(["TFSamples-Media/UnitTestResources/Textures/dds/*.tex"])} |
-    {paths.relativize(file,"TFSamples-Media/UnitTestResources"): file for file in glob(["TFSamples-Media/UnitTestResources/Fonts/**/*"])} |
-    {
-        "GPUCfg/gpu.data": "//:pc_gpu.data",
-        "GPUCfg/gpu.cfg": "//Samples/Unit_Tests/01_Transformations:gpu.cfg",
-    }
+      ("", "//Samples/01_Transformations:01_Transformations"),
+      ("",  "//Samples/01_Transformations:fsl")
+    ],
+    files = 
+      common_unit_test_resources() |
+      {
+          "GPUCfg/gpu.data": "//:pc_gpu.data",
+          "GPUCfg/gpu.cfg": "//Samples/01_Transformations:gpu.cfg",
+      }
 ) 
 
 

@@ -1,3 +1,5 @@
+load("@prelude//paths.bzl", "paths")
+
 def _package_app(ctx: AnalysisContext) -> list[Provider]:
     artifacts = []
     
@@ -8,9 +10,9 @@ def _package_app(ctx: AnalysisContext) -> list[Provider]:
         ctx.actions.copy_file(dest, files[f])
     
     for res in ctx.attrs.resources:
-        info = res[DefaultInfo]
+        info = res[1][DefaultInfo]
         for f in info.default_outputs:
-          dest = ctx.actions.declare_output(f.basename)
+          dest = ctx.actions.declare_output(paths.join(res[0], f.short_path))
           artifacts.append(dest)
           ctx.actions.copy_file(dest, f)
  
@@ -20,7 +22,7 @@ def _package_app(ctx: AnalysisContext) -> list[Provider]:
 package_app = rule(
     impl = _package_app,
     attrs = {
-        "resources": attrs.list(attrs.dep(), default = []),
+        "resources": attrs.list(attrs.tuple(attrs.string(),attrs.dep()), default = []),
         "files": attrs.named_set(attrs.source(), sorted = True, default = [])
     },
 )

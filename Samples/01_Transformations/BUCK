@@ -7,7 +7,7 @@ cxx_binary(
     deps = [
         "//:TF",
     ],
-  visibility = ['//Samples:']
+    visibility = ['//Samples:']
 )
 
 fsl_compile(
@@ -19,7 +19,7 @@ fsl_compile(
 export_file(
     name = "gpu.cfg",
     mode = "reference",
-    src = "GPUCfg/gpu.cfg",
+    src = "gpu.cfg",
     visibility = ['PUBLIC']
 )
 
