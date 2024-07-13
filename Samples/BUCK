@@ -1,7 +1,6 @@
 load("//cfg:package.bzl", "package_app")
 load("//Samples:defs.bzl", "common_unit_test_resources")
 
-
 package_app(
     name = "01_Transformations",
     resources = [ 
