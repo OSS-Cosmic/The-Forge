@@ -31,7 +31,7 @@ def check_targets_impl(ctx: BxlContext) -> None:
         
         cxx = cmd_entry.cxx_compile_cmd
         if cxx:
-            entry["command"] = cmd_args(cxx.base_compile_cmd, cxx.argsfile.input_args[0], delimiter = " ")
+            entry["command"] = cmd_args(cxx.base_compile_cmd, cxx.argsfile.input_args[0], cmd_entry.args, delimiter = " ")
 
         entries.append(entry)
    
