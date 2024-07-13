@@ -26,14 +26,11 @@ def _gen_compile_command(ctx: BxlContext) -> None:
     for key in infos:
         cmd_entry = infos[key]
         entry = {}
-        outPath = paths.replace_extension(cmd_entry.src.short_path, ".o")
         entry["directory"] = ctx.cli_args.base_dir 
         entry["file"] = cmd_entry.src.short_path
-        entry["output"] = outPath
-     
         cxx = cmd_entry.cxx_compile_cmd
         if cxx:
-            entry["command"] = cmd_args(cxx.base_compile_cmd, cxx.argsfile.input_args[0], cmd_args(outPath, format="-o {}"), cmd_entry.args, delimiter = " ")
+            entry["command"] = cmd_args(cxx.base_compile_cmd, cxx.argsfile.input_args[0], cmd_entry.args, delimiter = " ")
 
         entries.append(entry)
    
