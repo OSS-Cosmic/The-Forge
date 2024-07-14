@@ -29,7 +29,7 @@
 #include "../ThirdParty/OpenSource/OpenGL/GLES/egl.h"
 
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #include "GLESContextCreator.h"
 

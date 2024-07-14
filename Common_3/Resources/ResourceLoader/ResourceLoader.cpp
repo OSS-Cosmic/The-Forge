@@ -37,7 +37,7 @@
 #define TINYDDS_IMPLEMENTATION
 #include "ThirdParty/OpenSource/tinydds/tinydds.h"
 
-#include "../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 #include "../../Utilities/Interfaces/IThread.h"

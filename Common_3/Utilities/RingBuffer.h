@@ -26,7 +26,7 @@
 
 #include "../Application/Config.h"
 
-#include "../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "Interfaces/ILog.h"
 

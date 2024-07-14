@@ -30,7 +30,7 @@
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 

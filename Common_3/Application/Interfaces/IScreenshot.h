@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 FORGE_API void initScreenshotInterface(Renderer* pRenderer, Queue* pGraphicsQueue);
 

@@ -27,7 +27,7 @@
 #include <android_native_app_glue.h>
 
 #include "../../Application/Interfaces/IApp.h"
-#include "../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
 #include "../../Graphics/Quest/VrApiHooks.h"

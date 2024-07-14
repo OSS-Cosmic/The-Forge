@@ -62,7 +62,7 @@
 
 #include "tinyimageformat/tinyimageformat_query.h"
 
-#include "../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../OS/Interfaces/IOperatingSystem.h"
 #include "../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "../Utilities/Interfaces/IFileSystem.h"

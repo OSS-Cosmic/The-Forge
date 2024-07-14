@@ -25,7 +25,7 @@
 #ifndef SanMiguel_h
 #define SanMiguel_h
 
-#include "../../../Common_3/Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../../Common_3/Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 
 // Type definitions

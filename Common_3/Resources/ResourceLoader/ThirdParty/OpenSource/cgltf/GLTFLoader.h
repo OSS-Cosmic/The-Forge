@@ -4,7 +4,7 @@
 
 #include "../../../../../Utilities/Interfaces/ILog.h"
 #include "../../../../../Utilities/Interfaces/IToolFileSystem.h"
-#include "../../../../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../../../../Utilities/Math/MathTypes.h"
 
 #define IMEMORY_FROM_HEADER

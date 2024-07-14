@@ -42,7 +42,7 @@
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "../ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
 
-#include "../Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #if defined(XBOX)
 #include <pix3.h>

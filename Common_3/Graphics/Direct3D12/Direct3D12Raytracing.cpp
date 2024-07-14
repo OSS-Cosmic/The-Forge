@@ -45,7 +45,7 @@
 // Renderer
 #include "tinyimageformat/tinyimageformat_apis.h"
 
-#include "../Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../Interfaces/IRay.h"
 
 #include "Direct3D12Hooks.h"

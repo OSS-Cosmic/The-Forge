@@ -41,7 +41,7 @@
 
 #include "../../Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #include "../../Utilities/RingBuffer.h"
 

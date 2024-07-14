@@ -31,7 +31,7 @@
 #include "GpuProfiler.h"
 
 // RENDERER
-#include "../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 // INTERFACES
 #include "../../Application/Interfaces/IFont.h"

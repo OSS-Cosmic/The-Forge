@@ -41,7 +41,7 @@
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#import "../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../OS/Interfaces/IOperatingSystem.h"
 
 #ifdef ENABLE_OS_PROC_MEMORY

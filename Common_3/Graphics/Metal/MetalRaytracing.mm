@@ -34,7 +34,7 @@
 
 #include "tinyimageformat/tinyimageformat_apis.h"
 
-#import "../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #import "../../Graphics/Interfaces/IRay.h"
 #import "../../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "../../Utilities/Interfaces/ILog.h"

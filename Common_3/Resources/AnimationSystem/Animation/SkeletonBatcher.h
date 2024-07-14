@@ -25,7 +25,7 @@
 #pragma once
 
 #include "../../../Application/Interfaces/ICameraController.h"
-#include "../../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 
 #include "AnimatedObject.h"

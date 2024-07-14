@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "../../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #include "../../../Graphics/GraphicsConfig.h"
 #include "../../../Utilities/Math/MathTypes.h"

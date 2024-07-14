@@ -43,7 +43,7 @@
 #include "../../Application/Interfaces/IFont.h"
 #include "../../Application/Interfaces/IProfiler.h"
 #include "../../Application/Interfaces/IUI.h"
-#include "../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../OS/Interfaces/IOperatingSystem.h"
 #include "../../Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"

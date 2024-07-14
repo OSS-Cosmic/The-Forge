@@ -38,7 +38,7 @@
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../Interfaces/IRay.h"
 
 #include "../../Utilities/Math/AlgorithmsImpl.h"

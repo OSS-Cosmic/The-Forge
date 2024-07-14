@@ -26,7 +26,7 @@
 
 #ifdef DIRECT3D12
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #if defined(XBOX)
 #include "../../../Xbox/Common_3/Graphics/Direct3D12/Direct3D12X.h"

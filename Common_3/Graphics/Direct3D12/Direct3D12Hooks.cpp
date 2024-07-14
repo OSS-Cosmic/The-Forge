@@ -27,7 +27,7 @@
 
 #include "../ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
 
-#include "../Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 
 #include "../../../Common_3/Utilities/Math/MathTypes.h"
 

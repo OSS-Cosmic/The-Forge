@@ -48,7 +48,7 @@
 #if defined(NX64)
 #endif
 
-#include "../../../../Common_3/Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../../../Common_3/Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"

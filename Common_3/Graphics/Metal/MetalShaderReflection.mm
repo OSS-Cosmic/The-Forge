@@ -31,7 +31,7 @@
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "../../Graphics/Interfaces/IGraphics.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
