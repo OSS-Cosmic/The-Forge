@@ -22,13 +22,13 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../Application/Interfaces/IApp.h"
-#include "../../OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
 #include "../../Utilities/Math/Algorithms.h"

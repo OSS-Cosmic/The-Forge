@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #if defined(_WINDOWS) && !defined(DURANGO)
 #include "ags_lib/inc/amd_ags.h"

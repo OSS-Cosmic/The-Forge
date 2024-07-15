@@ -25,7 +25,7 @@
 #ifndef IFONT_H
 #define IFONT_H
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include "../../Application/Interfaces/ICameraController.h"
 

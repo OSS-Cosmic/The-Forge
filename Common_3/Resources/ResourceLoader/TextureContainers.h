@@ -32,8 +32,8 @@
 #include "ThirdParty/OpenSource/tinyktx/tinyktx.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
-#include "../../OS/Interfaces/IOperatingSystem.h"
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
 /************************************************************************/

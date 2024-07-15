@@ -23,9 +23,12 @@
  */
 
 #pragma once
-#include "../../Application/Config.h"
+#ifndef TF_IFileSystem_H_ 
+#define TF_IFileSystem_H_   
 
-#include "../../OS/Interfaces/IOperatingSystem.h"
+#include "Forge/Config.h"
+
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 // IOS Simulator paths can get a bit longer then 256 bytes
 #ifdef TARGET_IOS_SIMULATOR
@@ -679,4 +682,6 @@ extern "C"
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
+
 #endif

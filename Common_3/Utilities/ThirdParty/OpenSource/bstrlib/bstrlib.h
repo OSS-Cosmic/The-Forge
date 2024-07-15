@@ -18,7 +18,7 @@
 #ifndef BSTRLIB_INCLUDE
 #define BSTRLIB_INCLUDE
 
-#include "../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifdef __cplusplus
 extern "C" {

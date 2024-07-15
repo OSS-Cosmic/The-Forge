@@ -22,13 +22,13 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include "../../Application/Interfaces/IApp.h"
 #include "../../Application/Interfaces/IInput.h"
 #include "../../Application/Interfaces/IScreenshot.h"
 #include "../../Application/Interfaces/IUI.h"
-#include "../../OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../../Utilities/Interfaces/ITime.h"
 
 static WindowDesc*  pWindowRef = NULL;

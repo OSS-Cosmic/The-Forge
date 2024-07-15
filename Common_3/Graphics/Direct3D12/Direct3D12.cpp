@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef DIRECT3D12
 
@@ -56,7 +56,7 @@
 #include "../ThirdParty/OpenSource/nvapi/NvApiHelper.h"
 #include "../ThirdParty/OpenSource/renderdoc/renderdoc_app.h"
 
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
 #include "../../Utilities/Math/AlgorithmsImpl.h"

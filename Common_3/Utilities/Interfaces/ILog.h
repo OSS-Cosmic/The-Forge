@@ -24,11 +24,11 @@
 
 #pragma once
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include <stdarg.h>
 
-#include "../Log/Log.h"
+#include "Common_3/Utilities/Log/Log.h"
 
 #ifdef __cplusplus
 extern "C"

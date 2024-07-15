@@ -36,7 +36,7 @@
 #error "ozz-animation requires c++11 language standards."
 #endif  // __cplusplus
 
-#include "../../../../../../../../Application/Config.h"
+#include "Forge/Config.h"
 #include "../../../../../../../../Utilities/Math/MathTypes.h"
 #include "../../../../../../../../Utilities/Interfaces/ILog.h"
 

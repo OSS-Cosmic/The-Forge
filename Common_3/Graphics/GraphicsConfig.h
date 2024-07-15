@@ -42,7 +42,7 @@
 #undef TF_EXTERNAL_CONFIG_STRINGIFY2
 #else
 
-#include "../Application/Config.h"
+#include "Forge/Config.h"
 
 // ------------------------------- renderer configuration ------------------------------- //
 
@@ -143,7 +143,6 @@ enum
 #endif
 
 #endif
-#endif
 
 // ------------------------------- gpu configuration rules ------------------------------- //
 
@@ -200,3 +199,6 @@ FORGE_API GPUPresetLevel stringToPresetLevel(const char* presetLevel);
 FORGE_API bool           gpuVendorEquals(uint32_t vendorId, const char* vendorName);
 FORGE_API const char*    getGPUVendorName(uint32_t modelId);
 FORGE_API uint32_t       getGPUVendorID(const char*);
+
+#endif
+

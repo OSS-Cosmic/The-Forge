@@ -28,7 +28,7 @@
 #ifndef OZZ_OZZ_ANIMATION_OFFLINE_EXPORT_H_
 #define OZZ_OZZ_ANIMATION_OFFLINE_EXPORT_H_
 
-#include "../../../../../../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifndef OZZ_ANIMOFFLINE_DLL
 #define OZZ_ANIMOFFLINE_DLL FORGE_API

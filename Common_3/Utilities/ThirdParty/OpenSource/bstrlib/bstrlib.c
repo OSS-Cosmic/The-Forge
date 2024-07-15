@@ -11,7 +11,7 @@
  * This file is the core module for implementing the bstring functions.
  */
 
-#include "../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include "../Nothings/stb_ds.h"
 

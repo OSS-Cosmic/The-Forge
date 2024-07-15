@@ -24,9 +24,12 @@
 
 #pragma once
 
-#include "../../Application/Config.h"
+#ifndef TF_LOG_H_ 
+#define TF_LOG_H_ 
 
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Forge/Config.h"
+
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 
 #include "stdbool.h"
 
@@ -104,4 +107,6 @@ extern "C"
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
+
 #endif

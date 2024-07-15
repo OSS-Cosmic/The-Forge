@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #include "../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"

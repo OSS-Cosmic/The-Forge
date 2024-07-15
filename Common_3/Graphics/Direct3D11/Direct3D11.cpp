@@ -26,7 +26,7 @@
  * This implementation retrofits the new low level interface to D3D11.
  * TODO: explain how GPU resource dependencies are handled...
  */
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef DIRECT3D11
 #define RENDERER_IMPLEMENTATION
@@ -39,7 +39,7 @@
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 #include "Forge/Graphics/TF_Graphics.h"
 

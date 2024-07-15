@@ -1,0 +1,71 @@
+load("@prelude//paths.bzl", "paths")
+cxx_library(
+    name = "cpu_features",
+    srcs = select({
+        "config//cpu:x86_64": [
+            "cpu_features/src/impl_x86_freebsd.c",
+            "cpu_features/src/impl_x86_linux_or_android.c",
+            "cpu_features/src/impl_x86_macos.c",
+            "cpu_features/src/impl_x86_windows.c",
+        ],
+        "config//cpu:arm32": ["cpu_features/src/impl_arm_linux_or_android.c"],
+        "config//cpu:arm64": [
+            "cpu_features/src/impl_aarch64_cpuid.c",
+            "cpu_features/src/impl_aarch64_linux_or_android.c",
+            "cpu_features/src/impl_aarch64_macos_or_iphone.c",
+            "cpu_features/src/impl_aarch64_windows.c",
+            "cpu_features/src/impl_aarch64_freebsd.c",
+        ]
+        #PLATFORM_CPU_MIPS: ["src/impl_mips_linux_or_android.c"],
+        #PLATFORM_CPU_PPC: ["src/impl_ppc_linux.c"],
+        #PLATFORM_CPU_RISCV32: ["src/impl_riscv_linux.c"],
+        #PLATFORM_CPU_RISCV64: ["src/impl_riscv_linux.c"],
+    }) + [
+        "cpu_features/src/hwcaps.c",
+        "cpu_features/src/hwcaps_freebsd.c",
+        "cpu_features/src/hwcaps_linux_or_android.c",
+        "cpu_features/src/stack_line_reader.c",
+        "cpu_features/src/string_view.c",
+        "cpu_features/src/filesystem.c"
+    ],
+    link_style = "static",
+    header_namespace = "",
+    preprocessor_flags = select({
+        "config//os:macos": ["-DHAVE_SYSCTLBYNAME", "-DHAVE_DLFCN_H"],
+        "config//os:linux": ["-DHAVE_STRONG_GETAUXVAL"],
+        "DEFAULT" : []
+    }) + ["-DSTACK_LINE_READER_BUFFER_SIZE=1024"],
+    headers =
+      {paths.relativize(file, "cpu_features/include") : file for file in glob(["cpu_features/include/internal/*.h"])} |
+      {paths.basename(f):f for f in glob(["cpu_features/src/*.inl"])},
+    exported_headers = { paths.relativize(file, "cpu_features/include"): file for file in glob(["cpu_features/include/*.h"])}, 
+    visibility = ["PUBLIC"],
+)
+
+export_file(
+    name = "nvapi_lib",
+    src = "nvapi/amd64/nvapi64.lib",
+    out = "nvapi64.lib",
+    visibility = ['PUBLIC']
+)
+
+prebuilt_cxx_library(
+    name = "nvapi",
+    exported_linker_flags = ["$(location :nvapi_lib)"],
+    exported_headers  = { paths.relativize(file, "nvapi"): file for file in glob(["nvapi/*.h"])}, 
+    visibility = ["PUBLIC"],
+)
+
+export_file(
+    name = "ags_lib",
+    src = "AGS_SDK/ags_lib/lib/amd_ags_x64.lib",
+    out = "amd_ags_x64.lib",
+    visibility = ['PUBLIC']
+)
+
+prebuilt_cxx_library(
+    name = "ags",
+    exported_linker_flags = ["$(location :ags_lib)"],
+    exported_headers  = { "amd_ags.h" : "AGS_SDK/ags_lib/inc/amd_ags.h"}, 
+    visibility = ["PUBLIC"],
+)

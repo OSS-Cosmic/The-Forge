@@ -31,7 +31,7 @@
 
 #include "../../Application/Interfaces/IApp.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #if defined(QUEST_VR)
 #include "../Quest/VrApi.h"

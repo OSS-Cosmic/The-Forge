@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #if defined(GLES)
 #define RENDERER_IMPLEMENTATION

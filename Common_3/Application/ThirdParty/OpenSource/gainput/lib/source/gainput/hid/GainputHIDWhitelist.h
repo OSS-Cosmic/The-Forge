@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 struct hid_device_info;
 

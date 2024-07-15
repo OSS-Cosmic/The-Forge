@@ -23,10 +23,12 @@
  */
 
 #pragma once
+#ifndef TF_IOPERATING_SYSTEM_H_ 
+#define TF_IOPERATING_SYSTEM_H_  
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
-#include "../CPUConfig.h"
+#include "Common_3/OS/CPUConfig.h"
 
 #if defined(_WINDOWS) || defined(XBOX)
 #include <stdlib.h>
@@ -468,6 +470,5 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-//
-// failure research ...
-//
+
+#endif

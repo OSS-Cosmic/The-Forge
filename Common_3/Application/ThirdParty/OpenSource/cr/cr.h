@@ -366,7 +366,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __CR_H__
 #define __CR_H__
 
-#include "../../../../Application/Config.h"
+#include "Forge/Config.h"
 #include "../../../../Utilities/Interfaces/ILog.h"
 
 #if !FORGE_CODE_HOT_RELOAD && defined(CR_HOST)

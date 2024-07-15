@@ -22,6 +22,7 @@ export_file(
     src = "Resources/Fonts/Shaders/FSL/Fonts_ShaderList.fsl",
     visibility = ['PUBLIC']
 )
+
 subpath_export_files("Resources/GPUData", [
   "pc_gpu.data",
   "steamdeck_gpu.data",
@@ -116,31 +117,47 @@ cxx_library(
           "Common_3/Utilities/FileSystem/UnixFileSystem.c",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/linux/*.c"
         ]),
-        "config//os:windows": [
-
-        ] + glob([
+        "config//os:windows": glob([
           "Common_3/OS/Windows/*.cpp",
           "Common_3/OS/Windows/*.c",
+      
+          "Common_3/Graphics/Direct3D11/*.cpp",
+          "Common_3/Graphics/Direct3D12/*.cpp",
 
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/windows/*.c",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp",
         ])
     }),
-    preprocessor_flags = [ 
-    ],
-    deps = [
-      "//:gtk+-3.0",
-      "//:libudev",
-      "//:x11",
-      "//:xrandr"
-    ],
-    #linker_flags = select({
-    #  # "config//os:linux": ["-lX11", "-lXrandr", "-ludev"]
-    #}),
+    deps = select({
+      "config//os:linux": [
+        "//:gtk+-3.0",
+        "//:libudev",
+        "//:x11",
+        "//:xrandr"],
+      "config//os:windows": ["//Shed:nvapi", "//Shed:ags"]
+    }) ,
+    exported_preprocessor_flags = select({
+      "config//os:windows": [
+        "-DD3D12_AGILITY_SDK=1",
+        "-DD3D12_AGILITY_SDK_VERSION=611"
+      ],
+
+      "DEFAULT": []
+    }),
+    exported_linker_flags = select({
+      "config//os:windows": [
+        "/IMPLIB:d3d11.lib",
+        "/IMPLIB:Gdi32.lib",
+        "/IMPLIB:user32.lib"
+      ]
+    }),
+    exported_deps =["//Shed:cpu_features"],
+    link_style = "static",
     exported_headers =
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp","Common_3/Graphics/ThirdParty/OpenSource/volk/*.c" ]) } |
       { paths.relativize(file, "Include"): file for file in glob(["Include/**/*.h", "Include/**/*.hpp"]) } |  
+      { paths.relativize(file, "External/VulkanSDK/include"): file for file in glob(["External/VulkanSDK/**/*.h"]) } | 
       { paths.relativize(file, "External"): file for file in glob(["External/tinyimageformat/*.h"]) } | 
       { paths.relativize(file, "External"): file for file in glob(["External/stb/*.h"]) } ,
     visibility = ["PUBLIC"],

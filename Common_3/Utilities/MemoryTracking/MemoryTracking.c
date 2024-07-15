@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include "wchar.h"
 

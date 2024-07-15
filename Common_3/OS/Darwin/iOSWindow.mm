@@ -24,7 +24,7 @@
 
 #ifdef __APPLE__
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
@@ -35,7 +35,7 @@
 
 #include "../../Application/Interfaces/IApp.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "../../Utilities/Math/MathTypes.h"
 

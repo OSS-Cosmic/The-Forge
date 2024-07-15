@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../../../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 #include "../../../../Utilities/Interfaces/IThread.h"
 
 #define D3D12MA_D3D12_HEADERS_ALREADY_INCLUDED

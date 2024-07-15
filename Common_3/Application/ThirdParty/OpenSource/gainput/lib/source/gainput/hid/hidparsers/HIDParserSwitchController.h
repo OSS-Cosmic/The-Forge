@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common_3/Application/Config.h"
+#include "Forge/Config.h"
 
 struct HIDDeviceInfo;
 struct HIDController;

@@ -28,7 +28,7 @@
 #ifndef OZZ_OZZ_BASE_EXPORT_H_
 #define OZZ_OZZ_BASE_EXPORT_H_
 
-#include "../../../../../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifndef OZZ_BASE_DLL
 #define OZZ_BASE_DLL FORGE_API

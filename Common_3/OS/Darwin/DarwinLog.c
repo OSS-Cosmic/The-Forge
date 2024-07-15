@@ -22,14 +22,13 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <unistd.h>
 
-#include "../Interfaces/IOperatingSystem.h"
-
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 // interfaces
 #include "../../Utilities/Interfaces/ILog.h"
 

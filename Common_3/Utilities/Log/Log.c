@@ -24,12 +24,12 @@
 
 #include "Log.h"
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include <stdarg.h>
 
 #ifdef ENABLE_LOGGING
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/ITime.h"

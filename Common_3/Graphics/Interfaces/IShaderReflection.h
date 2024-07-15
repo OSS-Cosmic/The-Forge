@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
+
 #ifdef GLES
 #include "OpenGL/GLES2/gl2.h"
 #endif

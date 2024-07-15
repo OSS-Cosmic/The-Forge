@@ -24,7 +24,7 @@
 
 #ifdef __APPLE__
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #import <Cocoa/Cocoa.h>
 #include <Foundation/Foundation.h> // Needed to check for debugger
@@ -37,7 +37,7 @@
 
 #include "../../Application/Interfaces/IApp.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "../../Graphics/GraphicsConfig.h"
 #include "../../Utilities/Math/MathTypes.h"

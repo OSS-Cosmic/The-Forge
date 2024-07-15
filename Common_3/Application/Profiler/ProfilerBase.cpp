@@ -26,7 +26,7 @@
 
 #include <inttypes.h>
 
-#include "../../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #include "GpuProfiler.h"
 
@@ -38,7 +38,7 @@
 #include "../../Application/Interfaces/IProfiler.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "../../OS/Interfaces/IOperatingSystem.h"
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 
 #include "../../Utilities/Math/Algorithms.h"
 

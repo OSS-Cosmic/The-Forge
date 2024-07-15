@@ -21,14 +21,14 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifdef _WINDOWS
 
 #include <ctime>
 #include <ntverp.h>
 
-#include "../CPUConfig.h"
+#include "Common_3/OS/CPUConfig.h"
 
 #if !defined(XBOX)
 #include <shlwapi.h>
@@ -44,8 +44,8 @@
 #include "../../Application/Interfaces/IProfiler.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "Forge/Graphics/TF_Graphics.h"
-#include "../../OS/Interfaces/IOperatingSystem.h"
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/ITime.h"

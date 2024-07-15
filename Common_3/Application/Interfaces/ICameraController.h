@@ -24,9 +24,9 @@
 
 #pragma once
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
-#include "../../OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "../../Utilities/Math/MathTypes.h"
 

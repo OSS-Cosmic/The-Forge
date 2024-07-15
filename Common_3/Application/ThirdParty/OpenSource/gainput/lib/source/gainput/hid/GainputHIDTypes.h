@@ -2,7 +2,8 @@
 #ifndef GAINPUTHIDTYPES_H_
 #define GAINPUTHIDTYPES_H_
 
-#include "../../../../../../../../Application/Config.h"
+#include "Forge/Config.h"
+
 
 // While the standard says this is the max packet size, there is no enforcement
 //   so some products may have larger packets

@@ -23,7 +23,7 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifdef __cplusplus
 extern "C"

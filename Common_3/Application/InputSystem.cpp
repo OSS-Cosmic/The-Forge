@@ -25,7 +25,7 @@
 
 #include "../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 
-#include "../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef ENABLE_FORGE_INPUT
 #include "../Application/ThirdParty/OpenSource/gainput/lib/include/gainput/gainput.h"
@@ -63,9 +63,9 @@
 #include "tinyimageformat/tinyimageformat_query.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
-#include "../OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
-#include "../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../Utilities/Interfaces/ILog.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUI.h"

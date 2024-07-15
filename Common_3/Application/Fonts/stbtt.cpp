@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 // Don't compile stbtt unless we need it for UI or fonts
 #if defined ENABLE_FORGE_UI || defined ENABLE_FORGE_FONTS

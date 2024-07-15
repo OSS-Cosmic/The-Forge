@@ -29,7 +29,7 @@
 #define OZZ_OZZ_ANIMATION_RUNTIME_EXPORT_H_
 
 
-#include "../../../../../../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifndef OZZ_ANIMATION_DLL
 #define OZZ_ANIMATION_DLL FORGE_API

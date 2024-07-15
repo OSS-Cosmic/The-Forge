@@ -26,7 +26,7 @@
 
 #include "Forge/Graphics/TF_Graphics.h"
 
-#include "../../../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 #include "../../../Utilities/Math/MathTypes.h"
 #include "../../../Utilities/Threading/Atomics.h"
 

@@ -8,7 +8,7 @@
 #ifndef GAINPUT_H_
 #define GAINPUT_H_
 
-#include "../../../../../../Config.h"
+#include "Forge/Config.h"
 
 #if defined(VK_USE_PLATFORM_GGP)
 	#define GAINPUT_PLATFORM_GGP
