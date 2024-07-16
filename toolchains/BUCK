@@ -27,6 +27,58 @@ cxx_tools_info_toolchain(
     cxx_tools_info = select({
         "config//os:linux": ":clang_tools",
         "config//os:windows": ":msvc_tools",
+    }),  
+    c_flags = select({
+        "config//os:linux": [],
+        #Copied from the C++ flags
+        "config//os:windows": [
+            "/c",
+            "/Z7",
+            "/nologo",
+            "/W3",
+            "/WX-",
+            "/diagnostics:column",
+            "/EHsc",
+            "/permissive-",
+            "/TC",
+        ],
+    }), 
+    cxx_flags = select({
+        "config//os:linux": [],
+        "config//os:windows": [   
+            "/std:c++14",
+            "/c",
+            "/Z7",
+            "/nologo",
+            "/W3",
+            "/WX-",
+            "/diagnostics:column",
+            #"/D_CONSOLE",
+            #"/D_UNICODE",
+            "/EHsc",
+            #"/Zc:forScope",
+            #"/Zc:inline",
+            "/permissive-",
+            "/TP",
+        ]
+    }),
+    link_flags = select({
+        "config//os:linux": [],
+        "config//os:windows": [
+            "/NOLOGO",
+            "/DEBUG",
+            "/INCREMENTAL:NO",
+            "/VERBOSE",
+          #C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\
+          "/LIBPATH:\\\'C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\\\\'",
+          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\Shell32.Lib",
+          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\kernel32.lib",
+          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\User32.Lib", 
+          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\gdi32.lib",
+          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\Ole32.lib",
+          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\OleAut32.lib",
+          "Xinput.lib",
+        ],
     }),
     visibility = ["PUBLIC"],
 )

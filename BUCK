@@ -135,24 +135,43 @@ cxx_library(
         "//:libudev",
         "//:x11",
         "//:xrandr"],
-      "config//os:windows": ["//Shed:nvapi", "//Shed:ags"]
-    }) ,
+      "config//os:windows": [
+      ]
+    }),
     exported_preprocessor_flags = select({
       "config//os:windows": [
         "-DD3D12_AGILITY_SDK=1",
         "-DD3D12_AGILITY_SDK_VERSION=611"
       ],
-
       "DEFAULT": []
     }),
-    exported_linker_flags = select({
-      "config//os:windows": [
-        "/IMPLIB:d3d11.lib",
-        "/IMPLIB:Gdi32.lib",
-        "/IMPLIB:user32.lib"
-      ]
-    }),
-    exported_deps =["//Shed:cpu_features"],
+    #exported_linker_flags = select({
+    #    "config//os:linux": [],
+    #    "config//os:windows": [
+    #        "/VERBOSE",
+    #        "/LIBPATH:C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\",
+    #        "kernel32.lib",
+    #        "user32.lib",
+    #        "gdi32.lib",
+    #        "ole32.lib",
+    #        "oleaut32.lib",
+    #       
+    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\kernel32.Lib",
+    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\User32.Lib", 
+    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\gdi32.lib",
+    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\Ole32.lib",
+    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\OleAut32.lib",
+    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\Xinput.lib",
+    #    ]  
+    #}),
+
+    #exported_post_linker_flags = select({
+    #  "config//os:windows": [
+    #    "user32.lib"
+    #    #"$(location @prelude//toolchains/msvc:msvc_tools[cl.exe][json][LIB])"
+    #  ]
+    #}),
+    exported_deps =["//Shed:cpu_features", "//Shed:nvapi", "//Shed:ags"],
     link_style = "static",
     exported_headers =
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp","Common_3/Graphics/ThirdParty/OpenSource/volk/*.c" ]) } |

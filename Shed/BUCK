@@ -51,6 +51,7 @@ export_file(
 
 prebuilt_cxx_library(
     name = "nvapi",
+    header_namespace = "",
     exported_linker_flags = ["$(location :nvapi_lib)"],
     exported_headers  = { paths.relativize(file, "nvapi"): file for file in glob(["nvapi/*.h"])}, 
     visibility = ["PUBLIC"],
@@ -65,7 +66,8 @@ export_file(
 
 prebuilt_cxx_library(
     name = "ags",
-    exported_linker_flags = ["$(location :ags_lib)"],
+    header_namespace = "",
+    exported_linker_flags  = ["$(location :ags_lib)"],
     exported_headers  = { "amd_ags.h" : "AGS_SDK/ags_lib/inc/amd_ags.h"}, 
     visibility = ["PUBLIC"],
 )

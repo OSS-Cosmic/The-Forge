@@ -35,6 +35,7 @@
 #include "../../Utilities/Math/MathTypes.h"
 
 #pragma comment(lib, "WinMM.lib")
+#pragma comment(lib, "User32.lib")
 #include <windowsx.h>
 
 #define elementsOf(a)      (sizeof(a) / sizeof((a)[0]))

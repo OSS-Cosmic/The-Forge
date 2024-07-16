@@ -52,8 +52,8 @@
 
 #include "tinyimageformat/tinyimageformat_base.h"
 #include "tinyimageformat/tinyimageformat_query.h"
-#include "../ThirdParty/OpenSource/ags/AgsHelper.h"
-#include "../ThirdParty/OpenSource/nvapi/NvApiHelper.h"
+#include "Common_3/Graphics/AgsHelper.h"
+#include "Common_3/Graphics/NvApiHelper.h"
 #include "../ThirdParty/OpenSource/renderdoc/renderdoc_app.h"
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"

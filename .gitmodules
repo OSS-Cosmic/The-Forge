@@ -10,6 +10,3 @@
 [submodule "Shed/AGS_SDK"]
 	path = Shed/AGS_SDK
 	url = git@github.com:OSS-Cosmic/AGS_SDK.git
-[submodule "Shed/DirectXShaderCompiler"]
-	path = Shed/DirectXShaderCompiler
-	url = git@github.com:OSS-Cosmic/DirectXShaderCompiler.git

@@ -62,8 +62,8 @@
 #endif
 
 #include "Common_3/Graphics/ThirdParty/OpenSource/VulkanMemoryAllocator/VulkanMemoryAllocator.h"
-#include "Common_3/Graphics/ThirdParty/OpenSource/ags/AgsHelper.h"
-#include "Common_3/Graphics/ThirdParty/OpenSource/nvapi/NvApiHelper.h"
+#include "Common_3/Graphics/AgsHelper.h"
+#include "Common_3/Graphics/NvApiHelper.h"
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
@@ -98,7 +98,7 @@ extern RenderTarget* pFragmentDensityMask;
 #if defined(AUTOMATED_TESTING)
 #include "Common_3/Application/Interfaces/IScreenshot.h"
 #endif
-#include "Common_3/Graphics/ThirdParty/OpenSource/ags/AgsHelper.h"
+#include "Common_3/Graphics/AgsHelper.h"
 
 extern void vk_createShaderReflection(const uint8_t* shaderCode, uint32_t shaderSize, ShaderStage shaderStage,
                                       ShaderReflection* pOutReflection);
