@@ -28,4 +28,5 @@
   ignore = .git
 
 [tf]
-  memory-tracking = 1 
+  memory-tracking = 1
+  log-level = eAll
