@@ -31,8 +31,7 @@
 #include <sys/system_properties.h>
 #include <unistd.h>
 
-#include "../../Graphics/GraphicsConfig.h"
-
+#include "Common_3/Graphics/GraphicsConfig.h"
 #if defined(GLES)
 #include <OpenGL/EGL/egl.h>
 #include <OpenGL/GLES2/gl2.h>
@@ -43,11 +42,11 @@
 #include "../../Application/Interfaces/IProfiler.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "Forge/Graphics/TF_Graphics.h"
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/ITime.h"
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #if defined(ENABLE_FORGE_REMOTE_UI)
 #include "../../Tools/Network/Network.h"
@@ -55,7 +54,7 @@
 #if defined(ENABLE_FORGE_RELOAD_SHADER)
 #include "../../Tools/ReloadServer/ReloadClient.h"
 #endif
-#include "../CPUConfig.h"
+#include "Common_3/OS/CPUConfig.h"
 
 #if defined(QUEST_VR)
 #include "../Quest/VrApi.h"

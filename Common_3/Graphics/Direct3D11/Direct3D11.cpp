@@ -26,20 +26,20 @@
  * This implementation retrofits the new low level interface to D3D11.
  * TODO: explain how GPU resource dependencies are handled...
  */
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef DIRECT3D11
 #define RENDERER_IMPLEMENTATION
 #define IID_ARGS IID_PPV_ARGS
 
-#include "../../OS/ThirdParty/OpenSource/winpixeventruntime/Include/WinPixEventRuntime/pix3.h"
+#include "WinPixEventRuntime/pix3.h"
 #include "tinyimageformat/tinyimageformat_apis.h"
 #include "tinyimageformat/tinyimageformat_base.h"
 #include "tinyimageformat/tinyimageformat_query.h"
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 #include "Forge/Graphics/TF_Graphics.h"
 

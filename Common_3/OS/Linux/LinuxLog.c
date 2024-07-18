@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifdef __linux__
 
@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "stdarg.h"
 

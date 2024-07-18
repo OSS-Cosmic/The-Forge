@@ -25,7 +25,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifndef __cplusplus
 #include <stdbool.h>

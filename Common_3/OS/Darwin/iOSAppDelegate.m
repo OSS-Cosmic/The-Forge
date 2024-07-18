@@ -24,9 +24,9 @@
 
 #import "iOSAppDelegate.h"
 
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
-#include "../../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 @interface GameController: NSObject
 - (void)draw;

@@ -15,9 +15,9 @@
 #pragma once
 
 #include "../../../../Utilities/Interfaces/ILog.h"
-#include "../../../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../../../Utilities/Math/MathTypes.h"
-#include "../../../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../../../Utilities/Interfaces/ILog.h"
 #include "../../../../Utilities/Math/MathTypes.h"

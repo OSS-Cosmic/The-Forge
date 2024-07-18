@@ -26,7 +26,7 @@
 
 #include "tinyimageformat/tinyimageformat_apis.h"
 
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 inline void vkCapsBuilder(GpuInfo* pGpu)
 {

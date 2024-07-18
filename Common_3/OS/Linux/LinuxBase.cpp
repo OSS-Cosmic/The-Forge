@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifdef __linux__
 
@@ -41,11 +41,11 @@
 #include "../../Application/Interfaces/IProfiler.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "Forge/Graphics/TF_Graphics.h"
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../../Utilities/Interfaces/ITime.h"
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #if defined(ENABLE_FORGE_REMOTE_UI)
 #include "../../Tools/Network/Network.h"
@@ -54,7 +54,7 @@
 #include "../../Tools/ReloadServer/ReloadClient.h"
 #endif
 #include "../../Utilities/Math/MathTypes.h"
-#include "../CPUConfig.h"
+#include "Common_3/OS/CPUConfig.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 

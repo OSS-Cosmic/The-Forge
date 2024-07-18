@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 struct UIComponent;
 

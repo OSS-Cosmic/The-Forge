@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 // interfaces
 #include <android/log.h>

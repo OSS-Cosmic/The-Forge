@@ -29,7 +29,7 @@
 #define AMD_TRESSFX_ASSET_H
 
 #include "../../../../../Utilities/Math/MathTypes.h"
-#include "../../../../../Utilities/Interfaces/IFileSystem.h"
+#include "../../../Common_3/Utilities/Interfaces/IFileSystem.h"
 
 #include "TressFXFileFormat.h"
 

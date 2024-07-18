@@ -1,19 +1,17 @@
 load("@prelude//python:toolchain.bzl", "PythonToolchainInfo")
 
 def _fsl_compile(ctx: AnalysisContext) -> list[Provider]:
-    script = ctx.actions.declare_output("fsl-script")
+    script = ctx.actions.declare_output("fsl-script.bat")
   
     python_toolchain = ctx.attrs._python_toolchain[PythonToolchainInfo]
-    script_cmds = cmd_args([
-        "#!/bin/sh",
-    ])
+    script_cmds = cmd_args([])
     
     shaders = ctx.actions.declare_output("Shaders", dir = True)
     shaders_compiled = ctx.actions.declare_output("CompiledShaders", dir = True)
     
     for src in ctx.attrs.srcs: 
       script_cmds.add(cmd_args([python_toolchain.interpreter, ctx.attrs._fsl_compiler,
-        "-l", "VULKAN",
+        "-l", "DIRECT3D12",
         "-d", cmd_args(shaders.as_output(), format = "{}"),
         "-b", cmd_args(shaders_compiled .as_output(), format = "{}"),
         "--compile", src 

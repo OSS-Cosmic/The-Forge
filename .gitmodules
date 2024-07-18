@@ -4,3 +4,12 @@
 [submodule "prelude"]
 	path = prelude
 	url = git@github.com:OSS-Cosmic/buck2-prelude.git
+[submodule "Shed/cpu_features"]
+	path = Shed/cpu_features
+	url = git@github.com:OSS-Cosmic/cpu_features.git
+[submodule "Shed/AGS_SDK"]
+	path = Shed/AGS_SDK
+	url = git@github.com:OSS-Cosmic/AGS_SDK.git
+[submodule "Samples/TFSamples-Media"]
+	path = Samples/TFSamples-Media
+	url = git@github.com:OSS-Cosmic/TFSamples-Media.git

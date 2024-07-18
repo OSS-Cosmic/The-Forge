@@ -29,9 +29,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 

@@ -11,7 +11,7 @@
  * This file is the core module for implementing the bstring functions.
  */
 
-#include "../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include "../Nothings/stb_ds.h"
 
@@ -48,7 +48,7 @@ bool gIsBstrlibTest = false;
 #include <limits.h>
 #include <stdbool.h>
 
-#include "bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../../Interfaces/ILog.h"
 #include "Forge/Core/Mem/TF_Memory.h"

@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "../Application/Config.h"
+#include "Forge/Config.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
 #include "../Resources/ResourceLoader/Interfaces/IResourceLoader.h"

@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef DIRECT3D12
 
@@ -39,7 +39,7 @@
 
 #define D3D12MA_IMPLEMENTATION
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "../ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
@@ -47,16 +47,16 @@
 #if defined(XBOX)
 #include <pix3.h>
 #else
-#include "../../OS/ThirdParty/OpenSource/winpixeventruntime/Include/WinPixEventRuntime/pix3.h"
+#include "WinPixEventRuntime/pix3.h"
 #endif
 
 #include "tinyimageformat/tinyimageformat_base.h"
 #include "tinyimageformat/tinyimageformat_query.h"
-#include "../ThirdParty/OpenSource/ags/AgsHelper.h"
-#include "../ThirdParty/OpenSource/nvapi/NvApiHelper.h"
+#include "Common_3/Graphics/AgsHelper.h"
+#include "Common_3/Graphics/NvApiHelper.h"
 #include "../ThirdParty/OpenSource/renderdoc/renderdoc_app.h"
 
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
 #include "../../Utilities/Math/AlgorithmsImpl.h"

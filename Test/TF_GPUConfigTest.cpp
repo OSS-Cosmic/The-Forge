@@ -1,5 +1,5 @@
 #include "TF_TestMain.h"
-#include "Common_3/Application/Config.h"
+#include "Forge/Config.h"
 #include "Forge/Core/TF_String.h"
 #include "Forge/Graphics/TF_GPUConfig.h"
 #include "utest.h"

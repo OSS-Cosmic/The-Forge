@@ -22,8 +22,8 @@
  * under the License.
  */
 
-#include "../../../OS/Interfaces/IOperatingSystem.h"
-#include "../../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
+#include "../Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../../Utilities/Interfaces/ILog.h"
 #include "../../../Utilities/Interfaces/IToolFileSystem.h"
 

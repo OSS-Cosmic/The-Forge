@@ -23,11 +23,26 @@
  */
 
 #pragma once
-#include "../Application/Config.h"
-
+#include "Forge/Config.h"
 #include <stdbool.h>
 
-#include "ThirdParty/OpenSource/cpu_features/src/cpu_features_types.h"
+#include "cpu_features_macros.h"
+#ifdef CPU_FEATURES_ARCH_AARCH64
+#include "cpuinfo_aarch64.h"
+#endif
+
+#ifdef CPU_FEATURES_ARCH_X86_64
+#include "cpuinfo_x86.h"
+#endif
+
+
+#if defined(__cplusplus)
+#define CPU_FEATURE_PREFIX cpu_features::
+#else
+#define CPU_FEATURE_PREFIX 
+#endif
+    
+
 
 typedef enum
 {
@@ -43,11 +58,15 @@ typedef struct
 {
     char          mName[512];
     SimdIntrinsic mSimd;
+#if defined(CPU_FEATURES_ARCH_AARCH64)
+    CPU_FEATURE_PREFIX Aarch64Features mFeaturesAarch64;
+#endif 
 
-    X86Features          mFeaturesX86;
-    X86Microarchitecture mArchitectureX86;
+#if defined(CPU_FEATURES_ARCH_X86_64)
+    CPU_FEATURE_PREFIX X86Features          mFeaturesX86;
+    CPU_FEATURE_PREFIX X86Microarchitecture mArchitectureX86;
+#endif
 
-    Aarch64Features mFeaturesAarch64;
 } CpuInfo;
 
 #if defined(ANDROID)

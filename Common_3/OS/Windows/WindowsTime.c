@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include <stdint.h>
 #include <time.h>

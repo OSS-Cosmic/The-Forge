@@ -23,16 +23,16 @@
  */
 
 #include "../../Application/Interfaces/IFont.h"
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
-#include "../../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 // include Fontstash (should be after MemoryTracking so that it also detects memory free/remove in fontstash)
 #define FONTSTASH_IMPLEMENTATION
 #include "tinyimageformat/tinyimageformat_query.h"
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "../ThirdParty/OpenSource/Fontstash/src/fontstash.h"
 
 #include "Forge/Graphics/TF_Graphics.h"

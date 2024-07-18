@@ -24,14 +24,14 @@
 
 #pragma once
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 struct Renderer;
 struct RenderTarget;
 struct Cmd;
 struct PipelineCache;
 
-#include "../../OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 class IMiddleware
 {

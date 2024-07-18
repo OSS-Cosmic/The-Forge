@@ -16,7 +16,7 @@
 #ifndef RMEM_RMEM_H
 #define RMEM_RMEM_H
 
-#include "../../../../../Application/Config.h"
+#include "Forge/Config.h"
 #include <stdint.h>
 
 /*--------------------------------------------------------------------------

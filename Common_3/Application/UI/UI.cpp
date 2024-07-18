@@ -30,7 +30,7 @@
 #include "../../Application/Interfaces/IInput.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "../../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
-#include "../../Utilities/Interfaces/IFileSystem.h"
+#include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 
 #include "../../Utilities/Math/Algorithms.h"
@@ -2506,8 +2506,8 @@ void uiNewFrame()
                                      width * height * 4, pPixelData);
         }
     }
-#endif
     pUserInterface->mDynamicTexturesCount = 0;
+#endif
     ImGui::NewFrame();
 }
 

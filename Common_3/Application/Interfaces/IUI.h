@@ -25,7 +25,7 @@
 #ifndef IUI_H
 #define IUI_H
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
 // SCRIPTED TESTING :
 // For now, if a script file with the name "Test.lua", exist in the script directory, will run once an execution.
@@ -37,7 +37,7 @@
 // To add global Lua functions, independent of Unit Tests, add definition in UIApp::Init (Check LOGINFO there for example).
 
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../Utilities/Math/MathTypes.h"
 

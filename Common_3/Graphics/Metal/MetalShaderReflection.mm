@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef METAL
 

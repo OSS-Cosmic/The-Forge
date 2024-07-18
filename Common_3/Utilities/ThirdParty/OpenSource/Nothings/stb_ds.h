@@ -308,7 +308,7 @@ CREDITS
 #ifndef INCLUDE_STB_DS_H
 #define INCLUDE_STB_DS_H
 
-#include "../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #define STB_DS_API FORGE_API
 

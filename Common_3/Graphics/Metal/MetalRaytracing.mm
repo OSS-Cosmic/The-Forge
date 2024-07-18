@@ -28,7 +28,7 @@
  Xcode 13.0+
  */
 
-#include "../../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef METAL
 

@@ -22,9 +22,9 @@
  * under the License.
  */
 
-#include "../../Application/Config.h"
+#include "Forge/Config.h"
 
-#include "../../OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #ifndef _THREAD_H_
 #define _THREAD_H_

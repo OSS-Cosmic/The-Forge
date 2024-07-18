@@ -435,6 +435,9 @@ class Transformations: public IApp
 public:
     bool Init()
     {
+        bstring command = bdynfromcstr("test");
+
+        bformat(&command, "this is some text %d", 10);
         // FILE PATHS
         fsSetPathForResourceDir(pSystemFileIO, RM_CONTENT, RD_SHADER_BINARIES, "CompiledShaders");
         fsSetPathForResourceDir(pSystemFileIO, RM_CONTENT, RD_TEXTURES, "Textures");
@@ -484,6 +487,7 @@ public:
         settings.pContext = pContext;
         settings.pSelectedDevice = selection.mDeviceAdapter;
         settings.mProperties = selection.mGpuProperty;
+        settings.mProperties.mPipelineStatsQueries = false;
         initRenderer(GetName(), &settings, &pRenderer);
 
         tfFreeGPUConfiguration(&def);

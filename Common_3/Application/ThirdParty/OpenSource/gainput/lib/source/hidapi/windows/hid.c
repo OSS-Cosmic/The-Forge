@@ -30,7 +30,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "../../../../../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #include <windows.h>
 

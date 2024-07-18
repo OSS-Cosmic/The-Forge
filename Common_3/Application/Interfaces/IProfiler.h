@@ -24,12 +24,12 @@
 
 #pragma once
 
-#include "../../OS/Interfaces/IOperatingSystem.h"
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
 #include "../../Utilities/Interfaces/IThread.h"
 #include "../Interfaces/IApp.h"
 
-#include "../../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 #include "../../Utilities/Math/MathTypes.h"
 
 typedef uint64_t ProfileToken;

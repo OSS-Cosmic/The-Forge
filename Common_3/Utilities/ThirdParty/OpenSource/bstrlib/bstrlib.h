@@ -18,7 +18,7 @@
 #ifndef BSTRLIB_INCLUDE
 #define BSTRLIB_INCLUDE
 
-#include "../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,14 +50,14 @@ extern "C" {
 
 #define BSTR_DYNAMIC_BIT (~INT_MAX)
 
-#ifdef ENABLE_MEMORY_TRACKING
-#define BSTR_STRINGIFY(x) #x
-#define BSTR_DECLARE_FN(ret, name, ...) ret name##Impl(const char* FILE_NAME, int FILE_LINE, const char* FUNCTION_NAME, const char* PARENT_FUNCTION_NAME OPT_COMMA_VA_ARGS(__VA_ARGS__))
-#define BSTR_CALL(fn, ...) fn##Impl(__FILE__, __LINE__, __FUNCTION__, BSTR_STRINGIFY(fn) OPT_COMMA_VA_ARGS(__VA_ARGS__))
-#else
+//#ifdef ENABLE_MEMORY_TRACKING
+//#define BSTR_STRINGIFY(x) #x
+//#define BSTR_DECLARE_FN(ret, name, ...) ret name##Impl(const char* FILE_NAME, int FILE_LINE, const char* FUNCTION_NAME, const char* PARENT_FUNCTION_NAME OPT_COMMA_VA_ARGS(__VA_ARGS__))
+//#define BSTR_CALL(fn, ...) fn##Impl(__FILE__, __LINE__, __FUNCTION__, BSTR_STRINGIFY(fn) OPT_COMMA_VA_ARGS(__VA_ARGS__))
+//#else
 #define BSTR_DECLARE_FN(ret, name, ...) ret name##Impl (__VA_ARGS__)
 #define BSTR_CALL(fn, ...) fn##Impl(__VA_ARGS__)
-#endif
+//#endif
 
 typedef struct bstring {
 	int mlen;

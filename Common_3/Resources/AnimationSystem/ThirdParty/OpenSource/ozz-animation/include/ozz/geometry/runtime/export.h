@@ -28,7 +28,7 @@
 #ifndef OZZ_OZZ_GEOMETRY_EXPORT_H_
 #define OZZ_OZZ_GEOMETRY_EXPORT_H_
 
-#include "../../../../../../../../Application/Config.h"
+#include "Forge/Config.h"
 
 #ifndef OZZ_GEOMETRY_DLL
 #define OZZ_GEOMETRY_DLL FORGE_API

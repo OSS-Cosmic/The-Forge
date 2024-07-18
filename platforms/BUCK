@@ -1,0 +1,24 @@
+load(":defs.bzl", "execution_platform", "host_configuration")
+oncall("build_infra")
+
+execution_platform(
+    name = "default",
+    cpu_configuration = host_configuration.cpu,
+    os_configuration = host_configuration.os,
+    use_windows_path_separators = host_info().os.is_windows,
+    visibility = ["PUBLIC"],
+)
+
+platform(
+    name = "windows_11_x86_64",
+    constraint_values = [
+        "config//os/constraints:windows",
+        "config//cpu/constraints:x86_64",
+        "tf_config//D3D12:supported",
+        "tf_config//D3D11:supported",
+        "tf_config//VULKAN:supported",
+        "tf_config//platform:windows_11",
+    ] + host_configuration.common_constraints,
+    visibility = ["PUBLIC"],
+)
+

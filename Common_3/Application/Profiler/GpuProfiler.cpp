@@ -26,7 +26,7 @@
 
 #include "../../Application/Interfaces/IProfiler.h"
 
-#include "../../Graphics/GraphicsConfig.h"
+#include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifndef ENABLE_GPU_PROFILER
 ProfileToken addGpuProfiler(Renderer* pRenderer, Queue* pQueue, const char* pName) { return PROFILE_INVALID_TOKEN; }
