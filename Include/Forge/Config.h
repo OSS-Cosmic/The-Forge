@@ -22,6 +22,8 @@
  * under the License.
  */
 #pragma once
+#ifndef TF_CONFIG_INCLUDE
+#define TF_CONFIG_INCLUDE
 
 // Support external config file override
 #if defined(EXTERNAL_CONFIG_FILEPATH)
@@ -282,7 +284,7 @@ COMPILE_ASSERT(sizeof(ssize_t) == sizeof(int64_t));
 // #define ENABLE_MATH_CHECKS // Enables low level math library debug checks like SIMD variable alignment checks
 //#define ENABLE_FORGE_SCRIPTING
 //#define ENABLE_FORGE_RELOAD_SHADER
-#define ENABLE_FORGE_UI
+//#define ENABLE_FORGE_UI
 #define ENABLE_FORGE_FONTS
 #define ENABLE_FORGE_INPUT
 #define ENABLE_FORGE_ANIMATION_DEBUG
@@ -397,7 +399,8 @@ COMPILE_ASSERT(sizeof(ssize_t) == sizeof(int64_t));
 //////////////////////////////////////////////
 #if defined(FORGE_DEBUG)
 #if defined(ANDROID) || defined(_WIN32) || defined(PROSPERO) || defined(XBOX) || defined(__APPLE__) || defined(ORBIS)
-#define ENABLE_FORGE_REMOTE_UI
+//#define ENABLE_FORGE_REMOTE_UI
 #endif
 #endif
 
+#endif

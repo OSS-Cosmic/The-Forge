@@ -641,7 +641,7 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
             {
                 tfstrcatfmt(&vendorBufStr, ", ");
             }
-            tfstrcatprintf(&vendorBufStr, "%#x", vendorDef->mIdentifierArray[identIdx]);
+tfstrcatprintf(&vendorBufStr, "%#x", vendorDef->mIdentifierArray[identIdx]);
         }
         LOGF(eINFO, vendorBufStr.buf);
     }

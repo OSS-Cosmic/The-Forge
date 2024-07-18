@@ -2506,8 +2506,8 @@ void uiNewFrame()
                                      width * height * 4, pPixelData);
         }
     }
-#endif
     pUserInterface->mDynamicTexturesCount = 0;
+#endif
     ImGui::NewFrame();
 }
 

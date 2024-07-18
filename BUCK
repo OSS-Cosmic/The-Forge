@@ -1,6 +1,8 @@
 load("@prelude//paths.bzl", "paths")
 load("@prelude//third-party:pkgconfig.bzl", "external_pkgconfig_library")
-load("//cfg:utils.bzl", "subpath_export_files")
+load("//cfg:utils.bzl", "subpath_export_files", "constraint_boolean")
+load("//cfg/configure_define:configure_define.bzl", "configure_define")
+
 
 export_file(
     name = "fsl",
@@ -29,6 +31,30 @@ subpath_export_files("Resources/GPUData", [
   "apple_gpu.data",
   "android_gpu.data"
 ])
+
+configure_define(
+  name = "TF_Config",
+  file = "Include/Forge/TF_Config.in",
+  out = "TF_Config.h",
+  variables = {
+    "LOG_LEVEL": read_config("tf", "log-level", "eAll")
+  },
+  feature = {
+      "ENABLE_MEMORY_TRACKING": read_config("tf", "memory-tracking", "0") == "1",
+      "FEATURE_D3D12": select({
+          "tf_config//D3D12:supported":True, 
+          "DEFAULT": False,
+      }),
+      "FEATURE_D3D11": select({
+          "tf_config//D3D11:supported":True, 
+          "DEFAULT": False,
+      }),
+      "FEATURE_VULKAN": select({
+          "tf_config//VULKAN:supported":True, 
+          "DEFAULT": False,
+      }),
+  }
+)
 
 external_pkgconfig_library(name = "gtk+-3.0")
 external_pkgconfig_library(name = "libudev")
@@ -130,50 +156,44 @@ cxx_library(
         ])
     }),
     deps = select({
-      "config//os:linux": [
+      "tf_config//platform:linux": [
         "//:gtk+-3.0",
         "//:libudev",
         "//:x11",
         "//:xrandr"],
-      "config//os:windows": [
+      "DEFAULT": [
       ]
     }),
     exported_preprocessor_flags = select({
-      "config//os:windows": [
+      "tf_config//platform:windows_11": [
         "-DD3D12_AGILITY_SDK=1",
         "-DD3D12_AGILITY_SDK_VERSION=611"
       ],
       "DEFAULT": []
     }),
-    #exported_linker_flags = select({
-    #    "config//os:linux": [],
-    #    "config//os:windows": [
-    #        "/VERBOSE",
-    #        "/LIBPATH:C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\",
-    #        "kernel32.lib",
-    #        "user32.lib",
-    #        "gdi32.lib",
-    #        "ole32.lib",
-    #        "oleaut32.lib",
-    #       
-    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\kernel32.Lib",
-    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\User32.Lib", 
-    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\gdi32.lib",
-    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\Ole32.lib",
-    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\OleAut32.lib",
-    #        #"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\Xinput.lib",
-    #    ]  
-    #}),
-
-    #exported_post_linker_flags = select({
-    #  "config//os:windows": [
-    #    "user32.lib"
-    #    #"$(location @prelude//toolchains/msvc:msvc_tools[cl.exe][json][LIB])"
-    #  ]
-    #}),
-    exported_deps =["//Shed:cpu_features", "//Shed:nvapi", "//Shed:ags"],
+    exported_linker_flags = select({
+      "tf_config//platform:windows_11": [
+        "kernel32.lib",
+        "user32.lib",
+        "gdi32.lib",
+        "winspool.lib",
+        "comdlg32.lib",
+        "advapi32.lib",
+        "shell32.lib",
+        "ole32.lib",
+        "oleaut32.lib",
+        "uuid.lib",
+        "odbc32.lib",
+        "odbccp32.lib",
+        "Xinput.lib"],
+      "DEFAULT": []
+    }),
+    exported_deps =["//Shed:cpu_features", "//Shed:nvapi", "//Shed:ags", "//Shed:DirectXCompiler", "//Shed:winpix"],
     link_style = "static",
-    exported_headers =
+    exported_headers = 
+      {
+        "Forge/TF_Config.h":":TF_Config" 
+      } |
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp","Common_3/Graphics/ThirdParty/OpenSource/volk/*.c" ]) } |
       { paths.relativize(file, "Include"): file for file in glob(["Include/**/*.h", "Include/**/*.hpp"]) } |  
       { paths.relativize(file, "External/VulkanSDK/include"): file for file in glob(["External/VulkanSDK/**/*.h"]) } | 

@@ -22,6 +22,7 @@ system_python_toolchain(
     visibility = ["PUBLIC"],
 )
 
+
 cxx_tools_info_toolchain(
     name = "cxx",
     cxx_tools_info = select({
@@ -41,25 +42,33 @@ cxx_tools_info_toolchain(
             "/EHsc",
             "/permissive-",
             "/TC",
+            "/Od"
         ],
     }), 
     cxx_flags = select({
         "config//os:linux": [],
         "config//os:windows": [   
-            "/std:c++14",
+            "/std:c++17",
             "/c",
             "/Z7",
             "/nologo",
             "/W3",
             "/WX-",
             "/diagnostics:column",
-            #"/D_CONSOLE",
-            #"/D_UNICODE",
+            "/D_CONSOLE",
+            "/D_UNICODE",
+            "/D_DEBUG",
             "/EHsc",
             #"/Zc:forScope",
             #"/Zc:inline",
             "/permissive-",
             "/TP",
+
+            # debug
+            "/Od",
+            "/D_DEBUG",
+            "/RTC1",
+            "/MDd",
         ]
     }),
     link_flags = select({
@@ -69,15 +78,6 @@ cxx_tools_info_toolchain(
             "/DEBUG",
             "/INCREMENTAL:NO",
             "/VERBOSE",
-          #C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\
-          "/LIBPATH:\\\'C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\\\\'",
-          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\Shell32.Lib",
-          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\kernel32.lib",
-          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\User32.Lib", 
-          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\gdi32.lib",
-          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\Ole32.lib",
-          "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\OleAut32.lib",
-          "Xinput.lib",
         ],
     }),
     visibility = ["PUBLIC"],

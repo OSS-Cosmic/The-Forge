@@ -39,7 +39,7 @@
 #import <simd/simd.h>
 
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
 #include "../../OS/Interfaces/IOperatingSystem.h"

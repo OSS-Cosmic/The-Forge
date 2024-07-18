@@ -12,6 +12,11 @@ package_app(
       {
           "GPUCfg/gpu.data": "//:pc_gpu.data",
           "GPUCfg/gpu.cfg": "//Samples/01_Transformations:gpu.cfg",
+
+          "amd_ags_x64.dll": "//Shed:amd_ags.dll",
+          "dxil.dll": "//Shed:dxil.dll",
+          "dxcompiler.dll": "//Shed:dxcompiler.dll",
+          "WinPixEventRuntime.dll": "//Shed:WinPixEventRuntime.dll",
       }
 ) 
 

@@ -1,3 +1,9 @@
+## Building
+
+```
+buck2 build --target-platforms //platforms:windows_11_x86_64 //Samples:01_Transformations
+```
+
 ## generate compile commands
 
 The Forge is a cross-platform rendering framework supporting

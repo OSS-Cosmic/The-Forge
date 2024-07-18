@@ -26,7 +26,7 @@
 #ifdef DIRECT3D11
 #include <d3dcompiler.h>
 
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../Utilities/Interfaces/ILog.h"
 #include "Forge/Graphics/TF_Graphics.h"

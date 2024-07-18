@@ -71,3 +71,61 @@ prebuilt_cxx_library(
     exported_headers  = { "amd_ags.h" : "AGS_SDK/ags_lib/inc/amd_ags.h"}, 
     visibility = ["PUBLIC"],
 )
+
+export_file(
+    name = "dxcompiler_lib",
+    src = "DirectXShaderCompiler/lib/x64/dxcompiler.lib",
+    out = "dxcompiler.lib",
+    visibility = ['PUBLIC']
+)
+
+prebuilt_cxx_library(
+    name = "DirectXCompiler",
+    header_namespace = "",
+    exported_linker_flags = ["$(location :dxcompiler_lib)"],
+    exported_headers  = { paths.basename(file): file for file in glob(["DirectXShaderCompiler/inc/*.h"])}, 
+    visibility = ["PUBLIC"],
+)
+
+export_file(
+    name = "pix_lib",
+    src = "winpixeventruntime/bin/WinPixEventRuntime.lib",
+    out = "WinPixEventRuntime.lib",
+    visibility = ['PUBLIC']
+)
+
+prebuilt_cxx_library(
+    name = "winpix",
+    header_namespace = "",
+    exported_linker_flags = ["$(location :pix_lib)"],
+    exported_headers  = { paths.relativize(file, "winpixeventruntime/Include"): file for file in glob(["winpixeventruntime/Include/WinPixEventRuntime/*.h"])}, 
+    visibility = ["PUBLIC"],
+)
+
+export_file(
+    name = "WinPixEventRuntime.dll",
+    src = "winpixeventruntime/bin/WinPixEventRuntime.dll",
+    out = "WinPixEventRuntime.dll",
+    visibility = ["PUBLIC"],
+)
+
+export_file(
+    name = "amd_ags.dll",
+    src = "AGS_SDK/ags_lib/lib/amd_ags_x64.dll",
+    out = "amd_ags_x64.dll",
+    visibility = ["PUBLIC"],
+)
+export_file(
+    name = "dxcompiler.dll",
+    src = "DirectXShaderCompiler/bin/x64/dxcompiler.dll",
+    out = "dxcompiler.dll",
+    visibility = ["PUBLIC"],
+)
+
+export_file(
+    name = "dxil.dll",
+    src = "DirectXShaderCompiler/bin/x64/dxil.dll",
+    out = "dxil.dll",
+    visibility = ["PUBLIC"],
+)
+

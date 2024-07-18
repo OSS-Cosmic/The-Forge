@@ -39,7 +39,7 @@
 
 #define D3D12MA_IMPLEMENTATION
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "../ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
@@ -47,7 +47,7 @@
 #if defined(XBOX)
 #include <pix3.h>
 #else
-#include "../../OS/ThirdParty/OpenSource/winpixeventruntime/Include/WinPixEventRuntime/pix3.h"
+#include "WinPixEventRuntime/pix3.h"
 #endif
 
 #include "tinyimageformat/tinyimageformat_base.h"

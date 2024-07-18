@@ -85,12 +85,12 @@ typedef uint64_t uint64;
 #include <stddef.h>
 #include <time.h>
 
-#if defined(FORGE_DEBUG) && (defined(_WINDOWS) || (defined(__linux__) && !defined(__ANDROID__)) || defined(__APPLE__))
-#define WINDOW_DETAILS 1
-#include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
-#else
+//#if defined(FORGE_DEBUG) && (defined(_WINDOWS) || (defined(__linux__) && !defined(__ANDROID__)) || defined(__APPLE__))
+//#define WINDOW_DETAILS 1
+//#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
+//#else
 #define WINDOW_DETAILS 0
-#endif
+//#endif
 
 #define IMEMORY_FROM_HEADER
 #include "Forge/Core/Mem/TF_Memory.h"
