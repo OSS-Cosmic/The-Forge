@@ -17,6 +17,8 @@ package_app(
           "dxil.dll": "//Shed:dxil.dll",
           "dxcompiler.dll": "//Shed:dxcompiler.dll",
           "WinPixEventRuntime.dll": "//Shed:WinPixEventRuntime.dll",
+          "D3D12Core.dll": "//Shed:D3D12Core.dll",
+          "d3d12SDKLayers.dll": "//Shed:d3d12SDKLayers.dll",
       }
 ) 
 

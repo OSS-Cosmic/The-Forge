@@ -110,6 +110,21 @@ export_file(
 )
 
 export_file(
+    name = "D3D12Core.dll",
+    src = "Direct3d12Agility/bin/x64/D3D12Core.dll",
+    out = "D3D12Core.dll",
+    visibility = ["PUBLIC"],
+)
+
+export_file(
+    name = "d3d12SDKLayers.dll",
+    src = "Direct3d12Agility/bin/x64/d3d12SDKLayers.dll",
+    out = "d3d12SDKLayers.dll",
+    visibility = ["PUBLIC"],
+)
+
+
+export_file(
     name = "amd_ags.dll",
     src = "AGS_SDK/ags_lib/lib/amd_ags_x64.dll",
     out = "amd_ags_x64.dll",

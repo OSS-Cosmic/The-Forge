@@ -9,6 +9,11 @@ def _fsl_compile(ctx: AnalysisContext) -> list[Provider]:
    shaders = ctx.actions.declare_output("Shaders", dir = True)
    shaders_compiled = ctx.actions.declare_output("CompiledShaders", dir = True)
 
+   if ctx.attrs._exec_os_type[OsLookup].platform == "windows": 
+      fxc = read_config("tf", "fxc", None)
+      if fxc:
+        script_cmds.add("set FSL_COMPILER_FXC={}".format(fxc)) 
+
    for src in ctx.attrs.srcs: 
       for api in (["DIRECT3D12"] if ctx.attrs.D3D12 else []) + (["DIRECT3D11"] if ctx.attrs.D3D11 else []) + (["VULKAN"] if ctx.attrs.VULKAN else []) :
           script_cmds.add(cmd_args([python_toolchain.interpreter, ctx.attrs._fsl_compiler,
