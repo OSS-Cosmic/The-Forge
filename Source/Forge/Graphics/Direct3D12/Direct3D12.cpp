@@ -38,9 +38,9 @@
 #include <Windows.h>
 
 #define D3D12MA_IMPLEMENTATION
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
-#include "../ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
 
@@ -54,19 +54,19 @@
 #include "tinyimageformat/tinyimageformat_query.h"
 #include "Common_3/Graphics/AgsHelper.h"
 #include "Common_3/Graphics/NvApiHelper.h"
-#include "../ThirdParty/OpenSource/renderdoc/renderdoc_app.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/renderdoc/renderdoc_app.h"
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Common_3/Utilities/Interfaces/ILog.h"
 
-#include "../../Utilities/Math/AlgorithmsImpl.h"
-#include "../../Utilities/Math/MathTypes.h"
+#include "Common_3/Utilities/Math/AlgorithmsImpl.h"
+#include "Common_3/Utilities/Math/MathTypes.h"
 
-#include "Direct3D12CapBuilder.h"
-#include "Direct3D12Hooks.h"
+#include "Forge/Graphics/Direct3D12/Direct3D12CapBuilder.h"
+#include "Forge/Graphics/Direct3D12/Direct3D12Hooks.h"
 
 #if defined(AUTOMATED_TESTING)
-#include "../../Application/Interfaces/IScreenshot.h"
+#include "Common_3/Application/Interfaces/IScreenshot.h"
 #endif
 
 #if !defined(_WINDOWS) && !defined(XBOX)

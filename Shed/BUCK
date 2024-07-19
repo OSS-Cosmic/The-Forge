@@ -80,6 +80,13 @@ export_file(
 )
 
 prebuilt_cxx_library(
+    name = "Direct3d12Agility",
+    header_namespace = "",
+    exported_headers  = { paths.basename(file): file for file in glob(["Direct3d12Agility/include/*.h"])}, 
+    visibility = ["PUBLIC"],
+)
+
+prebuilt_cxx_library(
     name = "DirectXCompiler",
     header_namespace = "",
     exported_linker_flags = ["$(location :dxcompiler_lib)"],
@@ -122,7 +129,6 @@ export_file(
     out = "d3d12SDKLayers.dll",
     visibility = ["PUBLIC"],
 )
-
 
 export_file(
     name = "amd_ags.dll",

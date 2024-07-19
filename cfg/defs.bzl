@@ -8,3 +8,7 @@
 #            result.append(api)
 #    return result
 
+def select_has(constraints: list[str]):
+  return select({
+        "DEFAULT": False,
+    } | { c: True for c in constraints})

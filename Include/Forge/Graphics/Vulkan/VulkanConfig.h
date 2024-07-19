@@ -45,8 +45,8 @@
 #else
 #endif
 
-#define VOLK_VULKAN_H_PATH "../VulkanSDK/include/vulkan/vulkan.h"
-#include "../ThirdParty/OpenSource/volk/volk.h"
+#define VOLK_VULKAN_H_PATH "vulkan/vulkan.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/volk/volk.h"
 
 // #define USE_EXTERNAL_MEMORY_EXTENSIONS
 #ifdef USE_EXTERNAL_MEMORY_EXTENSIONS

@@ -36,19 +36,19 @@
 #endif
 
 // OS
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Common_3/Utilities/Interfaces/ILog.h"
 
-#include "../../Utilities/Math/MathTypes.h"
+#include "Common_3/Utilities/Math/MathTypes.h"
 
 // Renderer
 #include "tinyimageformat/tinyimageformat_apis.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
-#include "../Interfaces/IRay.h"
+#include "Common_3/Graphics/Interfaces/IRay.h"
 
-#include "Direct3D12Hooks.h"
+#include "Forge/Graphics/Direct3D12/Direct3D12Hooks.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 

@@ -473,7 +473,7 @@ inline void STBDS_AssertKeySizesImpl(size_t realSize, size_t providedSize)
 
 #endif
 
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 #define STBDS_IF_MEM_TRACKING(...) __VA_ARGS__
 #else
 #define STBDS_IF_MEM_TRACKING(...)
@@ -874,7 +874,7 @@ size_t stbds_rehash_items;
 
 void *stbds_arrgrowf(void *a, size_t elemsize, size_t elemalign, size_t addlen, size_t min_cap STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -946,7 +946,7 @@ void *stbds_arrgrowf(void *a, size_t elemsize, size_t elemalign, size_t addlen, 
 
 void  stbds_arrfree_func(const void* a STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -1073,7 +1073,7 @@ static inline int STBDS_HM_CONST_BSTRING_default_storage_mode(void)
 
 static inline void STBDS_HM_BINARY_free_key(stbds_hash_index* table, const void* key, size_t keysize STBDS_FN_ALLOC_ARGS)
 {
-	#ifdef ENABLE_MEMORY_TRACKING
+	#ifdef TF_ENABLE_MEMORY_TRACKING
     UNREF_PARAM(PARENT_FUNCTION_NAME);
 	UNREF_PARAM(FUNCTION_NAME);
 	UNREF_PARAM(FILE_NAME);
@@ -1086,7 +1086,7 @@ static inline void STBDS_HM_BINARY_free_key(stbds_hash_index* table, const void*
 
 static inline void STBDS_HM_STRING_free_key(stbds_hash_index* table, const void* key, size_t keysize STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -1171,7 +1171,7 @@ static size_t stbds_log2(size_t slot_count)
 
 static stbds_hash_index *stbds_make_hash_index(size_t slot_count, stbds_hash_index *ot STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -1523,7 +1523,7 @@ static int stbds_is_key_equal(void *a, size_t elemsize, const void *key, size_t 
 
 void stbds_hmfree_func(const void *a, size_t elemsize STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -1658,7 +1658,7 @@ static char *stbds_strdup(char *str STBDS_FN_ALLOC_ARGS);
 
 void *stbds_hmput_key(void *a, size_t elemsize, size_t elemalign, const void *key, size_t keysize, int mode STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -1810,7 +1810,7 @@ void * stbds_shmode_func(size_t elemsize, size_t elemalign, int mode STBDS_FN_AL
 
 void * stbds_hmdel_key(void *a, size_t elemsize, const void *key, size_t keysize, size_t keyoffset, int mode STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -1889,7 +1889,7 @@ void * stbds_hmdel_key(void *a, size_t elemsize, const void *key, size_t keysize
 
 static char *stbds_strdup(char *str STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -1929,7 +1929,7 @@ inline static char* stbds_string_arena_offset(stbds_string_arena *a, size_t offs
 
 char *stbds_stralloc_func(stbds_string_arena *a, char *str STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -1990,7 +1990,7 @@ char *stbds_stralloc_func(stbds_string_arena *a, char *str STBDS_FN_ALLOC_ARGS)
 
 void stbds_strreset_func(stbds_string_arena *a STBDS_FN_ALLOC_ARGS)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[256];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);

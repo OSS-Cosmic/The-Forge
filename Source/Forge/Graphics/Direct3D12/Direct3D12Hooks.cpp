@@ -25,14 +25,11 @@
 
 #ifdef DIRECT3D12
 
-#include "../ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
-
-#include "../../../Common_3/Utilities/Math/MathTypes.h"
-
-#include "Direct3D12Hooks.h"
-
+#include "Common_3/Utilities/Math/MathTypes.h"
+#include "Forge/Graphics/Direct3D12/Direct3D12Hooks.h"
 #include "Forge/Core/Mem/TF_Memory.h"
 
 #ifndef SAFE_RELEASE

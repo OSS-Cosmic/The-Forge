@@ -22,15 +22,23 @@
  * under the License.
  */
 #pragma once
-#ifndef TF_CONFIG_INCLUDE
-#define TF_CONFIG_INCLUDE
+#ifndef TF_CONFIG_2_INCLUDE
+#define TF_CONFIG_2_INCLUDE
 
-#configure01 ENABLE_MEMORY_TRACKING
 
-#define DEFAULT_LOG_LEVEL ${LOG_LEVEL}
+#configure TF_DEBUG
 
-#configure01 FEATURE_D3D12 
-#configure01 FEATURE_D3D11
-#configure01 FEATURE_VULKAN
+// Targets
+#configure TF_TARGET_WIN11
+
+#if defined(TF_TARGET_WIN11)
+    #define TF_WINDOWS
+#endif
+
+#define TF_DEFAULT_LOG_LEVEL ${LOG_LEVEL}
+#configure TF_FEATURE_D3D12 
+#configure TF_FEATURE_D3D11
+#configure TF_FEATURE_VULKAN
+#configure TF_ENABLE_MEMORY_TRACKING
 
 #endif

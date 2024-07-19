@@ -59,7 +59,7 @@ bool gIsBstrlibTest = false;
 #include "memdbg.h"
 #endif
 
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 #undef BSTR_CALL
 #define BSTR_CALL(fn, ...) fn##Impl(FILE_NAME, FILE_LINE, FUNCTION_NAME, PARENT_FUNCTION_NAME, __VA_ARGS__)
 #define BSTR_CALL_NO_TRACKING(fn, ...) fn##Impl(__FILE__, __LINE__, __FUNCTION__, "", __VA_ARGS__)
@@ -196,7 +196,7 @@ BSTR_DECLARE_FN(bstring, bdynfromstr, const bstring* b1, int minCapacity)
  */
 BSTR_DECLARE_FN(int, bmakedynamic, bstring*  b, int len)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	char fnNameBuf[128];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -244,7 +244,7 @@ BSTR_DECLARE_FN(int, bmakedynamic, bstring*  b, int len)
  */
 BSTR_DECLARE_FN(int, bmakedynamicmin, bstring*  b, int len)
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[128];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -292,7 +292,7 @@ BSTR_DECLARE_FN(int, bmakedynamicmin, bstring*  b, int len)
  */
 BSTR_DECLARE_FN(int, balloc, bstring* b, int olen) 
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	char fnNameBuf[128];
 	int res = snprintf(fnNameBuf, 128, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
 	ASSERT(res < 128);
@@ -387,7 +387,7 @@ BSTR_DECLARE_FN(int, balloc, bstring* b, int olen)
  *      only if capacity is not sufficient
  */
 BSTR_DECLARE_FN(int, ballocmin, bstring*  b, int len) {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[128];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -701,7 +701,7 @@ BSTR_DECLARE_FN(int, bassignblk, bstring* a, const void* s, int len) {
  *  Truncate the bstring to at most n characters.
  */
 BSTR_DECLARE_FN(int, btrunc, bstring*  b, int n) {
-    #ifdef ENABLE_MEMORY_TRACKING
+	#ifdef TF_ENABLE_MEMORY_TRACKING
 	UNREF_PARAM(PARENT_FUNCTION_NAME);
 	UNREF_PARAM(FUNCTION_NAME);
 	UNREF_PARAM(FILE_NAME);
@@ -1225,7 +1225,7 @@ int bdelete(bstring* b, int pos, int len)
  */
 BSTR_DECLARE_FN(int, bdestroy, bstring* b) {
 
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[128];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -2023,7 +2023,7 @@ static BSTR_DECLARE_FN(int, findreplaceengine,
 	const bstring* repl, int pos,
     instr_fnptr instr) 
 {
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	unsigned char fnNameBuf[128];
 	bstring fnName = bemptyfromarr(fnNameBuf);
 	bformat(&fnName, "%s(propagated from %s)", FUNCTION_NAME, PARENT_FUNCTION_NAME);
@@ -2637,7 +2637,7 @@ static int bscb(void* parm, int ofs, int len)
  */
 BSTR_DECLARE_FN(bstring*, bsplit, const bstring* str, unsigned char splitChar)
 {
-	#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
     UNREF_PARAM(PARENT_FUNCTION_NAME);
 	UNREF_PARAM(FUNCTION_NAME);
 	UNREF_PARAM(FILE_NAME);
@@ -2676,7 +2676,7 @@ BSTR_DECLARE_FN(bstring*, bsplit, const bstring* str, unsigned char splitChar)
  */
 BSTR_DECLARE_FN(bstring*, bsplitstr, const bstring* str, const bstring* splitStr)
 {
-	#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
     UNREF_PARAM(PARENT_FUNCTION_NAME);
 	UNREF_PARAM(FUNCTION_NAME);
 	UNREF_PARAM(FILE_NAME);
@@ -2707,7 +2707,7 @@ BSTR_DECLARE_FN(bstring*, bsplitstr, const bstring* str, const bstring* splitStr
  */
 BSTR_DECLARE_FN(bstring*, bsplits, const bstring* str, const bstring* splitChars)
 {
-	#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
     UNREF_PARAM(PARENT_FUNCTION_NAME);
 	UNREF_PARAM(FUNCTION_NAME);
 	UNREF_PARAM(FILE_NAME);

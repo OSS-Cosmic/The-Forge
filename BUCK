@@ -2,7 +2,7 @@ load("@prelude//paths.bzl", "paths")
 load("@prelude//third-party:pkgconfig.bzl", "external_pkgconfig_library")
 load("//cfg:utils.bzl", "subpath_export_files", "constraint_boolean")
 load("//cfg/configure_define:configure_define.bzl", "configure_define")
-
+load("//cfg:defs.bzl", "select_has")
 
 export_file(
     name = "fsl",
@@ -40,20 +40,12 @@ configure_define(
     "LOG_LEVEL": read_config("tf", "log-level", "eAll")
   },
   feature = {
-      "ENABLE_MEMORY_TRACKING": read_config("tf", "memory-tracking", "0") == "1",
-      
-      "FEATURE_D3D12": select({
-          "tf_config//D3D12:supported":True, 
-          "DEFAULT": False,
-      }),
-      "FEATURE_D3D11": select({
-          "tf_config//D3D11:supported":True, 
-          "DEFAULT": False,
-      }),
-      "FEATURE_VULKAN": select({
-          "tf_config//VULKAN:supported":True, 
-          "DEFAULT": False,
-      }),
+      "TF_ENABLE_MEMORY_TRACKING": read_config("tf", "memory-tracking", "0") == "1",
+      "TF_FEATURE_D3D12": select_has(["tf_config//D3D12:supported"]),
+      "TF_FEATURE_D3D11": select_has(["tf_config//D3D11:supported"]),
+      "TF_FEATURE_VULKAN": select_has(["tf_config//VULKAN:supported"]),
+      "TF_TARGET_WIN11": select_has(["tf_config//target:win11"]),
+      "TF_DEBUG": select_has(["tf_config//build:debug"]),
   }
 )
 
@@ -134,19 +126,28 @@ cxx_library(
      "Common_3/Utilities/ThirdParty/OpenSource/zstd/compress/*.c",
      "Common_3/Utilities/ThirdParty/OpenSource/zstd/decompress/*.c"
   ]) + select({
-        "tf_config//platform:linux": glob([
+    "tf_config//D3D12:supported": glob([
+          "Source/Forge/Graphics/Direct3D12/*.cpp",
+    ]),
+    "DEFAULT": []
+  }) + select({
+    "tf_config//D3D12:supported": glob([
+          "Source/Forge/Graphics/Direct3D11/*.cpp",
+    ]),
+    "DEFAULT": []
+  }) + select({
+        "tf_config//target:linux": glob([
           "Common_3/Utilities/ThirdParty/OpenSource/zstd/decompress/huf_decompress_amd64.S",
           "Common_3/OS/Linux/*.cpp",
           "Common_3/OS/Linux/*.c",
           "Common_3/Utilities/FileSystem/UnixFileSystem.c",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/linux/*.c"
         ]),
-        "tf_config//platform:win11": glob([
+        "tf_config//target:win11": glob([
           "Common_3/OS/Windows/*.cpp",
           "Common_3/OS/Windows/*.c",
       
           "Common_3/Graphics/Direct3D11/*.cpp",
-          "Common_3/Graphics/Direct3D12/*.cpp",
 
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/windows/*.c",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp",
@@ -154,7 +155,7 @@ cxx_library(
         ])
     }),
     deps = select({
-      "tf_config//platform:linux": [
+      "tf_config//target:linux": [
         "//:gtk+-3.0",
         "//:libudev",
         "//:x11",
@@ -163,14 +164,14 @@ cxx_library(
       ]
     }),
     exported_preprocessor_flags = select({
-      "tf_config//platform:win11": [
+      "tf_config//target:win11": [
         "-DD3D12_AGILITY_SDK=1",
         "-DD3D12_AGILITY_SDK_VERSION=611"
       ],
       "DEFAULT": []
     }),
     exported_linker_flags = select({
-      "tf_config//platform:win11": [
+      "tf_config//target:win11": [
         "kernel32.lib",
         "user32.lib",
         "gdi32.lib",
@@ -187,15 +188,21 @@ cxx_library(
       "DEFAULT": []
     }),
     exported_deps = select({
-        "tf_config//platform:linux": [
+        "tf_config//target:linux": [
           "//Shed:cpu_features", 
         ],
-        "tf_config//platform:win11": [
+        "tf_config//target:win11": [
           "//Shed:cpu_features", 
           "//Shed:nvapi", 
           "//Shed:ags", 
           "//Shed:DirectXCompiler", 
-          "//Shed:winpix"]
+          "//Shed:winpix"
+        ]
+    }) + select({
+      "tf_config//D3D12:supported": [
+          "//Shed:Direct3d12Agility"
+      ],
+      "DEFAULT": []
     }),
     link_style = "static",
     exported_headers = 

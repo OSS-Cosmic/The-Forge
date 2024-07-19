@@ -25,14 +25,14 @@
 #include "Common_3/Graphics/GraphicsConfig.h"
 
 #ifdef DIRECT3D12
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Common_3/Utilities/Interfaces/ILog.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
 #if defined(XBOX)
 #include "../../../Xbox/Common_3/Graphics/Direct3D12/Direct3D12X.h"
 #else
-#include "../ThirdParty/OpenSource/Direct3d12Agility/include/d3d12shader.h"
-#include "../ThirdParty/OpenSource/DirectXShaderCompiler/inc/dxcapi.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/Direct3d12Agility/include/d3d12shader.h"
+#include "Common_3/Graphics/ThirdParty/OpenSource/DirectXShaderCompiler/inc/dxcapi.h"
 #endif
 
 #include "Forge/Core/Mem/TF_Memory.h"

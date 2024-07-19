@@ -25,6 +25,8 @@
 #ifndef TF_CONFIG_INCLUDE
 #define TF_CONFIG_INCLUDE
 
+#include "Forge/TF_Config.h"
+
 // Support external config file override
 #if defined(EXTERNAL_CONFIG_FILEPATH)
 #include EXTERNAL_CONFIG_FILEPATH
@@ -365,9 +367,6 @@ COMPILE_ASSERT(sizeof(ssize_t) == sizeof(int64_t));
 
 #define ENABLE_LOGGING
 #define DEFAULT_LOG_LEVEL eALL
-#if !defined(NDEBUG)
-#define ENABLE_MEMORY_TRACKING
-#endif
 // #define ENABLE_FORGE_STACKTRACE_DUMP
 
 #ifdef AUTOMATED_TESTING

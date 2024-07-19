@@ -69,7 +69,7 @@
 #define MTUNER_FREE(_handle, _ptr)
 #endif
 
-#if defined(ENABLE_MEMORY_TRACKING)
+#if defined(TF_ENABLE_MEMORY_TRACKING)
 
 #define _CRT_SECURE_NO_WARNINGS 1
 

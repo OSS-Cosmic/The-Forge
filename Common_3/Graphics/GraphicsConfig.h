@@ -43,32 +43,46 @@
 #else
 
 #include "Forge/Config.h"
+#include "Forge/TF_Config.h"
 
 // ------------------------------- renderer configuration ------------------------------- //
 
 // Comment/uncomment includes to disable/enable rendering APIs
-#if defined(_WINDOWS)
-#ifndef _WINDOWS7
-#include "Direct3D12/Direct3D12Config.h"
+#ifdef TF_FEATURE_D3D12
+    #include "Forge/Graphics/Direct3D12/Direct3D12Config.h"
 #endif
-#include "Direct3D11/Direct3D11Config.h"
-#include "Vulkan/VulkanConfig.h"
-#elif defined(XBOX)
-#include "Direct3D12/Direct3D12Config.h"
-#elif defined(__APPLE__)
-#include "Metal/MetalConfig.h"
-#elif defined(__ANDROID__)
-#ifndef QUEST_VR
-#include "OpenGLES/GLESConfig.h"
+
+#ifdef TF_FEATURE_D3D11
+    #include "Forge/Graphics/Direct3D11/Direct3D11Config.h"
 #endif
-#ifdef ARCH_ARM64
-#include "Vulkan/VulkanConfig.h"
+
+#ifdef TF_FEATURE_VULKAN
+    #include "Forge/Graphics/Vulkan/VulkanConfig.h"
 #endif
-#elif defined(NX64)
-#include "Vulkan/VulkanConfig.h"
-#elif defined(__linux__)
-#include "Vulkan/VulkanConfig.h"
-#endif
+
+
+// #if defined(_WINDOWS)
+// #ifndef _WINDOWS7
+// #include "Direct3D12/Direct3D12Config.h"
+// #endif
+// #include "Direct3D11/Direct3D11Config.h"
+// #include "Forge/Graphics/Vulkan/VulkanConfig.h"
+// #elif defined(XBOX)
+// #include "Direct3D12/Direct3D12Config.h"
+// #elif defined(__APPLE__)
+// #include "Metal/MetalConfig.h"
+// #elif defined(__ANDROID__)
+// #ifndef QUEST_VR
+// #include "OpenGLES/GLESConfig.h"
+// #endif
+// #ifdef ARCH_ARM64
+// #include "Forge/Graphics/Vulkan/VulkanConfig.h"
+// #endif
+// #elif defined(NX64)
+// #include "Forge/Graphics/Vulkan/VulkanConfig.h"
+// #elif defined(__linux__)
+// #include "Forge/Graphics/Vulkan/VulkanConfig.h"
+// #endif
 
 // Uncomment this macro to define custom rendering max options
 // #define RENDERER_CUSTOM_MAX

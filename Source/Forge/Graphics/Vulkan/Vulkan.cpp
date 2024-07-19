@@ -76,7 +76,7 @@
 #include "Common_3/Utilities/Math/AlgorithmsImpl.h"
 #include "Common_3/Utilities/Threading/Atomics.h"
 
-#include "Common_3/Graphics/Vulkan/VulkanCapsBuilder.h"
+#include "Forge/Graphics/Vulkan/VulkanCapsBuilder.h"
 
 #if defined(VK_USE_DISPATCH_TABLES)
 #include "Common_3/Graphics/ThirdParty/OpenSource/volk/volkForgeExt.h"

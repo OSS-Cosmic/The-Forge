@@ -36,16 +36,16 @@
 #include "tinyimageformat/tinyimageformat_apis.h"
 #include "tinyimageformat/tinyimageformat_base.h"
 #include "tinyimageformat/tinyimageformat_query.h"
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Common_3/Utilities/Interfaces/ILog.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
-#include "../../Utilities/RingBuffer.h"
+#include "Common_3/Utilities/RingBuffer.h"
 
-#include "Direct3D11CapBuilder.h"
+#include "Forge/Graphics/Direct3D11/Direct3D11CapBuilder.h"
 
 // #include "../../ThirdParty/OpenSource/gpudetect/include/GpuDetectHelper.h"
 

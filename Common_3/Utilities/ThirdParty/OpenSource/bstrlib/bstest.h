@@ -3973,7 +3973,7 @@ int ret = 0;
 //}
 
 
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	typedef int(*bfindreplaceImplSignature)(const char*, int, const char*, const char*, bstring* b0, const bstring* find, const bstring* replace, int pos);
 #else
 	typedef int(*bfindreplaceImplSignature)(bstring* b0, const bstring* find, const bstring* replace, int pos);
@@ -3988,7 +3988,7 @@ static int test31_0x1 (bfindreplaceImplSignature fn, const char* fnName,
 	else if (b0)
 		copy = *b0;
 
-#ifdef ENABLE_MEMORY_TRACKING
+#ifdef TF_ENABLE_MEMORY_TRACKING
 	rv = fn(__FILE__, __LINE__, __FUNCTION__, "", b0, find, replace, pos);
 #else
 	rv = fn(b0, find, replace, pos);
