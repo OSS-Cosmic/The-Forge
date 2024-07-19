@@ -1,16 +1,17 @@
 constraint_setting(
-    name = "toolchain",
+    name = "build",
     visibility = ["PUBLIC"],
 )
 
 constraint_value(
-    name = "msvc",
-    constraint_setting = ":toolchain",
+    name = "debug",
+    constraint_setting = ":build",
     visibility = ["PUBLIC"],
 )
 
 constraint_value(
-    name = "clang",
-    constraint_setting = ":toolchain",
+    name = "release",
+    constraint_setting = ":build",
     visibility = ["PUBLIC"],
 )
+

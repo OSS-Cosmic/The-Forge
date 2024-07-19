@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Common_3/Graphics/GraphicsConfig.h"
-#include "../../../../Utilities/Interfaces/IThread.h"
+#include "Forge/Core/TF_Thread.h"
 
 #define D3D12MA_D3D12_HEADERS_ALREADY_INCLUDED
 #if defined(XBOX)

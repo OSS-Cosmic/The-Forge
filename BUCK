@@ -1,6 +1,6 @@
 load("@prelude//paths.bzl", "paths")
 load("@prelude//third-party:pkgconfig.bzl", "external_pkgconfig_library")
-load("//cfg:utils.bzl", "subpath_export_files", "constraint_boolean")
+load("//cfg:utils.bzl", "subpath_ref_export_files", "constraint_boolean")
 load("//cfg/configure_define:configure_define.bzl", "configure_define")
 load("//cfg:defs.bzl", "select_has")
 
@@ -25,7 +25,7 @@ export_file(
     visibility = ['PUBLIC']
 )
 
-subpath_export_files("Resources/GPUData", [
+subpath_ref_export_files("Resources/GPUData", [
   "pc_gpu.data",
   "steamdeck_gpu.data",
   "apple_gpu.data",

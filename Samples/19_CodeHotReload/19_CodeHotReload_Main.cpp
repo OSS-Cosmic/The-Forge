@@ -36,7 +36,7 @@
 #include "../../../../Common_3/Game/Interfaces/IScripting.h"
 #include "../../../../Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../../../Common_3/Utilities/Interfaces/ILog.h"
-#include "../../../../Common_3/Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Time.h"
 
 // Renderer
 #include "Forge/Graphics/TF_Graphics.h"

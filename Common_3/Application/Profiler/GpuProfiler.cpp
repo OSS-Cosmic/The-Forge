@@ -49,7 +49,7 @@ void         removeGpuProfiler(ProfileToken nProfileToken) {}
 #include "Forge/Graphics/TF_Graphics.h"
 #include "../../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../../Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Time.h"
 
 #include "ProfilerBase.h"
 

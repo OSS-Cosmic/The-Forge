@@ -26,7 +26,7 @@
 #include "../../../Common_3/Application/Interfaces/IProfiler.h"
 #include "Forge/Graphics/TF_Graphics.h"
 #include "../../../Common_3/Utilities/Interfaces/ILog.h"
-#include "../../../Common_3/Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Time.h"
 #include "../Interfaces/IVisibilityBuffer.h"
 
 #include "../../../Common_3/Utilities/RingBuffer.h"

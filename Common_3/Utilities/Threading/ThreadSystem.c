@@ -27,8 +27,8 @@
 #include "../ThirdParty/OpenSource/Nothings/stb_ds.h"
 
 #include "../Interfaces/ILog.h"
-#include "../Interfaces/IThread.h"
-#include "../Interfaces/ITime.h"
+#include "Forge/Core/TF_Thread.h"
+#include "Forge/Core/TF_Time.h"
 
 #include "Atomics.h"
 

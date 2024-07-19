@@ -254,7 +254,7 @@ struct PhysicalDevice;
 
 #else
 
-#include "../../Utilities/Interfaces/IThread.h"
+#include "Forge/Core/TF_Thread.h"
 
 #include "../../Utilities/Threading/Atomics.h"
 #ifndef PROFILE_API

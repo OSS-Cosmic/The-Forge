@@ -35,7 +35,7 @@
 #include "../../../../Common_3/Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "../../../../Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../../../Common_3/Utilities/Interfaces/ILog.h"
-#include "../../../../Common_3/Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Time.h"
 
 #include "../../../../Common_3/Utilities/RingBuffer.h"
 #include "../../../../Common_3/Utilities/Threading/ThreadSystem.h"

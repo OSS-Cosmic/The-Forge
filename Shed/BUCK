@@ -1,4 +1,6 @@
 load("@prelude//paths.bzl", "paths")
+load("//cfg:utils.bzl", "export_resources")
+
 cxx_library(
     name = "cpu_features",
     srcs = select({
@@ -42,17 +44,25 @@ cxx_library(
     visibility = ["PUBLIC"],
 )
 
+cxx_library(
+    name = "spirv-cross",
+    srcs = glob([
+        "SPIRV-Cross/*.cpp"
+    ])
+)
+
 export_file(
-    name = "nvapi_lib",
+    name = "nvapi64.lib",
     src = "nvapi/amd64/nvapi64.lib",
     out = "nvapi64.lib",
     visibility = ['PUBLIC']
 )
 
+
 prebuilt_cxx_library(
     name = "nvapi",
     header_namespace = "",
-    exported_linker_flags = ["$(location :nvapi_lib)"],
+    exported_linker_flags = ["$(location :nvapi64.lib)"],
     exported_headers  = { paths.relativize(file, "nvapi"): file for file in glob(["nvapi/*.h"])}, 
     visibility = ["PUBLIC"],
 )
@@ -72,12 +82,6 @@ prebuilt_cxx_library(
     visibility = ["PUBLIC"],
 )
 
-export_file(
-    name = "dxcompiler_lib",
-    src = "DirectXShaderCompiler/lib/x64/dxcompiler.lib",
-    out = "dxcompiler.lib",
-    visibility = ['PUBLIC']
-)
 
 prebuilt_cxx_library(
     name = "Direct3d12Agility",
@@ -85,17 +89,24 @@ prebuilt_cxx_library(
     exported_headers  = { paths.basename(file): file for file in glob(["Direct3d12Agility/include/*.h"])}, 
     visibility = ["PUBLIC"],
 )
+export_file(
+    name = "dxcompiler.lib",
+    src = "DirectXShaderCompiler/lib/x64/dxcompiler.lib",
+    out = "dxcompiler.lib",
+    visibility = ['PUBLIC']
+)
+
 
 prebuilt_cxx_library(
     name = "DirectXCompiler",
     header_namespace = "",
-    exported_linker_flags = ["$(location :dxcompiler_lib)"],
+    exported_linker_flags = ["$(location :dxcompiler.lib)"],
     exported_headers  = { paths.basename(file): file for file in glob(["DirectXShaderCompiler/inc/*.h"])}, 
     visibility = ["PUBLIC"],
 )
 
 export_file(
-    name = "pix_lib",
+    name = "WinPixEventRuntime.lib",
     src = "winpixeventruntime/bin/WinPixEventRuntime.lib",
     out = "WinPixEventRuntime.lib",
     visibility = ['PUBLIC']
@@ -104,49 +115,17 @@ export_file(
 prebuilt_cxx_library(
     name = "winpix",
     header_namespace = "",
-    exported_linker_flags = ["$(location :pix_lib)"],
+    exported_linker_flags = ["$(location :WinPixEventRuntime.lib)"],
     exported_headers  = { paths.relativize(file, "winpixeventruntime/Include"): file for file in glob(["winpixeventruntime/Include/WinPixEventRuntime/*.h"])}, 
     visibility = ["PUBLIC"],
 )
 
-export_file(
-    name = "WinPixEventRuntime.dll",
-    src = "winpixeventruntime/bin/WinPixEventRuntime.dll",
-    out = "WinPixEventRuntime.dll",
-    visibility = ["PUBLIC"],
-)
 
-export_file(
-    name = "D3D12Core.dll",
-    src = "Direct3d12Agility/bin/x64/D3D12Core.dll",
-    out = "D3D12Core.dll",
-    visibility = ["PUBLIC"],
-)
-
-export_file(
-    name = "d3d12SDKLayers.dll",
-    src = "Direct3d12Agility/bin/x64/d3d12SDKLayers.dll",
-    out = "d3d12SDKLayers.dll",
-    visibility = ["PUBLIC"],
-)
-
-export_file(
-    name = "amd_ags.dll",
-    src = "AGS_SDK/ags_lib/lib/amd_ags_x64.dll",
-    out = "amd_ags_x64.dll",
-    visibility = ["PUBLIC"],
-)
-export_file(
-    name = "dxcompiler.dll",
-    src = "DirectXShaderCompiler/bin/x64/dxcompiler.dll",
-    out = "dxcompiler.dll",
-    visibility = ["PUBLIC"],
-)
-
-export_file(
-    name = "dxil.dll",
-    src = "DirectXShaderCompiler/bin/x64/dxil.dll",
-    out = "dxil.dll",
-    visibility = ["PUBLIC"],
-)
-
+export_resources({
+    "dxil.dll": "DirectXShaderCompiler/bin/x64/dxil.dll",
+    "dxcompiler.dll": "DirectXShaderCompiler/bin/x64/dxcompiler.dll",
+    "amd_ags_x64.dll": "AGS_SDK/ags_lib/lib/amd_ags_x64.dll",
+    "d3d12SDKLayers.dll": "Direct3d12Agility/bin/x64/d3d12SDKLayers.dll",
+    "D3D12Core.dll": "Direct3d12Agility/bin/x64/D3D12Core.dll",
+    "WinPixEventRuntime.dll": "winpixeventruntime/bin/WinPixEventRuntime.dll",
+})

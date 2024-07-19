@@ -37,7 +37,7 @@ typedef unsigned long ThreadID;
 #include <pthread.h>
 #if !defined(NX64)
 #if !defined(__APPLE__) || defined(TARGET_IOS)
-typedef uint32_t       ThreadID;
+typedef uint32_t ThreadID;
 #endif
 #define THREAD_ID_MAX UINT32_MAX
 #define THREAD_ID_MIN ((uint32_t)0)
@@ -79,7 +79,7 @@ extern "C"
      * Notes:
      *   CallOnceGuard has to be a pointer to a global variable initialized with INIT_CALL_ONCE_GUARD
      */
-    void callOnce(CallOnceGuard* pGuard, CallOnceFn pFn);
+    void         callOnce(CallOnceGuard* pGuard, CallOnceFn pFn);
 
     /// Operating system mutual exclusion primitive.
     typedef struct Mutex
@@ -87,8 +87,8 @@ extern "C"
 #if defined(_WINDOWS) || defined(XBOX)
         CRITICAL_SECTION mHandle;
 #elif defined(NX64)
-    MutexTypeNX             mMutexPlatformNX;
-    uint32_t                mSpinCount;
+    MutexTypeNX mMutexPlatformNX;
+    uint32_t    mSpinCount;
 #else
     pthread_mutex_t pHandle;
     uint32_t        mSpinCount;
@@ -111,7 +111,7 @@ extern "C"
 #elif defined(NX64)
     ConditionVariableTypeNX mCondPlatformNX;
 #else
-    pthread_cond_t  pHandle;
+    pthread_cond_t pHandle;
 #endif
     } ConditionVariable;
 
@@ -155,7 +155,7 @@ extern "C"
 #if defined(_WINDOWS) || defined(XBOX)
     typedef void* ThreadHandle;
 #elif !defined(NX64)
-typedef pthread_t ThreadHandle;
+    typedef pthread_t ThreadHandle;
 #endif
 
     FORGE_API bool initThread(ThreadDesc* pItem, ThreadHandle* pHandle);

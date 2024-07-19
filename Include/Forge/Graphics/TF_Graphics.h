@@ -33,7 +33,7 @@
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "Common_3/Utilities/Interfaces/ILog.h"
-#include "Common_3/Utilities/Interfaces/IThread.h"
+#include "Forge/Core/TF_Thread.h"
 
 #ifdef __cplusplus
 #ifndef MAKE_ENUM_FLAG

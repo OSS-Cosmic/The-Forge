@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "../../Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Time.h"
 
 /************************************************************************/
 // Time Related Functions

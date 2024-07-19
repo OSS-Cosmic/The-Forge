@@ -28,8 +28,8 @@
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../../Utilities/Interfaces/IThread.h"
-#include "../../Utilities/Interfaces/ITime.h"
+#include"Forge/Core/TF_Thread.h"
+#include "Forge/Core/TF_Time.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 

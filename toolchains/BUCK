@@ -25,13 +25,12 @@ system_python_toolchain(
 cxx_tools_info_toolchain(
     name = "cxx",
     cxx_tools_info = select({
-        "tf_config//toolchain:clang": ":clang_tools",
-        "tf_config//toolchain:msvc": ":msvc_tools",
+        "config//os:linux": ":clang_tools",
+        "config//os:windows": ":msvc_tools",
     }),  
     c_flags = select({
-        "tf_config//toolchain:clang": [],
-        #Copied from the C++ flags
-        "tf_config//toolchain:msvc": [
+        "config//os:linux": [],
+        "config//os:windows": [
             "/c",
             "/Z7",
             "/nologo",
@@ -45,8 +44,8 @@ cxx_tools_info_toolchain(
         ],
     }), 
     cxx_flags = select({
-        "tf_config//toolchain:clang": [],
-        "tf_config//toolchain:msvc": [   
+        "config//os:linux": [],
+        "config//os:windows": [   
             "/std:c++17",
             "/c",
             "/Z7",
@@ -79,8 +78,8 @@ cxx_tools_info_toolchain(
         })
     }),
     link_flags = select({
-        "tf_config//toolchain:clang": [],
-        "tf_config//toolchain:msvc": [
+        "config//os:linux": [],
+        "config//os:windows": [
            "/NOLOGO",
             "/DEBUG",
             "/INCREMENTAL:NO",

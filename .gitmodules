@@ -19,3 +19,6 @@
 [submodule "Shed/VulkanMemoryAllocator"]
 	path = Shed/VulkanMemoryAllocator
 	url = git@github.com:OSS-Cosmic/VulkanMemoryAllocator.git
+[submodule "Shed/SPIRV-Cross"]
+	path = Shed/SPIRV-Cross
+	url = git@github.com:OSS-Cosmic/SPIRV-Cross.git

@@ -28,8 +28,8 @@
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../../Utilities/Interfaces/IThread.h"
-#include "../../Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Thread.h"
+#include "Forge/Core/TF_Time.h"
 
 #include "../../Utilities/Threading/Atomics.h"
 #include "../../Utilities/Threading/ThreadSystem.h"

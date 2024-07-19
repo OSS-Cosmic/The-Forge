@@ -43,8 +43,8 @@
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../../Utilities/Interfaces/IThread.h"
-#include "../../Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Thread.h"
+#include "Forge/Core/TF_Time.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "Common_3/OS/CPUConfig.h"

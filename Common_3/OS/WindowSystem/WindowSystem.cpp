@@ -29,7 +29,7 @@
 #include "../../Application/Interfaces/IScreenshot.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
-#include "../../Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Time.h"
 
 static WindowDesc*  pWindowRef = NULL;
 static UIComponent* pWindowControlsComponent = NULL;

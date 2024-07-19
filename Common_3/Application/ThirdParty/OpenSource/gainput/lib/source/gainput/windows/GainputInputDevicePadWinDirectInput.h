@@ -10,7 +10,7 @@
 #pragma comment(lib, "Hid.lib")
 
 #include "../../../../../../../../../Common_3/Utilities/Interfaces/ILog.h"
-#include "../../../../../../../../../Common_3/Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Time.h"
 
 #include "../pad/GainputControllerDb.h"
 

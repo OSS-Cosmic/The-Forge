@@ -37,8 +37,8 @@
 #include "../../../../Common_3/Renderer/Interfaces/IVisibilityBuffer.h"
 #include "../../../../Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../../../Common_3/Utilities/Interfaces/ILog.h"
-#include "../../../../Common_3/Utilities/Interfaces/IThread.h"
-#include "../../../../Common_3/Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Thread.h"
+#include "Forge/Core/TF_Time.h"
 
 #include "../../../../Common_3/Resources/AnimationSystem/Animation/AnimatedObject.h"
 #include "../../../../Common_3/Resources/AnimationSystem/Animation/Animation.h"

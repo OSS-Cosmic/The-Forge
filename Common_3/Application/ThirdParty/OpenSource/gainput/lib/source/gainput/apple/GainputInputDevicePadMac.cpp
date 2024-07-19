@@ -14,7 +14,7 @@
 #import <IOKit/hid/IOHIDManager.h>
 #import <IOKit/hid/IOHIDUsageTables.h>
 
-#include "../../../../../../../../Utilities/Interfaces/IThread.h"
+#include "Forge/Core/TF_Thread.h"
 
 
 namespace gainput

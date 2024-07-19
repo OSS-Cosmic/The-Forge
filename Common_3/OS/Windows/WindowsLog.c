@@ -31,7 +31,7 @@
 // interfaces
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../../Utilities/Interfaces/ILog.h"
-#include "../../Utilities/Interfaces/IThread.h"
+#include "Forge/Core/TF_Thread.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 

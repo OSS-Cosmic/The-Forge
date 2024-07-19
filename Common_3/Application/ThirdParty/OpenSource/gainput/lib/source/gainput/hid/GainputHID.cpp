@@ -6,7 +6,7 @@
 #include "../../hidapi/hidapi.h"
 #include "../../../include/gainput/gainput.h"
 #include "Common_3/Utilities/Interfaces/ILog.h"
-#include "Common_3/Utilities/Interfaces/ITime.h"
+#include "Forge/Core/TF_Time.h"
 
 #include "hidparsers/HIDParserPS4Controller.h"
 #include "hidparsers/HIDParserPS5Controller.h"

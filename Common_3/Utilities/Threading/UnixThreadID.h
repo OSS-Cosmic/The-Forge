@@ -30,7 +30,7 @@
 #include <stdlib.h>
 
 #include "../Interfaces/ILog.h"
-#include "../Interfaces/IThread.h"
+#include "Forge/Core/TF_Thread.h"
 
 #include "Atomics.h"
 
