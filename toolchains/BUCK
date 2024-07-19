@@ -22,17 +22,16 @@ system_python_toolchain(
     visibility = ["PUBLIC"],
 )
 
-
 cxx_tools_info_toolchain(
     name = "cxx",
     cxx_tools_info = select({
-        "config//os:linux": ":clang_tools",
-        "config//os:windows": ":msvc_tools",
+        "tf_config//toolchain:clang": ":clang_tools",
+        "tf_config//toolchain:msvc": ":msvc_tools",
     }),  
     c_flags = select({
-        "config//os:linux": [],
+        "tf_config//toolchain:clang": [],
         #Copied from the C++ flags
-        "config//os:windows": [
+        "tf_config//toolchain:msvc": [
             "/c",
             "/Z7",
             "/nologo",
@@ -46,8 +45,8 @@ cxx_tools_info_toolchain(
         ],
     }), 
     cxx_flags = select({
-        "config//os:linux": [],
-        "config//os:windows": [   
+        "tf_config//toolchain:clang": [],
+        "tf_config//toolchain:msvc": [   
             "/std:c++17",
             "/c",
             "/Z7",
@@ -59,26 +58,41 @@ cxx_tools_info_toolchain(
             "/D_UNICODE",
             "/D_DEBUG",
             "/EHsc",
-            #"/Zc:forScope",
-            #"/Zc:inline",
             "/permissive-",
             "/TP",
 
-            # debug
+        ] + select({
+          "tf_config//build:debug": [
             "/Od",
             "/D_DEBUG",
             "/RTC1",
             "/MDd",
-        ]
+          ],
+          "tf_config//build:release": [
+             "/O2",
+              "/Oi",
+              "/GL",
+              "/DNDEBUG",
+              "/MD",
+              "/Gy",
+          ]
+        })
     }),
     link_flags = select({
-        "config//os:linux": [],
-        "config//os:windows": [
-            "/NOLOGO",
+        "tf_config//toolchain:clang": [],
+        "tf_config//toolchain:msvc": [
+           "/NOLOGO",
             "/DEBUG",
             "/INCREMENTAL:NO",
-            "/VERBOSE",
-        ],
+        ] + select({
+          "tf_config//build:debug": [
+          ],
+          "tf_config//build:release": [
+             "/OPT:REF",
+             "/OPT:ICF",
+             "/LTCG",
+          ]
+        }),
     }),
     visibility = ["PUBLIC"],
 )

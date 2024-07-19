@@ -1,17 +1,16 @@
 constraint_setting(
-    name = "platform",
+    name = "toolchain",
     visibility = ["PUBLIC"],
 )
 
 constraint_value(
-    name = "win11",
-    constraint_setting = ":platform",
+    name = "msvc",
+    constraint_setting = ":toolchain",
     visibility = ["PUBLIC"],
 )
 
 constraint_value(
-    name = "linux",
-    constraint_setting = ":platform",
+    name = "clang",
+    constraint_setting = ":toolchain",
     visibility = ["PUBLIC"],
 )
-

@@ -41,6 +41,7 @@ configure_define(
   },
   feature = {
       "ENABLE_MEMORY_TRACKING": read_config("tf", "memory-tracking", "0") == "1",
+      
       "FEATURE_D3D12": select({
           "tf_config//D3D12:supported":True, 
           "DEFAULT": False,
@@ -133,17 +134,14 @@ cxx_library(
      "Common_3/Utilities/ThirdParty/OpenSource/zstd/compress/*.c",
      "Common_3/Utilities/ThirdParty/OpenSource/zstd/decompress/*.c"
   ]) + select({
-        "config//os:macos": [
-
-        ],
-        "config//os:linux": glob([
+        "tf_config//platform:linux": glob([
           "Common_3/Utilities/ThirdParty/OpenSource/zstd/decompress/huf_decompress_amd64.S",
           "Common_3/OS/Linux/*.cpp",
           "Common_3/OS/Linux/*.c",
           "Common_3/Utilities/FileSystem/UnixFileSystem.c",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/hidapi/linux/*.c"
         ]),
-        "config//os:windows": glob([
+        "tf_config//platform:win11": glob([
           "Common_3/OS/Windows/*.cpp",
           "Common_3/OS/Windows/*.c",
       
@@ -165,14 +163,14 @@ cxx_library(
       ]
     }),
     exported_preprocessor_flags = select({
-      "tf_config//platform:windows_11": [
+      "tf_config//platform:win11": [
         "-DD3D12_AGILITY_SDK=1",
         "-DD3D12_AGILITY_SDK_VERSION=611"
       ],
       "DEFAULT": []
     }),
     exported_linker_flags = select({
-      "tf_config//platform:windows_11": [
+      "tf_config//platform:win11": [
         "kernel32.lib",
         "user32.lib",
         "gdi32.lib",
@@ -188,7 +186,17 @@ cxx_library(
         "Xinput.lib"],
       "DEFAULT": []
     }),
-    exported_deps =["//Shed:cpu_features", "//Shed:nvapi", "//Shed:ags", "//Shed:DirectXCompiler", "//Shed:winpix"],
+    exported_deps = select({
+        "tf_config//platform:linux": [
+          "//Shed:cpu_features", 
+        ],
+        "tf_config//platform:win11": [
+          "//Shed:cpu_features", 
+          "//Shed:nvapi", 
+          "//Shed:ags", 
+          "//Shed:DirectXCompiler", 
+          "//Shed:winpix"]
+    }),
     link_style = "static",
     exported_headers = 
       {

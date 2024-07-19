@@ -17,8 +17,21 @@ platform(
         "tf_config//D3D12:supported",
         "tf_config//D3D11:supported",
         "tf_config//VULKAN:supported",
-        "tf_config//platform:windows_11",
+        "tf_config//platform:win11",
+        "tf_config//toolchain:msvc",
     ] + host_configuration.common_constraints,
     visibility = ["PUBLIC"],
 )
 
+platform(
+    name = "windows_11_edge_x86_64",
+    constraint_values = [
+        "config//os/constraints:windows",
+        "config//cpu/constraints:x86_64",
+        "tf_config//D3D12:supported",
+        "tf_config//VULKAN:supported",
+        "tf_config//platform:win11",
+        "tf_config//toolchain:msvc",
+    ] + host_configuration.common_constraints,
+    visibility = ["PUBLIC"],
+)
