@@ -10,9 +10,6 @@
 [submodule "Shed/AGS_SDK"]
 	path = Shed/AGS_SDK
 	url = git@github.com:OSS-Cosmic/AGS_SDK.git
-[submodule "Samples/TFSamples-Media"]
-	path = Samples/TFSamples-Media
-	url = git@github.com:OSS-Cosmic/TFSamples-Media.git
 [submodule "Shed/D3D12MemoryAllocator"]
 	path = Shed/D3D12MemoryAllocator
 	url = git@github.com:OSS-Cosmic/D3D12MemoryAllocator.git

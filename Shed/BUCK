@@ -1,5 +1,5 @@
 load("@prelude//paths.bzl", "paths")
-load("//cfg:utils.bzl", "export_resources")
+load("@tf//cfg:utils.bzl", "export_resources")
 
 cxx_library(
     name = "cpu_features",
@@ -61,6 +61,7 @@ export_file(
 
 prebuilt_cxx_library(
     name = "nvapi",
+    target_compatible_with = ["tf_config//target:win11"],
     header_namespace = "",
     exported_linker_flags = ["$(location :nvapi64.lib)"],
     exported_headers  = { paths.relativize(file, "nvapi"): file for file in glob(["nvapi/*.h"])}, 
@@ -69,6 +70,7 @@ prebuilt_cxx_library(
 
 export_file(
     name = "ags_lib",
+    target_compatible_with = ["tf_config//target:win11"],
     src = "AGS_SDK/ags_lib/lib/amd_ags_x64.lib",
     out = "amd_ags_x64.lib",
     visibility = ['PUBLIC']
@@ -76,6 +78,7 @@ export_file(
 
 prebuilt_cxx_library(
     name = "ags",
+    target_compatible_with = ["tf_config//target:win11"],
     header_namespace = "",
     exported_linker_flags  = ["$(location :ags_lib)"],
     exported_headers  = { "amd_ags.h" : "AGS_SDK/ags_lib/inc/amd_ags.h"}, 
@@ -85,6 +88,7 @@ prebuilt_cxx_library(
 
 prebuilt_cxx_library(
     name = "Direct3d12Agility",
+    target_compatible_with = ["tf_config//target:win11"],
     header_namespace = "",
     exported_headers  = { paths.basename(file): file for file in glob(["Direct3d12Agility/include/*.h"])}, 
     visibility = ["PUBLIC"],
@@ -99,6 +103,7 @@ export_file(
 
 prebuilt_cxx_library(
     name = "DirectXCompiler",
+    target_compatible_with = ["tf_config//target:win11"],
     header_namespace = "",
     exported_linker_flags = ["$(location :dxcompiler.lib)"],
     exported_headers  = { paths.basename(file): file for file in glob(["DirectXShaderCompiler/inc/*.h"])}, 
@@ -114,6 +119,7 @@ export_file(
 
 prebuilt_cxx_library(
     name = "winpix",
+    target_compatible_with = ["tf_config//target:win11"],
     header_namespace = "",
     exported_linker_flags = ["$(location :WinPixEventRuntime.lib)"],
     exported_headers  = { paths.relativize(file, "winpixeventruntime/Include"): file for file in glob(["winpixeventruntime/Include/WinPixEventRuntime/*.h"])}, 

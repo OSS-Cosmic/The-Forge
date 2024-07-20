@@ -28,8 +28,22 @@ platform(
         "config//os/constraints:windows",
         "config//cpu/constraints:x86_64",
         "tf_config//D3D12:supported",
+        "tf_config//D3D11:disabled",
         "tf_config//VULKAN:supported",
         "tf_config//target:win11",
+    ] + host_configuration.common_constraints,
+    visibility = ["PUBLIC"],
+)
+
+platform(
+    name = "linux_x86_64",
+    constraint_values = [
+        "config//os/constraints:linux",
+        "config//cpu/constraints:x86_64",
+        "tf_config//D3D12:disabled",
+        "tf_config//D3D11:disabled",
+        "tf_config//VULKAN:supported",
+        "tf_config//target:linux",
     ] + host_configuration.common_constraints,
     visibility = ["PUBLIC"],
 )

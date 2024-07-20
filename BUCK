@@ -1,8 +1,8 @@
 load("@prelude//paths.bzl", "paths")
 load("@prelude//third-party:pkgconfig.bzl", "external_pkgconfig_library")
-load("//cfg:utils.bzl", "subpath_ref_export_files", "constraint_boolean")
-load("//cfg/configure_define:configure_define.bzl", "configure_define")
-load("//cfg:defs.bzl", "select_has")
+load("@tf//cfg:utils.bzl", "subpath_ref_export_files", "constraint_boolean")
+load("@tf//cfg/configure_define:configure_define.bzl", "configure_define")
+load("@tf//cfg:defs.bzl", "select_has")
 
 export_file(
     name = "fsl",
@@ -156,10 +156,10 @@ cxx_library(
     }),
     deps = select({
       "tf_config//target:linux": [
-        "//:gtk+-3.0",
-        "//:libudev",
-        "//:x11",
-        "//:xrandr"],
+        ":gtk+-3.0",
+        ":libudev",
+        ":x11",
+        ":xrandr"],
       "DEFAULT": [
       ]
     }),
@@ -189,18 +189,18 @@ cxx_library(
     }),
     exported_deps = select({
         "tf_config//target:linux": [
-          "//Shed:cpu_features", 
+          "@tf//Shed:cpu_features", 
         ],
         "tf_config//target:win11": [
-          "//Shed:cpu_features", 
-          "//Shed:nvapi", 
-          "//Shed:ags", 
-          "//Shed:DirectXCompiler", 
-          "//Shed:winpix"
+          "@tf//Shed:cpu_features", 
+          "@tf//Shed:nvapi", 
+          "@tf//Shed:ags", 
+          "@tf//Shed:DirectXCompiler", 
+          "@tf//Shed:winpix"
         ]
     }) + select({
       "tf_config//D3D12:supported": [
-          "//Shed:Direct3d12Agility"
+          "@tf//Shed:Direct3d12Agility"
       ],
       "DEFAULT": []
     }),
