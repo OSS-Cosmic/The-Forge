@@ -19,3 +19,18 @@
 [submodule "Shed/SPIRV-Cross"]
 	path = Shed/SPIRV-Cross
 	url = git@github.com:OSS-Cosmic/SPIRV-Cross.git
+[submodule "Forge/3rdparty/Vulkan-Headers"]
+	path = Forge/3rdparty/Vulkan-Headers
+	url = git@github.com:OSS-Cosmic/Vulkan-Headers.git
+[submodule "Forge/3rdparty/D3D12MemoryAllocator"]
+	path = Forge/3rdparty/D3D12MemoryAllocator
+	url = git@github.com:OSS-Cosmic/D3D12MemoryAllocator.git
+[submodule "Forge/3rdparty/cpu_features"]
+	path = Forge/3rdparty/cpu_features
+	url = git@github.com:OSS-Cosmic/cpu_features.git
+[submodule "Forge/3rdparty/VulkanMemoryAllocator"]
+	path = Forge/3rdparty/VulkanMemoryAllocator
+	url = git@github.com:OSS-Cosmic/VulkanMemoryAllocator.git
+[submodule "Forge/3rdparty/AGS_SDK"]
+	path = Forge/3rdparty/AGS_SDK
+	url = git@github.com:OSS-Cosmic/AGS_SDK.git

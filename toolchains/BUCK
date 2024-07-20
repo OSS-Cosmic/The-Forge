@@ -61,13 +61,13 @@ cxx_tools_info_toolchain(
             "/TP",
 
         ] + select({
-          "tf_config//build:debug": [
+          "tf_platform//build:debug": [
             "/Od",
             "/D_DEBUG",
             "/RTC1",
             "/MDd",
           ],
-          "tf_config//build:release": [
+          "tf_platform//build:release": [
              "/O2",
               "/Oi",
               "/GL",
@@ -84,9 +84,9 @@ cxx_tools_info_toolchain(
             "/DEBUG",
             "/INCREMENTAL:NO",
         ] + select({
-          "tf_config//build:debug": [
+          "tf_platform//build:debug": [
           ],
-          "tf_config//build:release": [
+          "tf_platform//build:release": [
              "/OPT:REF",
              "/OPT:ICF",
              "/LTCG",

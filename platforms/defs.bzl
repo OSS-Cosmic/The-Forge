@@ -56,9 +56,9 @@ def _common_constraints() -> list[str]:
     cfg = []
     build_type = read_config("tf", "build", "debug")
     if build_type == "debug":
-        cfg.append("tf_config//build:debug")
+        cfg.append("tf_platform//build:debug")
     elif build_type == "release":
-        cfg.append("tf_config//build:release")
+        cfg.append("tf_platform//build:release")
     else:
         fail("unhandled build type `{}`.\n".format(build_type))
     return cfg

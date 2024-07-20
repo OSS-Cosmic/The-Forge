@@ -1,0 +1,17 @@
+constraint_setting(
+    name = "platform",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "win11",
+    constraint_setting = ":platform",
+    visibility = ["PUBLIC"],
+)
+
+constraint_value(
+    name = "linux",
+    constraint_setting = ":platform",
+    visibility = ["PUBLIC"],
+)
+

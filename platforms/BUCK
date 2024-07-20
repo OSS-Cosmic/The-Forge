@@ -14,10 +14,10 @@ platform(
     constraint_values = [
         "config//os/constraints:windows",
         "config//cpu/constraints:x86_64",
-        "tf_config//D3D12:supported",
-        "tf_config//D3D11:supported",
-        "tf_config//VULKAN:supported",
-        "tf_config//target:win11",
+        "tf_platform//D3D12:supported",
+        "tf_platform//D3D11:supported",
+        "tf_platform//VULKAN:supported",
+        "tf_platform//target:win11",
     ] + host_configuration.common_constraints,
     visibility = ["PUBLIC"],
 )
@@ -27,10 +27,10 @@ platform(
     constraint_values = [
         "config//os/constraints:windows",
         "config//cpu/constraints:x86_64",
-        "tf_config//D3D12:supported",
-        "tf_config//D3D11:disabled",
-        "tf_config//VULKAN:supported",
-        "tf_config//target:win11",
+        "tf_platform//D3D12:supported",
+        "tf_platform//D3D11:disabled",
+        "tf_platform//VULKAN:supported",
+        "tf_platform//target:win11",
     ] + host_configuration.common_constraints,
     visibility = ["PUBLIC"],
 )
@@ -40,10 +40,10 @@ platform(
     constraint_values = [
         "config//os/constraints:linux",
         "config//cpu/constraints:x86_64",
-        "tf_config//D3D12:disabled",
-        "tf_config//D3D11:disabled",
-        "tf_config//VULKAN:supported",
-        "tf_config//target:linux",
+        "tf_platform//D3D12:disabled",
+        "tf_platform//D3D11:disabled",
+        "tf_platform//VULKAN:supported",
+        "tf_platform//target:linux",
     ] + host_configuration.common_constraints,
     visibility = ["PUBLIC"],
 )
