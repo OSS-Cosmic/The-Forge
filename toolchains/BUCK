@@ -1,0 +1,107 @@
+load("@prelude//toolchains:genrule.bzl", "system_genrule_toolchain")
+load("@prelude//toolchains:python.bzl", "system_python_bootstrap_toolchain", "system_python_toolchain")
+load("@prelude//toolchains/msvc:tools.bzl", "find_msvc_tools")
+load("@prelude//toolchains/cxx/clang:tools.bzl", "path_clang_tools")
+load("@prelude//toolchains:cxx.bzl", "cxx_tools_info_toolchain")
+
+
+find_msvc_tools(
+    name = "msvc_tools",
+    target_compatible_with = ["config//os:windows"],
+    visibility = ["PUBLIC"],
+)
+
+path_clang_tools(
+    name = "clang_tools",
+    target_compatible_with = ["config//os:linux"],
+    visibility = ["PUBLIC"],
+)
+
+system_python_toolchain(
+    name = "python",
+    visibility = ["PUBLIC"],
+)
+
+cxx_tools_info_toolchain(
+    name = "cxx",
+    cxx_tools_info = select({
+        "config//os:linux": ":clang_tools",
+        "config//os:windows": ":msvc_tools",
+    }),  
+    c_flags = select({
+        "config//os:linux": [],
+        "config//os:windows": [
+            "/c",
+            "/Z7",
+            "/nologo",
+            "/W3",
+            "/WX-",
+            "/diagnostics:column",
+            "/EHsc",
+            "/permissive-",
+            "/TC",
+            "/Od"
+        ],
+    }), 
+    cxx_flags = select({
+        "config//os:linux": [],
+        "config//os:windows": [   
+            "/std:c++17",
+            "/c",
+            "/Z7",
+            "/nologo",
+            "/W3",
+            "/WX-",
+            "/diagnostics:column",
+            "/D_CONSOLE",
+            "/D_UNICODE",
+            "/D_DEBUG",
+            "/EHsc",
+            "/permissive-",
+            "/TP",
+
+        ] + select({
+          "tf_platform//build:debug": [
+            "/Od",
+            "/D_DEBUG",
+            "/RTC1",
+            "/MDd",
+          ],
+          "tf_platform//build:release": [
+             "/O2",
+              "/Oi",
+              "/GL",
+              "/DNDEBUG",
+              "/MD",
+              "/Gy",
+          ]
+        })
+    }),
+    link_flags = select({
+        "config//os:linux": [],
+        "config//os:windows": [
+           "/NOLOGO",
+            "/DEBUG",
+            "/INCREMENTAL:NO",
+        ] + select({
+          "tf_platform//build:debug": [
+          ],
+          "tf_platform//build:release": [
+             "/OPT:REF",
+             "/OPT:ICF",
+             "/LTCG",
+          ]
+        }),
+    }),
+    visibility = ["PUBLIC"],
+)
+
+system_genrule_toolchain(
+    name = "genrule",
+    visibility = ["PUBLIC"],
+)
+
+system_python_bootstrap_toolchain(
+    name = "python_bootstrap",
+    visibility = ["PUBLIC"],
+)

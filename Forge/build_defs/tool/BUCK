@@ -1,0 +1,6 @@
+python_bootstrap_binary(
+    name = "configure_define",
+    main = "configure_define.py",
+    visibility = ["PUBLIC"],
+)
+

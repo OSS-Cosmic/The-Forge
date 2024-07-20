@@ -1,0 +1,51 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+#
+# This source code is licensed under both the MIT license found in the
+# LICENSE-MIT file in the root directory of this source tree and the Apache
+# License, Version 2.0 found in the LICENSE-APACHE file in the root directory
+# of this source tree.
+load(
+    "@prelude//cxx:comp_db.bzl",
+    "CxxCompilationDbInfo",
+)
+load("@prelude//:paths.bzl", "paths")
+load("@prelude//paths.bzl", "paths")
+
+def _gen_compile_command(ctx: BxlContext) -> None:
+    target_filter = ctx.cli_args.targets or "..."
+    targets = ctx.configured_targets(target_filter, target_platform = ctx.cli_args.platform)
+
+    entries = [] 
+    infos = {}
+    
+    for target in targets:
+        providers = ctx.analysis(target).providers()
+        compile_db_info = providers.get(CxxCompilationDbInfo)
+        if compile_db_info != None:
+            infos |= compile_db_info.info
+    for key in infos:
+        cmd_entry = infos[key]
+        entry = {}
+        entry["directory"] = ctx.cli_args.base_dir 
+        entry["file"] = cmd_entry.src.short_path
+        cxx = cmd_entry.cxx_compile_cmd
+        if cxx:
+            entry["command"] = cmd_args(cxx.base_compile_cmd, cxx.argsfile.input_args[0], cmd_entry.args, delimiter = " ")
+
+        entries.append(entry)
+   
+    actions = ctx.bxl_actions(target_platform = ctx.cli_args.platform).actions
+    db_artifact = actions.write_json("compile_commands.json", entries)
+    db_artifact_ensured = ctx.output.ensure(db_artifact)
+    ctx.output.print(db_artifact_ensured)
+
+
+gen_compile_command = bxl_main(
+    impl = _gen_compile_command,
+    cli_args = {
+        "base_dir": cli_args.option(cli_args.string()),
+        "targets": cli_args.option(cli_args.target_expr()),
+        "platform": cli_args.option(cli_args.target_label())
+    },
+)
+

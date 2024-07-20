@@ -1,6 +1,36 @@
-[submodule "TFSamples"]
-	path = TFSamples
-	url = git@github.com:OSS-Cosmic/TFSamples.git
 [submodule "External/Vulkan-Headers"]
 	path = External/Vulkan-Headers
 	url = git@github.com:OSS-Cosmic/Vulkan-Headers.git
+[submodule "prelude"]
+	path = prelude
+	url = git@github.com:OSS-Cosmic/buck2-prelude.git
+[submodule "Shed/cpu_features"]
+	path = Shed/cpu_features
+	url = git@github.com:OSS-Cosmic/cpu_features.git
+[submodule "Shed/AGS_SDK"]
+	path = Shed/AGS_SDK
+	url = git@github.com:OSS-Cosmic/AGS_SDK.git
+[submodule "Shed/D3D12MemoryAllocator"]
+	path = Shed/D3D12MemoryAllocator
+	url = git@github.com:OSS-Cosmic/D3D12MemoryAllocator.git
+[submodule "Shed/VulkanMemoryAllocator"]
+	path = Shed/VulkanMemoryAllocator
+	url = git@github.com:OSS-Cosmic/VulkanMemoryAllocator.git
+[submodule "Shed/SPIRV-Cross"]
+	path = Shed/SPIRV-Cross
+	url = git@github.com:OSS-Cosmic/SPIRV-Cross.git
+[submodule "Forge/3rdparty/Vulkan-Headers"]
+	path = Forge/3rdparty/Vulkan-Headers
+	url = git@github.com:OSS-Cosmic/Vulkan-Headers.git
+[submodule "Forge/3rdparty/D3D12MemoryAllocator"]
+	path = Forge/3rdparty/D3D12MemoryAllocator
+	url = git@github.com:OSS-Cosmic/D3D12MemoryAllocator.git
+[submodule "Forge/3rdparty/cpu_features"]
+	path = Forge/3rdparty/cpu_features
+	url = git@github.com:OSS-Cosmic/cpu_features.git
+[submodule "Forge/3rdparty/VulkanMemoryAllocator"]
+	path = Forge/3rdparty/VulkanMemoryAllocator
+	url = git@github.com:OSS-Cosmic/VulkanMemoryAllocator.git
+[submodule "Forge/3rdparty/AGS_SDK"]
+	path = Forge/3rdparty/AGS_SDK
+	url = git@github.com:OSS-Cosmic/AGS_SDK.git
