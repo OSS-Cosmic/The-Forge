@@ -1,14 +1,29 @@
 load("@prelude//paths.bzl", "paths")
 load("@tf//:defs.bzl", "export_resources")
 
+
+cxx_library(
+    name = "vulkan-header",
+    header_namespace = "",
+    exported_headers = { paths.relativize(file, "Vulkan-Headers/include"): file for file in glob(["Vulkan-Headers/include/**/*.h"])},
+    visibility = ["PUBLIC"],
+)
+
 cxx_library(
     name = "cpu_features",
-    srcs = select({
+    srcs =  [
+        "cpu_features/src/hwcaps.c",
+        "cpu_features/src/hwcaps_freebsd.c",
+        "cpu_features/src/hwcaps_linux_or_android.c",
+        "cpu_features/src/stack_line_reader.c",
+        "cpu_features/src/string_view.c",
+        "cpu_features/src/filesystem.c"
+    ] + select({
         "config//cpu:x86_64": [
-            "cpu_features/src/impl_x86_freebsd.c",
             "cpu_features/src/impl_x86_linux_or_android.c",
             "cpu_features/src/impl_x86_macos.c",
             "cpu_features/src/impl_x86_windows.c",
+            "cpu_features/src/impl_x86_freebsd.c",
         ],
         "config//cpu:arm32": ["cpu_features/src/impl_arm_linux_or_android.c"],
         "config//cpu:arm64": [
@@ -22,14 +37,7 @@ cxx_library(
         #PLATFORM_CPU_PPC: ["src/impl_ppc_linux.c"],
         #PLATFORM_CPU_RISCV32: ["src/impl_riscv_linux.c"],
         #PLATFORM_CPU_RISCV64: ["src/impl_riscv_linux.c"],
-    }) + [
-        "cpu_features/src/hwcaps.c",
-        "cpu_features/src/hwcaps_freebsd.c",
-        "cpu_features/src/hwcaps_linux_or_android.c",
-        "cpu_features/src/stack_line_reader.c",
-        "cpu_features/src/string_view.c",
-        "cpu_features/src/filesystem.c"
-    ],
+    }),
     link_style = "static",
     header_namespace = "",
     preprocessor_flags = select({
@@ -44,12 +52,6 @@ cxx_library(
     visibility = ["PUBLIC"],
 )
 
-cxx_library(
-    name = "vulkan-header",
-    header_namespace = "",
-    exported_headers = { paths.relativize(file, "Vulkan-Headers/include"): file for file in glob(["Vulkan-Headers/include/**/*.h"])},
-    visibility = ["PUBLIC"],
-)
 
 cxx_library(
     name = "stb",

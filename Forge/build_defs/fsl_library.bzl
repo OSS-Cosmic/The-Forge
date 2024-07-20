@@ -21,8 +21,7 @@ def _fsl_library(ctx: AnalysisContext) -> list[Provider]:
             "-d", cmd_args(shaders.as_output(), format = "{}"),
             "-b", cmd_args(shaders_compiled .as_output(), format = "{}"),
             "--compile", src,
-            "|| exit /b !ERRORLEVEL!"
-          ], delimiter = " "))
+          ] + (["|| exit /b !ERRORLEVEL!"] if (ctx.attrs._exec_os_type[OsLookup].platform == "windows") else []), delimiter = " "))
 
    if ctx.attrs._exec_os_type[OsLookup].platform == "windows":
       shim, _ = ctx.actions.write(
