@@ -21,10 +21,11 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-#include "volk.h"
-#include "volkForgeExt.h"
+#include "volk/volk.h"
 
 #if defined(VK_USE_DISPATCH_TABLES)
+#include "VulkanDispatchTable.h"
+
 extern VkLayerInstanceDispatchTable gExternInstanceDispatchTable;
 extern VkLayerDispatchTable gExternDeviceDispatchTable;
 extern VkInstance pExternVkInstance;
@@ -770,3 +771,4 @@ VkResult volkInitializeWithDispatchTables(Renderer* pRenderer)
 #endif
 
 #endif
+

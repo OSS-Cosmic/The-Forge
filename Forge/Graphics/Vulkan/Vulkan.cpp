@@ -79,7 +79,7 @@
 #include "Forge/Graphics/Vulkan/VulkanCapsBuilder.h"
 
 #if defined(VK_USE_DISPATCH_TABLES)
-#include "Common_3/Graphics/ThirdParty/OpenSource/volk/volkForgeExt.h"
+#include "Forge/Graphics/Vulkan/VulkanDispatchTable.h"
 #endif
 
 #if defined(QUEST_VR)
@@ -4038,7 +4038,7 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
         }
 
         VmaVulkanFunctions vulkanFunctions = {};
-        vulkanFunctions.vkGetInstanceProcAddr = _vkGetInstanceProcAddr;
+        vulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
         vulkanFunctions.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
         vulkanFunctions.vkAllocateMemory = vkAllocateMemory;
         vulkanFunctions.vkBindBufferMemory = vkBindBufferMemory;
@@ -10360,8 +10360,8 @@ void exitVulkanRendererContext(RendererContext* pContext)
     
 }
 
-#include "Common_3/Graphics/ThirdParty/OpenSource/volk/volk.c"
+#include "Forge/Graphics/Vulkan/volk/volk.c"
 #if defined(VK_USE_DISPATCH_TABLES)
-#include "Common_3/Graphics/ThirdParty/OpenSource/volk/volkForgeExt.c"
+#include "Forge/Graphics/Vulkan/VulkanDispatchTable.inl"
 #endif
 #endif

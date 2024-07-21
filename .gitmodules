@@ -43,3 +43,9 @@
 [submodule "Forge/3rdparty/glslang"]
 	path = Forge/3rdparty/glslang
 	url = git@github.com:OSS-Cosmic/glslang.git
+[submodule "Forge/3rdparty/PixEvents"]
+	path = Forge/3rdparty/PixEvents
+	url = git@github.com:OSS-Cosmic/PixEvents.git
+[submodule "Forge/Graphics/Vulkan/volk"]
+	path = Forge/Graphics/Vulkan/volk
+	url = git@github.com:OSS-Cosmic/volk.git
