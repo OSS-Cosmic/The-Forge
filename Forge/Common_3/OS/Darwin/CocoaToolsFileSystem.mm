@@ -24,7 +24,7 @@
 
 #include <AppKit/AppKit.h>
 
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "../../Utilities/Interfaces/IToolFileSystem.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"

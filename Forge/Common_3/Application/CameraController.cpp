@@ -23,7 +23,7 @@
  */
 
 #define _USE_MATH_DEFINES
-#include "../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Interfaces/ICameraController.h"
 
 // Include this file as last include in all cpp files allocating memory

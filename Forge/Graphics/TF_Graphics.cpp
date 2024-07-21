@@ -25,7 +25,7 @@
 
 #include "Forge/Graphics/TF_Graphics.h"
 
-#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Common_3/Graphics/Interfaces/IRay.h"
 
 #include "Common_3/Graphics/GraphicsConfig.h"

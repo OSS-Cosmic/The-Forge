@@ -66,7 +66,7 @@
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUI.h"
 

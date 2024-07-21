@@ -1,5 +1,5 @@
 // This file is part of meshoptimizer library; see meshoptimizer.h for version/license details
-#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "meshoptimizer.h"
 
 #include "Common_3/Utilities/Math/MathTypes.h"

@@ -28,7 +28,7 @@
 
 #include "Forge/Graphics/TF_Graphics.h"
 #include "../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
-#include "Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 /************************************************************************/
 /* RING BUFFER MANAGEMENT											  */

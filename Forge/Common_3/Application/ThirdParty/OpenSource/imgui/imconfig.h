@@ -14,12 +14,12 @@
 
 #pragma once
 
-#include "../../../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "../../../../Utilities/Math/MathTypes.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "../../../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "../../../../Utilities/Math/MathTypes.h"
 
 //---- Define assertion handler. Defaults to calling assert().

@@ -30,7 +30,7 @@
 
 #ifdef ENABLE_LOGGING
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 #include "Forge/Core/TF_Time.h"
 

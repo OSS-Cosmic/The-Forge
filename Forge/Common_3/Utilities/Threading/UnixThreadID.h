@@ -29,7 +29,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "../Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 
 #include "Atomics.h"

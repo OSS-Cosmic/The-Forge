@@ -24,7 +24,7 @@
 
 #include "../../Application/Interfaces/IFont.h"
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 #include "Common_3/Graphics/GraphicsConfig.h"
 

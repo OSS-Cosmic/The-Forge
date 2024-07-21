@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Forge/Core/TF_Core.h"
-#include "Forge/Core/TF_Logging.h"
+#include "Forge/Core/TF_Log.h"
 
 typedef void* (*TFAllocatorMalloc)(void* self, size_t size);
 typedef void* (*TFAllocatorFree)(void* self, void* ptr);

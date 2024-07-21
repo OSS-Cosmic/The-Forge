@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <stdarg.h>
 
-#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/Mem/TF_Memory.h"
 
 

@@ -28,17 +28,25 @@
 
 #configure TF_DEBUG
 
+
 // Targets
 #configure TF_TARGET_WIN11
+#configure TF_TARGET_LINUX
+#configure TF_TARGET_DARWIN
+#configure TF_TARGET_ANDROID
 
 #if defined(TF_TARGET_WIN11)
     #define TF_WINDOWS
 #endif
 
-#define TF_DEFAULT_LOG_LEVEL ${LOG_LEVEL}
 #configure TF_FEATURE_D3D12 
 #configure TF_FEATURE_D3D11
 #configure TF_FEATURE_VULKAN
+
+
+#define TF_DEFAULT_LOG_LEVEL ${LOG_LEVEL}
+#configure TF_ENABLE_LOGGING 
+
 #configure TF_ENABLE_MEMORY_TRACKING
 
 #endif

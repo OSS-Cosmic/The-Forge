@@ -24,7 +24,7 @@
 
 #include "Algorithms.h"
 
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 #include "AlgorithmsImpl.h"
 

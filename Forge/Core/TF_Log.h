@@ -25,9 +25,7 @@
 #pragma once
 
 #include "Forge/Config.h"
-
 #include <stdarg.h>
-
 #include "Common_3/Utilities/Log/Log.h"
 
 #ifdef __cplusplus

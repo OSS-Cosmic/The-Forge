@@ -83,7 +83,7 @@
 #include <time.h>
 
 #include "../../../../../OS/Interfaces/IOperatingSystem.h"
-#include "../../../../Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 #if !defined(WIN32) && !defined(XBOX)
 #include <unistd.h>

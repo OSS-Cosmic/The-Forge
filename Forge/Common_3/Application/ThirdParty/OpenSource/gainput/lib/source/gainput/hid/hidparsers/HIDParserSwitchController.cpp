@@ -3,7 +3,7 @@
 #include "../GainputHIDTypes.h"
 #include "../GainputHIDWhitelist.h"
 #include "../../../hidapi/hidapi.h"
-#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 #include "../../../../include/gainput/gainput.h"
 #include "../../../../include/gainput/GainputInputDeltaState.h"

@@ -27,7 +27,7 @@
 #include <malloc.h> // alloca
 #include <wchar.h>  // _wrename
 
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 #include "../../Utilities/Interfaces/IToolFileSystem.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"

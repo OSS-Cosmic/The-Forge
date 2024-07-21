@@ -32,7 +32,7 @@
 #include "tinyimageformat/tinyimageformat_base.h"
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
-#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 
 #ifdef __cplusplus

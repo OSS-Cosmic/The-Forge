@@ -28,7 +28,7 @@
 
 #include "Common_3/Graphics/ThirdParty/OpenSource/SPIRV_Cross/SpirvTools.h"
 
-#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"

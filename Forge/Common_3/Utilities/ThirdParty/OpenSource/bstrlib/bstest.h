@@ -30,7 +30,7 @@
 #include "../Nothings/stb_ds.h"
 
 #include "../../../../Utilities/Threading/Atomics.h"
-#include "../../../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 
 #define DUMP_BSTRING_COUNT 32
