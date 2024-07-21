@@ -25,7 +25,7 @@
 #ifndef VOLK_FORGE_EXT_H_
 #define VOLK_FORGE_EXT_H_
 
-#include "../../../Renderer/IRenderer.h"
+#include "Forge/Graphics/TF_Graphics.h"
 #if defined(VK_USE_PLATFORM_GGP)
 #include <vulkan/vk_layer_dispatch_table.h>
 #else

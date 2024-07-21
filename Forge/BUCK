@@ -134,16 +134,19 @@ cxx_library(
   ]) + select({
     "tf_platform//VULKAN:supported": glob([
           "Graphics/Vulkan/*.cpp",
+          "Graphics/Vulkan/*.c"
     ]),
     "DEFAULT": []
   })+ select({
     "tf_platform//D3D12:supported": glob([
           "Graphics/Direct3D12/*.cpp",
+          "Graphics/Direct3D12/*.c",
     ]),
     "DEFAULT": []
   }) + select({
     "tf_platform//D3D12:supported": glob([
           "Graphics/Direct3D11/*.cpp",
+          "Graphics/Direct3D11/*.c",
     ]),
     "DEFAULT": []
   }) + select({
@@ -224,9 +227,10 @@ cxx_library(
       {
         "Forge/TF_Config.h":":TF_Config",
         "Forge/Config.h": "Config.h",
+        "Forge/Graphics/Vulkan/volk/volk.c": "Graphics/Vulkan/volk/volk.c"
       } |
-      { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp","Common_3/Graphics/ThirdParty/OpenSource/volk/*.c" ]) } |
-      { paths.join("Forge",file): file for file in glob(["Core/**/*.h", "Core/*.h", "Graphics/*.h", "Graphics/**/*.h" ]) }, 
+      { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp"]) } |
+      { paths.join("Forge",file): file for file in glob(["Core/**/*.h", "Core/*.h", "Graphics/*.h", "Graphics/**/*.h","Graphics/*.inl", "Graphics/**/*.inl" ]) }, 
     visibility = ["PUBLIC"],
 )
 
