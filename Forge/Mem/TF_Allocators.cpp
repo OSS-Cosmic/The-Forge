@@ -1,6 +1,6 @@
 #include "Forge/Core/Mem/TF_Allocators.h"
 
-#include "Forge/Core/TF_Logging.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Math.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"

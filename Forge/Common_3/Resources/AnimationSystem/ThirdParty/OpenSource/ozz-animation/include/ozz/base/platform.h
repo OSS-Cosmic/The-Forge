@@ -38,7 +38,7 @@
 
 #include "Forge/Config.h"
 #include "../../../../../../../../Utilities/Math/MathTypes.h"
-#include "../../../../../../../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 #include "../../../include/ozz/base/export.h"
 

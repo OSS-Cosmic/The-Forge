@@ -28,7 +28,7 @@
 
 #include "Forge/Config.h"
 
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 

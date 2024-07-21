@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 #include "AssetPipeline.h"
 

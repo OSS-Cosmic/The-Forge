@@ -51,7 +51,9 @@ configure_define(
       "TF_FEATURE_D3D11": select_has(["tf_platform//D3D11:supported"]),
       "TF_FEATURE_VULKAN": select_has(["tf_platform//VULKAN:supported"]),
       "TF_TARGET_WIN11": select_has(["tf_platform//target:win11"]),
+      "TF_TARGET_LINUX": select_has(["tf_platform//target:linux"]),
       "TF_DEBUG": select_has(["tf_platform//build:debug"]),
+      "TF_ENABLE_LOGGING": True 
   }
 )
 

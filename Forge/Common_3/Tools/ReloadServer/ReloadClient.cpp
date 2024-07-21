@@ -53,7 +53,7 @@ If an error occurs on the host:
 #include "../../Application/Interfaces/IInput.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 
 #include "../../Utilities/Threading/Atomics.h"

@@ -40,7 +40,7 @@
 #define IMEMORY_FROM_HEADER
 
 #include "Forge/Core/Mem/TF_Memory.h"
-#include "../../../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 
 #define VMA_ASSERT(expr) ASSERT(expr)

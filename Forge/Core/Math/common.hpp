@@ -13,7 +13,7 @@
 #include "Forge/Core/Mem/TF_Memory.h"
 
 #include "../../../../Utilities/Math/Random.h"
-#include "../../../Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 namespace Vectormath
 {

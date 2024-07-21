@@ -40,7 +40,7 @@ UTEST(TF, scratchAlloc_2)
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
 #include "Forge/Core/Mem/TF_Memory.h"
-#include "Common_3/Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 UTEST_STATE();
 TF_UTEST_MAIN("TF_ScratchAllocatorTest")
 

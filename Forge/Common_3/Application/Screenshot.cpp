@@ -30,7 +30,7 @@
 #include "tinyimageformat/tinyimageformat_query.h"
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Interfaces/IUI.h"
 
 #include "../Utilities/Math/MathTypes.h"

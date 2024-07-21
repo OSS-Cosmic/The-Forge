@@ -36,7 +36,7 @@
 #include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
 
 #include "../../Application/Interfaces/IApp.h"
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "../../Graphics/GraphicsConfig.h"

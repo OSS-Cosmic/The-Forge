@@ -4,12 +4,24 @@
 buck2 build --target-platforms //platforms:windows_11_x86_64 //Samples:01_Transformations
 ```
 
+## platforms
+
+- tf_platform//:windows_11_x86_64
+- tf_platform//:linux_x86_64
+
+
 ## generate compile commands
 
+### windows
+```
+cat $(buck2 bxl --target-platforms tf_platform//:windows_11_x86_64 toolchain//compile_command.bxl:gen_compile_command) | Out-File compile_commands.json
+```
 
+### linux
 ```
-cat $(buck2 bxl --target-platforms //platforms:windows_11_edge_x86_64 //compile_command.bxl:gen_compile_command -- --base_dir (Get-Location).Path) | Out-File compile_commands.json
+cat $(buck2 bxl --target-platforms tf_platform//:linux_x86_64 toolchains//compile_command.bxl:gen_compile_command) > compile_commands.json
 ```
+
 
 The Forge is a cross-platform rendering framework supporting
 - Windows 10/11 

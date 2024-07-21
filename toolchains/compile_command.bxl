@@ -12,21 +12,22 @@ load("@prelude//:paths.bzl", "paths")
 load("@prelude//paths.bzl", "paths")
 
 def _gen_compile_command(ctx: BxlContext) -> None:
-    target_filter = ctx.cli_args.targets or "..."
-    targets = ctx.configured_targets(target_filter, target_platform = ctx.cli_args.platform)
+    #target_filter = ctx.cli_args.filter or "..."
 
     entries = [] 
     infos = {}
-    
-    for target in targets:
-        providers = ctx.analysis(target).providers()
-        compile_db_info = providers.get(CxxCompilationDbInfo)
-        if compile_db_info != None:
-            infos |= compile_db_info.info
+   
+    for filter in ctx.cli_args.filter:
+        targets = ctx.configured_targets(filter, target_platform = ctx.cli_args.platform)
+        for target in targets:
+            providers = ctx.analysis(target).providers()
+            compile_db_info = providers.get(CxxCompilationDbInfo)
+            if compile_db_info != None:
+                infos |= compile_db_info.info
     for key in infos:
         cmd_entry = infos[key]
         entry = {}
-        entry["directory"] = ctx.cli_args.base_dir 
+        entry["directory"] = ctx.fs.abs_path_unsafe("//")
         entry["file"] = cmd_entry.src.short_path
         cxx = cmd_entry.cxx_compile_cmd
         if cxx:
@@ -43,8 +44,7 @@ def _gen_compile_command(ctx: BxlContext) -> None:
 gen_compile_command = bxl_main(
     impl = _gen_compile_command,
     cli_args = {
-        "base_dir": cli_args.option(cli_args.string()),
-        "targets": cli_args.option(cli_args.target_expr()),
+        "filter": cli_args.list(cli_args.target_expr()),
         "platform": cli_args.option(cli_args.target_label())
     },
 )

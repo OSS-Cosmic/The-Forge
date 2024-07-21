@@ -24,7 +24,7 @@
 
 #include <UIKit/UIKit.h>
 
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "../../Utilities/Interfaces/IToolFileSystem.h"
 
 bool fsGetFilesWithExtension(ResourceDirectory resourceDir, const char* subDirectory, const char* extension, char*** out, int* count)

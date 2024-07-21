@@ -37,12 +37,10 @@
 
 
 #if defined(__cplusplus)
-#define CPU_FEATURE_PREFIX cpu_features::
+    #define CPU_FEATURE_PREFIX cpu_features::
 #else
-#define CPU_FEATURE_PREFIX 
+    #define CPU_FEATURE_PREFIX 
 #endif
-    
-
 
 typedef enum
 {

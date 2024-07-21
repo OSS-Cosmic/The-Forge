@@ -28,7 +28,7 @@
 
 #include "../../Application/Interfaces/IApp.h"
 #include "Forge/Graphics/TF_Graphics.h"
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 #include "../../Graphics/Quest/VrApiHooks.h"
 #include "../../Utilities/Math/MathTypes.h"

@@ -358,7 +358,7 @@ Strings are represented like this:
 
 */
 
-#include "../../../../../../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 
 namespace gainput
 {

@@ -26,7 +26,7 @@
 
 #ifdef ENABLE_FORGE_STACKTRACE_DUMP
 
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #pragma warning(push)
 #pragma warning(disable : 4091)
 #include <DbgHelp.h>

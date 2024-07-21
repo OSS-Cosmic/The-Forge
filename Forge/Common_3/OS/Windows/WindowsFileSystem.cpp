@@ -37,7 +37,7 @@
 #include <stdio.h>
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "../../Utilities/Interfaces/ILog.h"
+#include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
