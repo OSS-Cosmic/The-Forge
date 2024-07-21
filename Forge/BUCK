@@ -57,6 +57,11 @@ configure_define(
   }
 )
 
+#cxx_library(
+#    name = "TF-imgui"
+#)
+
+
 cxx_library(
     name = "TF",
     srcs = glob([
@@ -195,10 +200,8 @@ cxx_library(
     }),
     exported_deps = select({
         "tf_platform//target:linux": [
-          "@tf//3rdparty:cpu_features", 
         ],
         "tf_platform//target:win11": [
-          "@tf//3rdparty:cpu_features", 
           "@tf//3rdparty:nvapi", 
           "@tf//3rdparty:ags", 
           "@tf//3rdparty:DirectXCompiler", 
@@ -213,6 +216,8 @@ cxx_library(
       "@tf//3rdparty:tinyimageformat",
       "@tf//3rdparty:vulkan-header",
       "@tf//3rdparty:stb",
+      "@tf//3rdparty:cpu_features",
+      "@tf//3rdparty:SPIRV-Cross"
     ],
     link_style = "static",
     exported_headers = 

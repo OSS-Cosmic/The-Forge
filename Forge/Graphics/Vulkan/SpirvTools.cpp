@@ -22,14 +22,14 @@
  * under the License.
 */
 
-#include "SpirvTools.h"
+#include "Forge/Graphics/Vulkan/SpirvTools.h"
 
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4996)    // warning C4996: 'std::move_backward::_Unchecked_iterators::_Deprecate'
 #endif
 
-#include "spirv_cross.hpp"
+#include "spirv_cross/spirv_cross.hpp"
 
 // helper functions
 void ReflectBoundResources(
@@ -426,3 +426,4 @@ void ReflectHullShaderControlPoint(CrossCompiler* pCompiler, uint32_t* pSizeX)
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+

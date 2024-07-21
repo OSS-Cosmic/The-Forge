@@ -68,11 +68,16 @@ cxx_library(
 )
 
 cxx_library(
-    name = "spirv-cross",
+    name = "SPIRV-Cross",
+    link_style = "static",
     header_namespace = "",
     srcs = glob([
         "SPIRV-Cross/*.cpp"
-    ])
+    ]),
+    exported_headers =
+      {paths.join("spirv_cross", paths.basename(file)) : file for file in glob(["SPIRV-Cross/*.hpp", "SPIRV-Cross/*.h"])} |
+      {paths.relativize(file, "SPIRV-Cross/include") : file for file in glob(["SPIRV-Cross/include/**/*.h"])}, 
+    visibility = ["PUBLIC"],
 )
 
 export_file(
@@ -108,7 +113,6 @@ prebuilt_cxx_library(
     visibility = ["PUBLIC"],
 )
 
-
 prebuilt_cxx_library(
     name = "Direct3d12Agility",
     target_compatible_with = ["tf_platform//target:win11"],
@@ -116,6 +120,7 @@ prebuilt_cxx_library(
     exported_headers  = { paths.basename(file): file for file in glob(["Direct3d12Agility/include/*.h"])}, 
     visibility = ["PUBLIC"],
 )
+
 export_file(
     name = "dxcompiler.lib",
     src = "DirectXShaderCompiler/lib/x64/dxcompiler.lib",

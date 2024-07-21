@@ -26,7 +26,7 @@
 
 #ifdef VULKAN
 
-#include "Common_3/Graphics/ThirdParty/OpenSource/SPIRV_Cross/SpirvTools.h"
+#include "SpirvTools.h"
 
 #include "Forge/Core/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"
