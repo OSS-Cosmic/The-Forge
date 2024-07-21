@@ -34,3 +34,12 @@
 [submodule "Forge/3rdparty/AGS_SDK"]
 	path = Forge/3rdparty/AGS_SDK
 	url = git@github.com:OSS-Cosmic/AGS_SDK.git
+[submodule "Forge/3rdparty/imgui"]
+	path = Forge/3rdparty/imgui
+	url = git@github.com:OSS-Cosmic/imgui.git
+[submodule "Forge/3rdparty/SPIRV-Cross"]
+	path = Forge/3rdparty/SPIRV-Cross
+	url = git@github.com:OSS-Cosmic/SPIRV-Cross.git
+[submodule "Forge/3rdparty/glslang"]
+	path = Forge/3rdparty/glslang
+	url = git@github.com:OSS-Cosmic/glslang.git

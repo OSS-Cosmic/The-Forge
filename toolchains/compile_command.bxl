@@ -12,28 +12,29 @@ load("@prelude//:paths.bzl", "paths")
 load("@prelude//paths.bzl", "paths")
 
 def _gen_compile_command(ctx: BxlContext) -> None:
-    #target_filter = ctx.cli_args.filter or "..."
-
     entries = [] 
-    infos = {}
-   
+    query_targets = {}
     for filter in ctx.cli_args.filter:
         targets = ctx.configured_targets(filter, target_platform = ctx.cli_args.platform)
         for target in targets:
-            providers = ctx.analysis(target).providers()
-            compile_db_info = providers.get(CxxCompilationDbInfo)
-            if compile_db_info != None:
-                infos |= compile_db_info.info
-    for key in infos:
-        cmd_entry = infos[key]
-        entry = {}
-        entry["directory"] = ctx.fs.abs_path_unsafe("//")
-        entry["file"] = cmd_entry.src.short_path
-        cxx = cmd_entry.cxx_compile_cmd
-        if cxx:
-            entry["command"] = cmd_args(cxx.base_compile_cmd, cxx.argsfile.input_args[0], cmd_entry.args, delimiter = " ")
+            query_targets[target.label.raw_target()] = target 
 
-        entries.append(entry)
+    for key in query_targets:
+        target = query_targets[key]
+
+        providers = ctx.analysis(target).providers()
+        compile_db_info = providers.get(CxxCompilationDbInfo)
+
+        if compile_db_info != None:
+            for key in compile_db_info.info:
+                cmd_entry = compile_db_info.info[key]
+                entry = {}
+                entry["directory"] = ctx.fs.abs_path_unsafe("root//") #"{}".format(target.label.path))
+                entry["file"] = cmd_entry.src.short_path
+                cxx = cmd_entry.cxx_compile_cmd
+                if cxx:
+                    entry["command"] = cmd_args(cxx.base_compile_cmd, cxx.argsfile.input_args[0], cmd_entry.args, delimiter = " ")
+                entries.append(entry)
    
     actions = ctx.bxl_actions(target_platform = ctx.cli_args.platform).actions
     db_artifact = actions.write_json("compile_commands.json", entries)
