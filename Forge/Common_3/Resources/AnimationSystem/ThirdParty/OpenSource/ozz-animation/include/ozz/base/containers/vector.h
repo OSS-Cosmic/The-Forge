@@ -29,7 +29,7 @@
 #define OZZ_OZZ_BASE_CONTAINERS_VECTOR_H_
 
 
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 
 namespace ozz {
   

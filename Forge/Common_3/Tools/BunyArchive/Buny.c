@@ -25,7 +25,7 @@
 #define BUNYAR_LIB_INTERNAL
 #include "Buny.h"
 
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 
 #include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"

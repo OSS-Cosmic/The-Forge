@@ -36,7 +36,7 @@
 #include "tinyimageformat/tinyimageformat_apis.h"
 #include "tinyimageformat/tinyimageformat_base.h"
 #include "tinyimageformat/tinyimageformat_query.h"
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Common_3/Utilities/Interfaces/IFileSystem.h"

@@ -24,7 +24,7 @@
 
 #include "Forge/Config.h"
 
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../Application/Interfaces/IApp.h"

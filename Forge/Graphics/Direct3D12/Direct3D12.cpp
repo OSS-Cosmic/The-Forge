@@ -38,7 +38,7 @@
 #include <Windows.h>
 
 #define D3D12MA_IMPLEMENTATION
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "Common_3/Graphics/ThirdParty/OpenSource/D3D12MemoryAllocator/Direct3D12MemoryAllocator.h"
 

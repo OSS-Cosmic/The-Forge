@@ -36,7 +36,7 @@
 #endif
 
 // OS
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 
 #include "Forge/Core/TF_Log.h"
 

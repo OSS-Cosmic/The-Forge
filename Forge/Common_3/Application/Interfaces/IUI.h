@@ -36,7 +36,7 @@
 //											e.g., "X" variable will have "SetX" and "GetX" pair of functions
 // To add global Lua functions, independent of Unit Tests, add definition in UIApp::Init (Check LOGINFO there for example).
 
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../Utilities/Math/MathTypes.h"

@@ -35,7 +35,7 @@
 #pragma comment(lib, "shlwapi.lib")
 #endif
 
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "../../Utilities/ThirdParty/OpenSource/rmem/inc/rmem.h"
 

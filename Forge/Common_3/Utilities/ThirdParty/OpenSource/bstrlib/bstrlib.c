@@ -13,7 +13,7 @@
 
 #include "Forge/Config.h"
 
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 
 #include <wchar.h>
 #include <stdbool.h>

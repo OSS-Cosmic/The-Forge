@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "Forge/3rdparty/Nothings/stb_ds.h"
+#include "Forge/Core/Nothings/stb_ds.h"
 
 #include "Forge/Core/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"

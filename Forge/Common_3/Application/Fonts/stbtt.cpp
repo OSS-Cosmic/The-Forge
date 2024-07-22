@@ -36,7 +36,7 @@
 #ifndef STB_RECT_PACK_IMPLEMENTATION
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_ASSERT(x) ASSERT(x)
-#include "Forge/3rdparty/Nothings/stb_rectpack.h"
+#include "Forge/Core/Nothings/stb_rectpack.h"
 #endif
 
 #include "Forge/Core/Mem/TF_Memory.h"
@@ -60,7 +60,7 @@ static void stbtt_dealloc_func(void* ptr, void* user_data)
 #define STBTT_malloc(x, u) stbtt_alloc_func(x, u)
 #define STBTT_free(x, u)   stbtt_dealloc_func(x, u)
 
-#include "Forge/3rdparty/Nothings/stb_truetype.h"
+#include "Forge/Core/Nothings/stb_truetype.h"
 #endif
 
 #endif // UI OR FONTS
