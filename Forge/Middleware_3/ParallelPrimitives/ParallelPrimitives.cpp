@@ -44,7 +44,7 @@
 
 #include "ParallelPrimitives.h"
 
-#include "../../Common_3/Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Forge/3rdparty/Nothings/stb_ds.h"
 
 #include "../../Common_3/Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "Forge/Core/TF_Log.h"

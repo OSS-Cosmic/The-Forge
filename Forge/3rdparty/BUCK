@@ -63,9 +63,9 @@ cxx_library(
 
 
 cxx_library(
-    name = "stb",
-    header_namespace = "",
-    exported_headers = { file: file for file in glob(["stb/*.h"])},
+    name = "Nothings",
+    header_namespace = "Forge/3rdparty",
+    exported_headers = { file: file for file in glob(["Nothings/*.h"])},
     visibility = ["PUBLIC"],
 )
 

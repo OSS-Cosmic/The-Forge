@@ -31,7 +31,7 @@
 #import <QuartzCore/CoreAnimation.h>
 #import <UIKit/UIKit.h>
 
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Forge/3rdparty/Nothings/stb_ds.h"
 
 #include "../../Application/Interfaces/IApp.h"
 #include "Forge/Core/TF_Log.h"

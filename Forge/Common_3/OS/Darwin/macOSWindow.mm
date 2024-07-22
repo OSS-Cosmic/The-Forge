@@ -33,7 +33,7 @@
 #import <MetalKit/MetalKit.h>
 #include <sys/sysctl.h> // Needed for debugger check
 
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Forge/3rdparty/Nothings/stb_ds.h"
 
 #include "../../Application/Interfaces/IApp.h"
 #include "Forge/Core/TF_Log.h"

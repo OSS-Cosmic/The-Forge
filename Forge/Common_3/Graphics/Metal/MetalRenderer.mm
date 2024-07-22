@@ -38,7 +38,7 @@
 #include <MetalPerformanceShaders/MetalPerformanceShaders.h>
 #import <simd/simd.h>
 
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Forge/3rdparty/Nothingss/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Forge/Graphics/TF_Graphics.h"

@@ -23,7 +23,7 @@
  * under the License.
  */
 
-#include "../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Forge/3rdparty/Nothings/stb_ds.h"
 
 #include "Common_3/Graphics/GraphicsConfig.h"
 

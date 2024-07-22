@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "../../Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Forge/3rdparty/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "tinyimageformat/tinyimageformat_apis.h"
 #include "tinyimageformat/tinyimageformat_base.h"

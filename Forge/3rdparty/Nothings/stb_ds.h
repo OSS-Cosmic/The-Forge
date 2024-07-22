@@ -845,8 +845,8 @@ template<class T> static T * stbds_shmode_func_wrapper(T *, size_t elemsize, siz
 
 #ifdef STB_DS_IMPLEMENTATION
 #include "Forge/Core/TF_Log.h"
-#include "../../../Threading/Atomics.h"
-#include "../bstrlib/bstrlib.h"
+#include "Common_3/Utilities/Threading/Atomics.h"
+#include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include <string.h>
 

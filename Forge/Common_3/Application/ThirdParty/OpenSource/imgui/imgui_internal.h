@@ -208,7 +208,7 @@ namespace ImStb
 #define STB_TEXTEDIT_GETWIDTH_NEWLINE   (-1.0f)
 #define STB_TEXTEDIT_UNDOSTATECOUNT     99
 #define STB_TEXTEDIT_UNDOCHARCOUNT      999
-#include "../../../../Utilities/ThirdParty/OpenSource/Nothings/stb_textedit.h"
+#include "Forge/3rdparty/Nothings/stb_textedit.h"
 
 } // namespace ImStb
 

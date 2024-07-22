@@ -40,7 +40,7 @@
 #define strncpy_s     strncpy
 #endif
 
-#include "Common_3/Utilities/ThirdParty/OpenSource/Nothings/stb_ds.h"
+#include "Forge/3rdparty/Nothings/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Forge/Core/TF_Log.h"

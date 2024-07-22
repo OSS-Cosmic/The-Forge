@@ -261,7 +261,7 @@ static int fons__tt_getGlyphKernAdvance(FONSttFontImpl *font, int glyph1, int gl
 
 // Using a unified stbtt implementation for fontstash and imgui
 // All we need is the header for the function declarations since they're compiled in Core/stbtt.cpp
-#include "../../../../../Utilities/ThirdParty/OpenSource/Nothings/stb_truetype.h"
+#include "Forge/3rdparty/Nothings/stb_truetype.h"
 
 //Previous implementation:
 //#define STB_TRUETYPE_IMPLEMENTATION

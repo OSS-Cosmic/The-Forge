@@ -218,7 +218,7 @@ cxx_library(
     }) + [
       "@tf//3rdparty:tinyimageformat",
       "@tf//3rdparty:vulkan-header",
-      "@tf//3rdparty:stb",
+      "@tf//3rdparty:Nothings",
       "@tf//3rdparty:cpu_features",
       "@tf//3rdparty:SPIRV-Cross"
     ],
@@ -230,7 +230,13 @@ cxx_library(
         "Forge/Graphics/Vulkan/volk/volk.c": "Graphics/Vulkan/volk/volk.c"
       } |
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp"]) } |
-      { paths.join("Forge",file): file for file in glob(["Core/**/*.h", "Core/*.h", "Graphics/*.h", "Graphics/**/*.h","Graphics/*.inl", "Graphics/**/*.inl" ]) }, 
+      { paths.join("Forge",file): file for file in glob([
+          "Core/**/*.h", 
+          "Core/*.h", 
+          "Graphics/*.h",
+          "Graphics/**/*.h",
+          "Graphics/*.inl",
+          "Graphics/**/*.inl" ]) }, 
     visibility = ["PUBLIC"],
 )
 
