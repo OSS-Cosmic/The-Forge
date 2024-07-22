@@ -37,7 +37,7 @@
 #include "../../../Resources/AnimationSystem/ThirdParty/OpenSource/ozz-animation/include/ozz/animation/offline/skeleton_builder.h"
 #include "../../../Resources/AnimationSystem/ThirdParty/OpenSource/ozz-animation/include/ozz/animation/offline/track_optimizer.h"
 #include "../../../Resources/AnimationSystem/ThirdParty/OpenSource/ozz-animation/include/ozz/base/io/archive.h"
-#include "../tinyimageformat/tinyimageformat_base.h"
+#include "../Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
 
 // TressFX
 #include "../../../Resources/AnimationSystem/ThirdParty/OpenSource/TressFX/TressFXAsset.h"

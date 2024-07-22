@@ -31,9 +31,9 @@
 
 #define VAO_STATE_CACHE_SIZE 64
 
-#include "tinyimageformat/tinyimageformat_apis.h"
-#include "tinyimageformat/tinyimageformat_base.h"
-#include "tinyimageformat/tinyimageformat_query.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_apis.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_query.h"
 #include "Forge/Core/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 

@@ -50,8 +50,8 @@
 #include "WinPixEventRuntime/pix3.h"
 #endif
 
-#include "tinyimageformat/tinyimageformat_base.h"
-#include "tinyimageformat/tinyimageformat_query.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_query.h"
 #include "Common_3/Graphics/AgsHelper.h"
 #include "Common_3/Graphics/NvApiHelper.h"
 #include "Common_3/Graphics/ThirdParty/OpenSource/renderdoc/renderdoc_app.h"

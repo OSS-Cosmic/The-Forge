@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "tinyimageformat/tinyimageformat_query.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_query.h"
 #include "../ThirdParty/OpenSource/imgui/imgui.h"
 #include "../ThirdParty/OpenSource/imgui/imgui_internal.h"
 

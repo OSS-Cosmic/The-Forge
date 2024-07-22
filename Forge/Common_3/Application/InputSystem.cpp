@@ -60,7 +60,7 @@
 #endif
 #endif
 
-#include "tinyimageformat/tinyimageformat_query.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_query.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"

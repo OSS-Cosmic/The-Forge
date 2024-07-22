@@ -43,7 +43,7 @@
 #include "Common_3/Utilities/Math/MathTypes.h"
 
 // Renderer
-#include "tinyimageformat/tinyimageformat_apis.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_apis.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Common_3/Graphics/Interfaces/IRay.h"

@@ -27,7 +27,7 @@
 
 #include "../../OS/ThirdParty/PrivateOculus/ovr_sdk_mobile/VrApi/Include/VrApi.h"
 #include "../../OS/ThirdParty/PrivateOculus/ovr_sdk_mobile/VrApi/Include/VrApi_Vulkan.h"
-#include "tinyimageformat/tinyimageformat_apis.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_apis.h"
 
 #include "Forge/Core/TF_Log.h"
 

@@ -33,9 +33,9 @@
 #define IID_ARGS IID_PPV_ARGS
 
 #include "WinPixEventRuntime/pix3.h"
-#include "tinyimageformat/tinyimageformat_apis.h"
-#include "tinyimageformat/tinyimageformat_base.h"
-#include "tinyimageformat/tinyimageformat_query.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_apis.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_query.h"
 #include "Forge/Core/Nothings/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 

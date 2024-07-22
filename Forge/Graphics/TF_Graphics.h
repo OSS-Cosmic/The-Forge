@@ -29,7 +29,7 @@
 #include "../ThirdParty/PrivateNvidia/NsightAftermath/include/AftermathTracker.h"
 #endif
 
-#include "tinyimageformat/tinyimageformat_base.h"
+#include "Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "Forge/Core/TF_Log.h"

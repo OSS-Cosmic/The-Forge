@@ -30,7 +30,7 @@
 #include "AssetPipeline.h"
 
 // Math
-#include "../tinyimageformat/tinyimageformat_base.h"
+#include "../Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
 #include "../../../Utilities/ThirdParty/OpenSource/ModifiedSonyMath/vectormath.hpp"
 
 #include "../../../Resources/ResourceLoader/TextureContainers.h"

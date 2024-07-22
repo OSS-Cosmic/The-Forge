@@ -61,21 +61,6 @@ cxx_library(
     visibility = ["PUBLIC"],
 )
 
-
-cxx_library(
-    name = "Nothings",
-    header_namespace = "Forge/3rdparty",
-    exported_headers = { file: file for file in glob(["Nothings/*.h"])},
-    visibility = ["PUBLIC"],
-)
-
-cxx_library(
-    name = "tinyimageformat",
-    header_namespace = "",
-    exported_headers = { file: file for file in glob(["tinyimageformat/*.h"])}, 
-    visibility = ["PUBLIC"],
-)
-
 cxx_library(
     name = "SPIRV-Cross",
     link_style = "static",

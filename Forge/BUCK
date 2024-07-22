@@ -216,9 +216,7 @@ cxx_library(
       ],
       "DEFAULT": []
     }) + [
-      "@tf//3rdparty:tinyimageformat",
       "@tf//3rdparty:vulkan-header",
-      "@tf//3rdparty:Nothings",
       "@tf//3rdparty:cpu_features",
       "@tf//3rdparty:SPIRV-Cross"
     ],
