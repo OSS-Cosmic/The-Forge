@@ -10,6 +10,15 @@ cxx_library(
 )
 
 cxx_library(
+    name = "VulkanMemoryAllocator",
+    header_namespace = "",
+    exported_headers = { 
+        "vk_mem_alloc.h":"VulkanMemoryAllocator/include/vk_mem_alloc.h"
+    },
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
     name = "cpu_features",
     srcs =  [
         "cpu_features/src/hwcaps.c",

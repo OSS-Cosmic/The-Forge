@@ -76,7 +76,7 @@
 #include "Common_3/Utilities/Math/AlgorithmsImpl.h"
 #include "Common_3/Utilities/Threading/Atomics.h"
 
-#include "Forge/Graphics/Vulkan/VulkanCapsBuilder.h"
+#include "tinyimageformat/tinyimageformat_apis.h"
 
 #if defined(VK_USE_DISPATCH_TABLES)
 #include "Forge/Graphics/Vulkan/VulkanDispatchTable.h"

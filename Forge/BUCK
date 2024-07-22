@@ -137,7 +137,7 @@ cxx_library(
           "Graphics/Vulkan/*.c"
     ]),
     "DEFAULT": []
-  })+ select({
+  }) + select({
     "tf_platform//D3D12:supported": glob([
           "Graphics/Direct3D12/*.cpp",
           "Graphics/Direct3D12/*.c",

@@ -63,6 +63,36 @@ void tfInitGPUConfiguration(struct GPUConfiguration* config)
     tfAddScratchAllocator(&config->mAlloc, &allocDesc);
 }
 
+
+void tfBoostrapDefaultGPUConfiguration(struct GPUConfiguration* def) {
+    ASSERT(def);
+    {
+        FileStream fh = {};
+        if (!fsOpenStreamFromPath(RD_GPU_CONFIG, "gpu.data", FM_READ, &fh))
+        {
+            LOGF(LogLevel::eWARNING, "gpu.data could not be found, setting preset will be set to Low as a default.");
+        }
+        size_t fileSize = fsGetStreamFileSize(&fh);
+        char*  buffer = (char*)tf_malloc(fileSize * sizeof(char));
+        fsReadFromStream(&fh, (void*)buffer, fileSize);
+        tfLoadGPUData(def, { buffer, fileSize });
+        tf_free(buffer);
+    }
+    {
+        FileStream fh = {};
+        if (!fsOpenStreamFromPath(RD_GPU_CONFIG, "gpu.cfg", FM_READ, &fh))
+        {
+            LOGF(LogLevel::eWARNING, "gpu.data could not be found, setting preset will be set to Low as a default.");
+        }
+        size_t fileSize = fsGetStreamFileSize(&fh);
+        char*  buffer = (char*)tf_malloc(fileSize * sizeof(char));
+        fsReadFromStream(&fh, (void*)buffer, fileSize);
+        tfLoadGPUConfig(def, { buffer, fileSize });
+        tf_free(buffer);
+    }
+}
+
+
 void tfFreeGPUConfiguration(struct GPUConfiguration* config)
 {
     arrfree(config->mConfigurationUserSettings);

@@ -117,6 +117,10 @@ struct GPUConfiguration
 
 GPUPresetLevel tfQueryPresetLevel(const struct GPUConfiguration* config, uint32_t vendorId, uint32_t modelId);
 
+
+//Default loading behavior for the the GPUConfig
+void tfBoostrapDefaultGPUConfiguration(struct GPUConfiguration* def);
+
 void tfInitGPUConfiguration(struct GPUConfiguration* def);
 bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input);
 bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input);

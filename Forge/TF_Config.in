@@ -46,6 +46,7 @@
 
 #define TF_DEFAULT_LOG_LEVEL ${LOG_LEVEL}
 #configure TF_ENABLE_LOGGING 
+#configure TF_USE_MTUNER
 
 #configure TF_ENABLE_MEMORY_TRACKING
 
