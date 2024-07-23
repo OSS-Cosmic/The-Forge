@@ -29,8 +29,8 @@
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_FileSystem.h"
+#include "Forge/TF_Log.h"
 
 int systemRun(const char* command, const char** arguments, size_t argumentCount, const char* stdOutFile)
 {

@@ -9,7 +9,7 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "Hid.lib")
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "Forge/Core/TF_Time.h"
 
 #include "../pad/GainputControllerDb.h"

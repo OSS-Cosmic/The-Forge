@@ -38,7 +38,7 @@
 #include "../../Application/Interfaces/IProfiler.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "../../OS/Interfaces/IOperatingSystem.h"
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 
 #include "../../Utilities/Math/Algorithms.h"
 

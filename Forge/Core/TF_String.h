@@ -40,7 +40,7 @@
 #define TF_STRING_H_INCLUDED
 
 #include "TF_Types.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #define TFSTR_LLSTR_SIZE 21
 #define TFSTR_LSTR_SIZE 16 

@@ -24,7 +24,7 @@
 
 #include <locale.h>
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #include "Buny.h"
 

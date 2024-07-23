@@ -47,7 +47,7 @@
 #include "Forge/Core/Nothings/stb_ds.h"
 
 #include "../../Common_3/Resources/ResourceLoader/Interfaces/IResourceLoader.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "Forge/Core/Mem/TF_Memory.h"
 
 ParallelPrimitives::PipelineComponents::PipelineComponents():

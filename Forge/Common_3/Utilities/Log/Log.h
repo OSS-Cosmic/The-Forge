@@ -29,7 +29,7 @@
 
 #include "Forge/Config.h"
 
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 
 #include "stdbool.h"
 

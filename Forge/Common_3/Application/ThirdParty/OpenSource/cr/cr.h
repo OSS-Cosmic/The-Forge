@@ -367,7 +367,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define __CR_H__
 
 #include "Forge/Config.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #if !FORGE_CODE_HOT_RELOAD && defined(CR_HOST)
 #error "CR_HOST can't be defined when FORGE_CODE_HOT_RELOAD is disabled."

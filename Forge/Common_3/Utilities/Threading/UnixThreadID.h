@@ -29,8 +29,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "Forge/Core/TF_Log.h"
-#include "Forge/Core/TF_Thread.h"
+#include "Forge/TF_Log.h"
+#include "Forge/System/TF_Thread.h"
 
 #include "Atomics.h"
 

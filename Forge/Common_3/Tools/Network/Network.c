@@ -26,7 +26,7 @@
 
 #include <string.h>
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #define ENETWORKUNINITALIZED INT_MAX
 

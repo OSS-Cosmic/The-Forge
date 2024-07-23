@@ -33,7 +33,7 @@
 #include <android/log.h>
 #include <assert.h>
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 

@@ -30,8 +30,8 @@
 #include "../../Application/Interfaces/IInput.h"
 #include "../../Application/Interfaces/IUI.h"
 #include "../../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_FileSystem.h"
+#include "Forge/TF_Log.h"
 
 #include "../../Utilities/Math/Algorithms.h"
 

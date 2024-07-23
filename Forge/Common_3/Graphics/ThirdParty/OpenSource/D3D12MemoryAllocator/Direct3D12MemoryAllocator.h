@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Common_3/Graphics/GraphicsConfig.h"
-#include "Forge/Core/TF_Thread.h"
+#include "Forge/System/TF_Thread.h"
 
 #define D3D12MA_D3D12_HEADERS_ALREADY_INCLUDED
 #if defined(XBOX)
@@ -1573,7 +1573,7 @@ DEFINE_ENUM_FLAG_OPERATORS(D3D12MA::VIRTUAL_ALLOCATION_FLAGS);
 #endif
 
 #ifndef D3D12MA_ASSERT
-  #include "Forge/Core/TF_Log.h"
+  #include "Forge/TF_Log.h"
   #define D3D12MA_ASSERT(cond) ASSERT(cond)
 #endif
 

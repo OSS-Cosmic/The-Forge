@@ -38,9 +38,9 @@
 #include "ThirdParty/OpenSource/tinydds/tinydds.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "Forge/Core/TF_Log.h"
-#include "Forge/Core/TF_Thread.h"
+#include "Forge/TF_FileSystem.h"
+#include "Forge/TF_Log.h"
+#include "Forge/System/TF_Thread.h"
 #include "Interfaces/IResourceLoader.h"
 
 #include "../../Utilities/Math/ShaderUtilities.h" // Packing functions

@@ -86,7 +86,7 @@
 #include "../../../../include/ozz/base/platform.h"
 #include "../../../../include/ozz/base/span.h"
 
-#include "../../../../../../../Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 
 namespace ozz {
 namespace io {

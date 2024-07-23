@@ -25,7 +25,7 @@
 #include "../../../Common_3/Application/Interfaces/ICameraController.h"
 #include "../../../Common_3/Application/Interfaces/IProfiler.h"
 #include "Forge/Graphics/TF_Graphics.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "Forge/Core/TF_Time.h"
 #include "../Interfaces/IVisibilityBuffer.h"
 

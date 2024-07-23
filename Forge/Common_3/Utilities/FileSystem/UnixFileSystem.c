@@ -28,8 +28,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_FileSystem.h"
+#include "Forge/TF_Log.h"
 
 bool fsMergeDirAndFileName(const char* dir, const char* path, char separator, size_t dstSize, char* dst);
 void fsGetParentPath(const char* path, char* output);

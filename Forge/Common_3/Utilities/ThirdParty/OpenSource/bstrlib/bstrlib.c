@@ -50,7 +50,7 @@ bool gIsBstrlibTest = false;
 
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "Forge/Core/Mem/TF_Memory.h"
 
 /* Optionally include a mechanism for debugging memory */

@@ -30,7 +30,7 @@
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 // interfaces
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 

@@ -65,8 +65,8 @@
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_FileSystem.h"
+#include "Forge/TF_Log.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUI.h"
 

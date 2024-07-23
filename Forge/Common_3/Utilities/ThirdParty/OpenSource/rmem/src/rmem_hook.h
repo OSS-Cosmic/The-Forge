@@ -11,7 +11,7 @@
 #include "rmem_utils.h"
 #include "rmem_mutex.h"
 
-#include "../../../../Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 
 namespace rmem {
 

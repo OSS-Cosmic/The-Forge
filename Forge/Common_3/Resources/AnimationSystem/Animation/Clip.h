@@ -29,7 +29,7 @@
 #include "../ThirdParty/OpenSource/ozz-animation/include/ozz/base/io/archive.h"
 #include "../ThirdParty/OpenSource/ozz-animation/include/ozz/base/memory/allocator.h"
 
-#include "../Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 
 #include "../../../Utilities/Math/MathTypes.h"
 

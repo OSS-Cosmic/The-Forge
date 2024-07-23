@@ -28,7 +28,7 @@
 
 #include "../ThirdParty/OpenSource/OpenGL/GLES/egl.h"
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
 #include "GLESContextCreator.h"

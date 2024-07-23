@@ -33,8 +33,8 @@
 #include <unistd.h>
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
-#include "Forge/Core/TF_Log.h"
-#include "Forge/Core/TF_Thread.h"
+#include "Forge/TF_Log.h"
+#include "Forge/System/TF_Thread.h"
 #include "../../Utilities/Interfaces/IToolFileSystem.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"

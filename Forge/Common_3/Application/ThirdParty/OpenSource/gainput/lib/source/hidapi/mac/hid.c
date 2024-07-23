@@ -30,7 +30,7 @@
 
 #include "../hidapi.h"
 
-#include "Forge/Core/TF_Thread.h"
+#include "Forge/System/TF_Thread.h"
 #include "Forge/Core/Mem/TF_Memory.h"
 
 /* As defined in AppKit.h, but we don't need the entire AppKit for a single constant. */

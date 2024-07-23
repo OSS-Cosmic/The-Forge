@@ -75,7 +75,7 @@ extern "C"
 #ifdef RTREE_IMPLEMENTATION
 #undef RTREE_IMPLEMENTATION
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))

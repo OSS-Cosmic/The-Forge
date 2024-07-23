@@ -27,7 +27,7 @@
 // Don't compile stbtt unless we need it for UI or fonts
 #if defined ENABLE_FORGE_UI || defined ENABLE_FORGE_FONTS
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 // Previous implementation defined all stb math functions as imgui math functions
 // However, imgui math functions expand to standard c math functions, so no need to define unless we want custom math
 // Also we must check for implementation defines in case the user already has an implementation in the _same_ compilation unit (e.g. unity

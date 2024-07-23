@@ -463,7 +463,7 @@ inline void STBDS_AssertKeySizesImpl()
 #define STBDS_ASSERT_KEY_SIZE(tableKey, key) ( (void)STBDS_AssertKeySizesImpl<decltype(tableKey), decltype(key)>() )
 
 #else
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 // Can't do static assert in the middle of expression, so have to use ASSERT for C
 inline void STBDS_AssertKeySizesImpl(size_t realSize, size_t providedSize)
 {
@@ -844,7 +844,7 @@ template<class T> static T * stbds_shmode_func_wrapper(T *, size_t elemsize, siz
 //
 
 #ifdef STB_DS_IMPLEMENTATION
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "Common_3/Utilities/Threading/Atomics.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
@@ -2023,7 +2023,7 @@ void stbds_strreset_func(stbds_string_arena *a STBDS_FN_ALLOC_ARGS)
 
 #ifdef STBDS_UNIT_TESTS
 #include <stdio.h>
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 typedef struct { int key,b,c,d; } stbds_struct;
 typedef struct { int key[2],b,c,d; } stbds_struct2;

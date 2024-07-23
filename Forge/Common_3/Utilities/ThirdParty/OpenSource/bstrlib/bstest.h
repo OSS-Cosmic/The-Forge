@@ -30,8 +30,8 @@
 #include "../Nothings/stb_ds.h"
 
 #include "../../../../Utilities/Threading/Atomics.h"
-#include "Forge/Core/TF_Log.h"
-#include "Forge/Core/TF_Thread.h"
+#include "Forge/TF_Log.h"
+#include "Forge/System/TF_Thread.h"
 
 #define DUMP_BSTRING_COUNT 32
 static bstring dumpOut[DUMP_BSTRING_COUNT];

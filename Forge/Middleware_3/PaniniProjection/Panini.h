@@ -27,7 +27,7 @@
 #endif // ! NULL
 
 #include "../../Common_3/Application/Interfaces/IMiddleware.h"
-#include "../../Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 
 extern ResourceDirectory RD_MIDDLEWARE_PANINI;
 

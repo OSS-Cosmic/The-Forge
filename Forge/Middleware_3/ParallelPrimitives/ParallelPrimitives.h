@@ -43,7 +43,7 @@ THE SOFTWARE.
 ********************************************************************/
 
 #include "Forge/Graphics/TF_Graphics.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 struct IndirectCountBuffer
 {

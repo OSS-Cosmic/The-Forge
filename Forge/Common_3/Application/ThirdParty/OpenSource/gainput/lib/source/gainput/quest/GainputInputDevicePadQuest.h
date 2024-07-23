@@ -18,7 +18,7 @@
 #include "../../../../../../../../../Common_3/OS/Quest/VrApi.h"
 #include "../../../../../../../../OS/ThirdParty/PrivateOculus/ovr_sdk_mobile/VrApi/Include/VrApi_Input.h"
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 extern QuestVR* pQuest; 
 

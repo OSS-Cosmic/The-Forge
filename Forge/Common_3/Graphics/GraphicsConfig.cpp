@@ -27,7 +27,7 @@
 #include "Forge/Core/Nothings/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "../Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"

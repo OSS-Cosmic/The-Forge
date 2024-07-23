@@ -37,7 +37,7 @@
 #include "Forge/Core/Nothings/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"
 #include "../Interfaces/IRay.h"
 

@@ -29,7 +29,7 @@
 #include "../../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "../../../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
-#include "../Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 #include "../../../Utilities/Interfaces/IToolFileSystem.h"
 
 #include "AssetPipelineConfig.h"

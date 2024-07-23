@@ -29,7 +29,7 @@
 #include "../../../include/gainput/GainputInputDevice.h"
 #include "../touch/GainputTouchInfo.h"
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "../../../../../../../../Utilities/Math/MathTypes.h"
 
 

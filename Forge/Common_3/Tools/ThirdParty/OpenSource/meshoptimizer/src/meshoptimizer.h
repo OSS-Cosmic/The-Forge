@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include <stddef.h>
 #include <math.h>
 

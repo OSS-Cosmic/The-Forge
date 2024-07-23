@@ -234,12 +234,16 @@ cxx_library(
       {
         "Forge/TF_Config.h":":TF_Config",
         "Forge/Config.h": "Config.h",
+        "Forge/TF_FileSystem.h": "TF_FileSystem.h",
+        "Forge/TF_Log.h": "TF_Log.h",
         "Forge/Graphics/Vulkan/volk/volk.c": "Graphics/Vulkan/volk/volk.c"
       } |
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp"]) } |
       { paths.join("Forge",file): file for file in glob([
           "Core/**/*.h", 
           "Core/*.h", 
+          "System/*.h",
+
           "Graphics/*.h",
           "Graphics/**/*.h",
           "Graphics/*.inl",

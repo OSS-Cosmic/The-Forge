@@ -62,8 +62,8 @@
 #define TINYKTX_IMPLEMENTATION
 #endif
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
-#include "../Common_3/Utilities/Interfaces/IFileSystem.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_FileSystem.h"
+#include "Forge/TF_Log.h"
 #include "../../../Utilities/Interfaces/IToolFileSystem.h"
 
 #include "../../../Resources/ResourceLoader/TextureContainers.h"

@@ -30,7 +30,7 @@
 #include "../ThirdParty/OpenSource/ozz-animation/include/ozz/base/memory/allocator.h"
 #include "../ThirdParty/OpenSource/ozz-animation/include/ozz/base/span.h"
 
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #include "../../../Utilities/Math/MathTypes.h"
 

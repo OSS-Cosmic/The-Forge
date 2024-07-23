@@ -83,7 +83,7 @@
 #include <time.h>
 
 #include "../../../../../OS/Interfaces/IOperatingSystem.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 
 #if !defined(WIN32) && !defined(XBOX)
 #include <unistd.h>
@@ -305,8 +305,8 @@ static HANDLE gProcessHandle;
 // 4. Add the mutex initialization function inside CreateMutex() on the bottom of this file.
 // 5. Add the mutex destruction function inside RemoveMutex() on the bottom of this file. (Currently not used)
 
-#include "../../../../Interfaces/IFileSystem.h"
-#include "Forge/Core/TF_Thread.h"
+#include "Forge/TF_FileSystem.h"
+#include "Forge/System/TF_Thread.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(*x))
 

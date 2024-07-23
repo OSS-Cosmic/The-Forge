@@ -30,7 +30,7 @@ distribution.
 #include <cstring>
 #include <cstdarg>
 
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 #define IMEMORY_FROM_HEADER
 #include "Forge/Core/Mem/TF_Memory.h"
 

@@ -116,9 +116,9 @@ UTEST(Core, loadData_2)
   tfFreeGPUConfiguration(&def);
 }
 
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 #include "Forge/Core/Mem/TF_Memory.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 UTEST_STATE();
 TF_UTEST_MAIN("TF_StringTest")
 

@@ -34,7 +34,7 @@
 #include "Forge/Core/Nothings/stb_ds.h"
 
 #include "../../Application/Interfaces/IApp.h"
-#include "Forge/Core/TF_Log.h"
+#include "Forge/TF_Log.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "../../Utilities/Math/MathTypes.h"

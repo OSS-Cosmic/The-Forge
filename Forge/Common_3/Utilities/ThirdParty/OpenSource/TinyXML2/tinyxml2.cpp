@@ -28,7 +28,7 @@ distribution.
 #include <new>
 #include <cstddef>
 
-#include "Common_3/Utilities/Interfaces/IFileSystem.h"
+#include "Forge/TF_FileSystem.h"
 #include "Forge/Core/Mem/TF_Memory.h"
 
 namespace tinyxml2
