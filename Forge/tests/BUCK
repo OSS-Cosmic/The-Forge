@@ -1,0 +1,43 @@
+
+
+cxx_library(
+  name = "TF_utest",
+  exported_headers = { 
+    "TF_TestMain.h":"TF_TestMain.h",
+    "utest.h":"utest.h" 
+  },
+  link_style = "static",
+)
+
+cxx_test(
+  name = 'TF_GPUConfigTest',
+  srcs = [
+    'TF_GPUConfigTest.cpp',
+  ],
+  deps = [
+      "@tf//:TF",
+      ":TF_utest"
+  ]
+)
+
+cxx_test(
+  name = 'TF_ScratchAllocatorTest',
+  srcs = [
+    'TF_ScratchAllocatorTest.cpp',
+  ],
+  deps = [
+      "@tf//:TF",
+      ":TF_utest"
+  ]
+)
+
+cxx_test(
+  name = 'TF_StringTest',
+  srcs = [
+    'TF_StringTest.cpp',
+  ],
+  deps = [
+      "@tf//:TF",
+      ":TF_utest"
+  ]
+)

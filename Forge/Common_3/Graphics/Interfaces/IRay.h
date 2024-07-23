@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Forge/Graphics/TF_Graphics.h"
+#include "Forge/Core/TF_Types.h"
 
 #ifdef METAL
 #import <MetalKit/MetalKit.h>
@@ -61,7 +62,7 @@ typedef enum AccelerationStructureBuildFlags
     ACCELERATION_STRUCTURE_BUILD_FLAG_MINIMIZE_MEMORY = 0x10,
     ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE = 0x20,
 } AccelerationStructureBuildFlags;
-MAKE_ENUM_FLAG(uint32_t, AccelerationStructureBuildFlags)
+TF_ENUM_FLAG(uint32_t, AccelerationStructureBuildFlags)
 
 // Rustam: check if this can be mapped to Metal
 typedef enum AccelerationStructureGeometryFlags
@@ -70,7 +71,7 @@ typedef enum AccelerationStructureGeometryFlags
     ACCELERATION_STRUCTURE_GEOMETRY_FLAG_OPAQUE = 0x1,
     ACCELERATION_STRUCTURE_GEOMETRY_FLAG_NO_DUPLICATE_ANYHIT_INVOCATION = 0x2
 } AccelerationStructureGeometryFlags;
-MAKE_ENUM_FLAG(uint32_t, AccelerationStructureGeometryFlags)
+TF_ENUM_FLAG(uint32_t, AccelerationStructureGeometryFlags)
 
 // Rustam: check if this can be mapped to Metal
 typedef enum AccelerationStructureInstanceFlags
@@ -81,7 +82,7 @@ typedef enum AccelerationStructureInstanceFlags
     ACCELERATION_STRUCTURE_INSTANCE_FLAG_FORCE_OPAQUE = 0x4,
     ACCELERATION_STRUCTURE_INSTANCE_FLAG_FORCE_NON_OPAQUE = 0x8
 } AccelerationStructureInstanceFlags;
-MAKE_ENUM_FLAG(uint32_t, AccelerationStructureInstanceFlags)
+TF_ENUM_FLAG(uint32_t, AccelerationStructureInstanceFlags)
 
 typedef struct AccelerationStructureInstanceDesc
 {

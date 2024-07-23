@@ -57,10 +57,19 @@ configure_define(
   }
 )
 
-#cxx_library(
-#    name = "TF-imgui"
-#)
-
+cxx_library(
+  name = "TF~GLTF",
+  exported_headers = { 
+    "Forge/Formats/TF_gltf.h":"Formats/TF_gltf.h" 
+  },
+  deps = [
+      "@tf//3rdparty:cgltf",
+      "@tf//:TF"
+  ],
+  srcs = ["Formats/TF_gltf.cpp"],
+  link_style = "static",
+  visibility = ["PUBLIC"],
+)
 
 cxx_library(
     name = "TF",

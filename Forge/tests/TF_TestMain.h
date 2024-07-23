@@ -1,5 +1,5 @@
 
-#define TF_UTEST_MAIN(NAME)                                               \
+#define TF_UTEST_MAIN(NAME)                                           \
     int main(int argc, const char* const argv[])                      \
     {                                                                 \
         FileSystemInitDesc fsDesc = {};                               \

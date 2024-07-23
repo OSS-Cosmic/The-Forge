@@ -33,6 +33,8 @@
 #include "../../../Utilities/Interfaces/IToolFileSystem.h"
 
 #include "AssetPipelineConfig.h"
+#include "Forge/Core/TF_Types.h"
+
 
 #define STRCMP(a, b)  (stricmp(a, b) == 0)
 
@@ -272,7 +274,7 @@ typedef enum MeshOptimizerFlags
     /// All
     MESH_OPTIMIZATION_FLAG_ALL = 0x7,
 } MeshOptimizerFlags;
-MAKE_ENUM_FLAG(uint32_t, MeshOptimizerFlags)
+TF_ENUM_FLAG(uint32_t, MeshOptimizerFlags)
 
 struct ProcessGLTFParams
 {

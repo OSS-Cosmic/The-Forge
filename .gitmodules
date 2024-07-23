@@ -49,3 +49,9 @@
 [submodule "Forge/Graphics/Vulkan/volk"]
 	path = Forge/Graphics/Vulkan/volk
 	url = git@github.com:OSS-Cosmic/volk.git
+[submodule "Forge/3rdparty/cgltf"]
+	path = Forge/3rdparty/cgltf
+	url = git@github.com:OSS-Cosmic/cgltf.git
+[submodule "Forge/3rdparty/ozz-animation"]
+	path = Forge/3rdparty/ozz-animation
+	url = git@github.com:OSS-Cosmic/ozz-animation.git

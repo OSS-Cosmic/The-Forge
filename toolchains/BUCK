@@ -3,6 +3,12 @@ load("@prelude//toolchains:python.bzl", "system_python_bootstrap_toolchain", "sy
 load("@prelude//toolchains/msvc:tools.bzl", "find_msvc_tools")
 load("@prelude//toolchains/cxx/clang:tools.bzl", "path_clang_tools")
 load("@prelude//toolchains:cxx.bzl", "cxx_tools_info_toolchain")
+load("@prelude//toolchains:remote_test_execution.bzl", "remote_test_execution_toolchain")
+
+remote_test_execution_toolchain(
+    name = "remote_test_execution",
+    visibility = ["PUBLIC"],
+)
 
 
 find_msvc_tools(

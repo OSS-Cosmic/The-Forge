@@ -34,21 +34,8 @@
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "Forge/Core/TF_Log.h"
 #include "Forge/Core/TF_Thread.h"
+#include "Forge/Core/TF_Types.h"
 
-#ifdef __cplusplus
-#ifndef MAKE_ENUM_FLAG
-#define MAKE_ENUM_FLAG(TYPE, ENUM_TYPE)                                                                                      \
-    inline FORGE_CONSTEXPR ENUM_TYPE operator|(ENUM_TYPE a, ENUM_TYPE b) { return ENUM_TYPE(((TYPE)a) | ((TYPE)b)); }        \
-    inline ENUM_TYPE&                operator|=(ENUM_TYPE& a, ENUM_TYPE b) { return (ENUM_TYPE&)(((TYPE&)a) |= ((TYPE)b)); } \
-    inline FORGE_CONSTEXPR ENUM_TYPE operator&(ENUM_TYPE a, ENUM_TYPE b) { return ENUM_TYPE(((TYPE)a) & ((TYPE)b)); }        \
-    inline ENUM_TYPE&                operator&=(ENUM_TYPE& a, ENUM_TYPE b) { return (ENUM_TYPE&)(((TYPE&)a) &= ((TYPE)b)); } \
-    inline FORGE_CONSTEXPR ENUM_TYPE operator~(ENUM_TYPE a) { return ENUM_TYPE(~((TYPE)a)); }                                \
-    inline FORGE_CONSTEXPR ENUM_TYPE operator^(ENUM_TYPE a, ENUM_TYPE b) { return ENUM_TYPE(((TYPE)a) ^ ((TYPE)b)); }        \
-    inline ENUM_TYPE&                operator^=(ENUM_TYPE& a, ENUM_TYPE b) { return (ENUM_TYPE&)(((TYPE&)a) ^= ((TYPE)b)); }
-#endif
-#else
-#define MAKE_ENUM_FLAG(TYPE, ENUM_TYPE)
-#endif
 
 //
 // default capability levels of the renderer
@@ -151,7 +138,7 @@ typedef enum RendererApiFlags
 //    RENDERER_API_PROSPERO_FLAG = (1 << RENDERER_API_PROSPERO),
 //#endif
 } RendererApiFlags;
-MAKE_ENUM_FLAG(uint32_t, RendererApiFlags)
+TF_ENUM_FLAG(uint32_t, RendererApiFlags)
 
 
 typedef enum QueueType
@@ -169,7 +156,7 @@ typedef enum QueueFlag
     QUEUE_FLAG_INIT_MICROPROFILE = 0x2,
     MAX_QUEUE_FLAG = 0xFFFFFFFF
 } QueueFlag;
-MAKE_ENUM_FLAG(uint32_t, QueueFlag)
+TF_ENUM_FLAG(uint32_t, QueueFlag)
 
 typedef enum QueuePriority
 {
@@ -229,7 +216,7 @@ typedef enum ResourceState
     RESOURCE_STATE_SHADING_RATE_SOURCE = 0x10000,
 #endif
 } ResourceState;
-MAKE_ENUM_FLAG(uint32_t, ResourceState)
+TF_ENUM_FLAG(uint32_t, ResourceState)
 
 /// Choosing Memory Type
 typedef enum ResourceMemoryUsage
@@ -371,7 +358,7 @@ typedef enum DescriptorType
     DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER = (DESCRIPTOR_TYPE_RW_TEXEL_BUFFER << 1),
 #endif
 } DescriptorType;
-MAKE_ENUM_FLAG(uint32_t, DescriptorType)
+TF_ENUM_FLAG(uint32_t, DescriptorType)
 
 typedef enum SampleCount
 {
@@ -429,7 +416,7 @@ typedef enum ShaderStageIndex
     SHADER_STAGE_INDEX_DOMN = SHADER_STAGE_INDEX_TESE,
 } ShaderStageIndex;
 #endif
-MAKE_ENUM_FLAG(uint32_t, ShaderStage)
+TF_ENUM_FLAG(uint32_t, ShaderStage)
 
 // This include is placed here because it uses data types defined previously in this file
 // and forward enums are not allowed for some compilers (Xcode).
@@ -539,7 +526,7 @@ typedef enum ColorMask
     COLOR_MASK_ALPHA = 0x8,
     COLOR_MASK_ALL = (COLOR_MASK_RED | COLOR_MASK_GREEN | COLOR_MASK_BLUE | COLOR_MASK_ALPHA),
 } ColorMask;
-MAKE_ENUM_FLAG(uint8_t, ColorMask)
+TF_ENUM_FLAG(uint8_t, ColorMask)
 
 // Blend states are always attached to one of the eight or more render targets that
 // are in a MRT
@@ -556,7 +543,7 @@ typedef enum BlendStateTargets
     BLEND_STATE_TARGET_7 = 0x80,
     BLEND_STATE_TARGET_ALL = 0xFF,
 } BlendStateTargets;
-MAKE_ENUM_FLAG(uint32_t, BlendStateTargets)
+TF_ENUM_FLAG(uint32_t, BlendStateTargets)
 
 typedef enum CullMode
 {
@@ -648,7 +635,7 @@ typedef enum BufferCreationFlags
 #endif
 
 } BufferCreationFlags;
-MAKE_ENUM_FLAG(uint32_t, BufferCreationFlags)
+TF_ENUM_FLAG(uint32_t, BufferCreationFlags)
 
 typedef enum TextureCreationFlags
 {
@@ -692,7 +679,7 @@ typedef enum TextureCreationFlags
 #endif
     TEXTURE_CREATION_FLAG_SAMPLE_LOCATIONS_COMPATIBLE = 0x20000
 } TextureCreationFlags;
-MAKE_ENUM_FLAG(uint32_t, TextureCreationFlags)
+TF_ENUM_FLAG(uint32_t, TextureCreationFlags)
 
 // Used for swapchain
 typedef enum ColorSpace
@@ -1598,7 +1585,7 @@ typedef enum RootSignatureFlags
     /// Default flag
     ROOT_SIGNATURE_FLAG_NONE = 0,
 } RootSignatureFlags;
-MAKE_ENUM_FLAG(uint32_t, RootSignatureFlags)
+TF_ENUM_FLAG(uint32_t, RootSignatureFlags)
 
 typedef struct RootSignatureDesc
 {
@@ -1903,7 +1890,7 @@ typedef enum MarkerFlags
     MARKER_FLAG_NONE = 0,
     MARKER_FLAG_WAIT_FOR_WRITE = 0x1,
 } MarkerFlags;
-MAKE_ENUM_FLAG(uint8_t, MarkerFlags)
+TF_ENUM_FLAG(uint8_t, MarkerFlags)
 
 typedef struct MarkerDesc
 {
@@ -2605,7 +2592,7 @@ typedef enum PipelineCacheFlags
     PIPELINE_CACHE_FLAG_NONE = 0x0,
     PIPELINE_CACHE_FLAG_EXTERNALLY_SYNCHRONIZED = 0x1,
 } PipelineCacheFlags;
-MAKE_ENUM_FLAG(uint32_t, PipelineCacheFlags);
+TF_ENUM_FLAG(uint32_t, PipelineCacheFlags);
 
 typedef struct PipelineCacheDesc
 {
@@ -2681,7 +2668,7 @@ typedef enum SwapChainCreationFlags
     SWAP_CHAIN_CREATION_FLAG_NONE = 0x0,
     SWAP_CHAIN_CREATION_FLAG_ENABLE_FOVEATED_RENDERING_VR = 0x1,
 } SwapChainCreationFlags;
-MAKE_ENUM_FLAG(uint32_t, SwapChainCreationFlags);
+TF_ENUM_FLAG(uint32_t, SwapChainCreationFlags);
 
 typedef struct SwapChainDesc
 {
@@ -2850,7 +2837,7 @@ typedef enum FormatCapability
     FORMAT_CAP_READ_WRITE = 0x8,
     FORMAT_CAP_RENDER_TARGET = 0x10,
 } FormatCapability;
-MAKE_ENUM_FLAG(uint32_t, FormatCapability);
+TF_ENUM_FLAG(uint32_t, FormatCapability);
 
 typedef struct GPUCapBits
 {
@@ -2876,7 +2863,7 @@ typedef enum WaveOpsSupportFlags
     WAVE_OPS_SUPPORT_FLAG_PARTITIONED_BIT_NV = 0x00000100,
     WAVE_OPS_SUPPORT_FLAG_ALL = 0x7FFFFFFF
 } WaveOpsSupportFlags;
-MAKE_ENUM_FLAG(uint32_t, WaveOpsSupportFlags);
+TF_ENUM_FLAG(uint32_t, WaveOpsSupportFlags);
 
 
 typedef struct GpuProperties

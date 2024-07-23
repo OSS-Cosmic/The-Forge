@@ -23,6 +23,13 @@ cat $(buck2 bxl --target-platforms tf_platform//:linux_x86_64 toolchains//compil
 ```
 
 
+## Unit Tests
+
+```
+buck2 test --target-platforms <platform> tf//...
+```
+
+
 The Forge is a cross-platform rendering framework supporting
 - Windows 10/11 
     * with DirectX 12 / Vulkan 1.1

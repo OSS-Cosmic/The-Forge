@@ -69,8 +69,7 @@ cxx_library(
         "SPIRV-Cross/*.cpp"
     ]),
     exported_headers =
-      {paths.join("spirv_cross", paths.basename(file)) : file for file in glob(["SPIRV-Cross/*.hpp", "SPIRV-Cross/*.h"])} |
-      {paths.relativize(file, "SPIRV-Cross/include") : file for file in glob(["SPIRV-Cross/include/**/*.h"])}, 
+      {paths.join("spirv_cross", paths.basename(file)) : file for file in glob(["SPIRV-Cross/*.hpp", "SPIRV-Cross/*.h"])}, 
     visibility = ["PUBLIC"],
 )
 
@@ -148,6 +147,16 @@ prebuilt_cxx_library(
     visibility = ["PUBLIC"],
 )
 
+cxx_library(
+  name = "cgltf",
+  header_namespace = "",
+  exported_headers =  {
+    "cgltf/cgltf.h":"cgltf/cgltf.h",
+    "cgltf/cgltf_write.h":"cgltf/cgltf_write.h",
+  },
+  link_style = "static",
+  visibility = ["PUBLIC"],
+)
 
 export_resources({
     "dxil.dll": "DirectXShaderCompiler/bin/x64/dxil.dll",

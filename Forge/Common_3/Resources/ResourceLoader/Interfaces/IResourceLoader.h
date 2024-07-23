@@ -25,6 +25,7 @@
 #pragma once
 
 #include "Forge/Graphics/TF_Graphics.h"
+#include "Forge/Core/TF_Types.h"
 
 #include "Common_3/Graphics/GraphicsConfig.h"
 #include "../../../Utilities/Math/MathTypes.h"
@@ -285,7 +286,7 @@ typedef enum GeometryLoadFlags
     /// Geometry buffers can be used as input for ray tracing
     GEOMETRY_LOAD_FLAG_RAYTRACING_INPUT = 0x4,
 } GeometryLoadFlags;
-MAKE_ENUM_FLAG(uint32_t, GeometryLoadFlags)
+TF_ENUM_FLAG(uint32_t, GeometryLoadFlags)
 
 typedef struct GeometryBufferLoadDesc
 {
