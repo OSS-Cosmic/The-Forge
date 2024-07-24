@@ -26,7 +26,7 @@
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "Forge/TF_Log.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "../Interfaces/IApp.h"
 
 #include "Common_3/Graphics/GraphicsConfig.h"

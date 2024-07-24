@@ -44,7 +44,7 @@
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Forge/TF_FileSystem.h"
 #include "Forge/TF_Log.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "Forge/Core/TF_Time.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 

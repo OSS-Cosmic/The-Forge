@@ -306,7 +306,7 @@ static HANDLE gProcessHandle;
 // 5. Add the mutex destruction function inside RemoveMutex() on the bottom of this file. (Currently not used)
 
 #include "Forge/TF_FileSystem.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(*x))
 

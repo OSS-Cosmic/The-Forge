@@ -176,7 +176,9 @@ cxx_library(
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/*.cpp",
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp",
         ])
-    }),
+    }) + [
+      "TF_Log.c"
+    ],
     deps = select({
       "tf_platform//target:linux": [
         ":gtk+-3.0",
@@ -236,6 +238,7 @@ cxx_library(
         "Forge/Config.h": "Config.h",
         "Forge/TF_FileSystem.h": "TF_FileSystem.h",
         "Forge/TF_Log.h": "TF_Log.h",
+        "Forge/TF_Thread.h": "TF_Thread.h",
         "Forge/Graphics/Vulkan/volk/volk.c": "Graphics/Vulkan/volk/volk.c"
       } |
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp"]) } |

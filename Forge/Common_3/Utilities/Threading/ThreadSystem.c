@@ -27,7 +27,7 @@
 #include "Forge/Core/Nothings/stb_ds.h"
 
 #include "Forge/TF_Log.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "Forge/Core/TF_Time.h"
 
 #include "Atomics.h"

@@ -28,7 +28,6 @@
 
 #configure TF_DEBUG
 
-
 // Targets
 #configure TF_TARGET_WIN11
 #configure TF_TARGET_LINUX
@@ -36,7 +35,7 @@
 #configure TF_TARGET_ANDROID
 
 #if defined(TF_TARGET_WIN11)
-    #define TF_WINDOWS
+    #define TF_TARGET_WINDOWS
 #endif
 
 #configure TF_FEATURE_D3D12 

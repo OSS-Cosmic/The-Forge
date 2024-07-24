@@ -32,7 +32,7 @@
 #include <sys/time.h>
 
 #include "Forge/TF_Log.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
 #include "../../Utilities/Threading/UnixThreadID.h"
