@@ -40,7 +40,7 @@
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Forge/TF_FileSystem.h"
 #include "Forge/TF_Log.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "Interfaces/IResourceLoader.h"
 
 #include "../../Utilities/Math/ShaderUtilities.h" // Packing functions

@@ -22,22 +22,163 @@
  * under the License.
  */
 
-#include "Log.h"
-
 #include "Forge/Config.h"
 
 #include <stdarg.h>
 
-#ifdef ENABLE_LOGGING
 #include "Forge/TF_FileSystem.h"
 #include "Forge/TF_Log.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "Forge/Core/TF_Time.h"
 
 #include "Forge/Core/Mem/TF_Memory.h"
 
+static bool gIsInteractiveMode = true;
+void _EnableInteractiveMode(bool isInteractiveMode) { gIsInteractiveMode = isInteractiveMode; }
+bool _IsInteractiveMode(void) { return gIsInteractiveMode; }
+
+#if defined(TF_TARGET_LINUX)
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
+
+static void _OutputDebugStringV(const char* str, va_list args)
+{
+#if defined(TF_DEBUG)
+    vprintf(str, args);
+#endif
+}
+
+static void _OutputDebugString(const char* str, ...)
+{
+#if defined(TF_DEBUG)
+    va_list arglist;
+    va_start(arglist, str);
+    vprintf(str, arglist);
+    va_end(arglist);
+#endif
+}
+
+static void _FailedAssertImpl(const char* file, int line, const char* statement, const char* message)
+{
+    if (gIsInteractiveMode)
+    {
+        raise(SIGTRAP);
+    }
+}
+
+static void _PrintUnicode(const char* str, bool error) { printf("%s", str); }
+#elif defined(TF_TARGET_WINDOWS)
+
+#include "Common_3/OS/Interfaces/IOperatingSystem.h"
+
+#include <io.h> // _isatty
+
+#define BUFFER_SIZE 4096
+
+HWND* gLogWindowHandle = NULL;
+
+void _OutputDebugStringV(const char* str, va_list args)
+{
+    char buf[BUFFER_SIZE];
+
+    vsprintf_s(buf, BUFFER_SIZE, str, args);
+    OutputDebugStringA(buf);
+}
+
+void _OutputDebugString(const char* str, ...)
+{
+    va_list arglist;
+    va_start(arglist, str);
+    _OutputDebugStringV(str, arglist);
+    va_end(arglist);
+}
+
+void _FailedAssertImpl(const char* file, int line, const char* statement, const char* message)
+{
+    if (!gIsInteractiveMode)
+    {
+        return;
+    }
+
+    static bool debug = true;
+
+    if (debug)
+    {
+        WCHAR str[1024];
+        WCHAR wstatement[1024];
+        WCHAR wfile[1024];
+        mbstowcs(wstatement, statement, 1024);
+        mbstowcs(wfile, file, 1024);
+        wsprintfW(str, L"Failed: (%s)\n\nFile: %s\nLine: %d\n\n", wstatement, wfile, line);
+
+        if (message)
+        {
+            WCHAR wmessage[1024];
+            mbstowcs(wmessage, message, 1024);
+            wcscat(str, L"Message: ");
+            wcscat(str, wmessage);
+            wcscat(str, L"\n\n");
+        }
+
+        const HWND hwnd = (gLogWindowHandle && isMainThread()) ? *gLogWindowHandle : NULL;
+        UNREF_PARAM(hwnd);
+#ifndef AUTOMATED_TESTING
+        if (IsDebuggerPresent())
+        {
+            wcscat(str, L"Debug?");
+            const int res = MessageBoxW(hwnd, str, L"Assert failed", MB_YESNOCANCEL | MB_ICONERROR | MB_SETFOREGROUND);
+
+            if (res == IDYES) //-V779
+            {
+                __debugbreak();
+            }
+            else if (res == IDCANCEL)
+            {
+                debug = false;
+            }
+        }
+        else
+#endif
+        {
+#ifdef ENABLE_FORGE_STACKTRACE_DUMP
+            __debugbreak();
+#else
+            wcscat(str, L"Display more asserts?");
+            if (MessageBoxW(hwnd, str, L"Assert failed", MB_YESNO | MB_ICONERROR | MB_DEFBUTTON2 | MB_SETFOREGROUND) != IDYES)
+            {
+                debug = false;
+            }
+#endif
+        }
+    }
+}
+
+void _PrintUnicode(const char* str, bool error)
+{
+    // If the output stream has been redirected, use fprintf instead of WriteConsoleW,
+    // though it means that proper Unicode output will not work
+    FILE* out = error ? stderr : stdout;
+    if (!_isatty(_fileno(out)))
+        fprintf(out, "%s", str);
+    else
+    {
+        if (error)
+            printf("%s", str); // use this for now because WriteCosnoleW sometimes cause blocking
+        else
+            printf("%s", str); //-V523
+    }
+
+    _OutputDebugString("%s", str);
+}
+
+#else
+#error unsupported platform
+#endif
+
 #define LOG_CALLBACK_MAX_ID FS_MAX_PATH
 #define LOG_MAX_BUFFER      1024
+
 
 typedef struct LogCallback
 {
@@ -344,6 +485,7 @@ void _FailedAssert(const char* file, int line, const char* statement, const char
     }
 
     _FailedAssertImpl(file, line, statement, usrMsgBuf[0] ? usrMsgBuf : NULL);
+
 }
 
 static void addInitialLogFile(const char* appName)
@@ -419,19 +561,6 @@ static bool isLogCallback(const char* id)
     return false;
 }
 
-#else
-void initLog(const char* appName, LogLevel level) {}
-void exitLog(void) {}
-
-void addLogFile(const char* filename, FileMode file_mode, LogLevel log_level) {}
-void addLogCallback(const char* id, uint32_t log_level, void* user_data, LogCallbackFn callback, LogCloseFn close, LogFlushFn flush) {}
-
-void writeLog(uint32_t level, const char* filename, int line_number, const char* message, va_list args) {}
-void writeLog(uint32_t level, const char* filename, int line_number, const char* message, ...) {}
-void writeRawLog(uint32_t level, bool error, const char* message, ...) {}
-
-void _FailedAssert(const char* file, int line, const char* statement, const char* msgFmt, ...) {}
-#endif
 
 // minimum length is 7 + precision
 static size_t doubleToShortStr(double d, int precision, char* str)
@@ -529,3 +658,4 @@ struct HumanReadableValue humanReadableTimeD(double value)
     memcpy(hrs.str + doubleToShortStr(value, precision, hrs.str), strs[i], 3);
     return hrs;
 }
+

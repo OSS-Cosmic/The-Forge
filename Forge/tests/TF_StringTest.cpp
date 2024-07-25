@@ -246,7 +246,7 @@ UTEST(Core, tfcatprintf)
 
     tfStrSetLen(&buf, 0);
     EXPECT_EQ(tfstrcatprintf(&buf, "a%cb", 0), true);
-    EXPECT_EQ(tfStrEqual(tfToRef(buf), TStrSpan{ "a\0" "b",3 }), 1);
+    EXPECT_EQ(tfStrEqual(tfToRef(buf), TStrSpan{ (char*)"a\0" "b",(size_t)3 }), 1);
     tfStrFree(&buf);
 }
 

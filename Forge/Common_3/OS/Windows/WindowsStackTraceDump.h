@@ -26,7 +26,7 @@
 #include "Forge/Config.h"
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 
 struct WindowsStackTraceLineInfo
 {

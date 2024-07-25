@@ -24,7 +24,7 @@
 
 #include "../Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "Forge/TF_Log.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "Interfaces/IUI.h"
 
 #include "../Tools/Network/Network.h"

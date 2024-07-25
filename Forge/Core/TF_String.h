@@ -316,4 +316,7 @@ int tfStrLastIndexOfCaselessOffset(const struct TStrSpan haystack, size_t offset
 int tfStrIndexOfAny(const struct TStrSpan haystack, const struct TStrSpan characters);
 int tfStrLastIndexOfAny(const struct TStrSpan haystack, const struct TStrSpan characters);
 
+int tfPrettyPrintBytes(struct TStrSpan slice,ssize_t numBytes);
+int tfPrettyPrintDuration(struct TStrSpan slice,double nanoseconds);
+
 #endif

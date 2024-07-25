@@ -41,7 +41,7 @@
 
 #include "Forge/Core/Mem/TF_Memory.h"
 #include "Forge/TF_Log.h"
-#include "Forge/System/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 
 #define VMA_ASSERT(expr) ASSERT(expr)
 

@@ -980,3 +980,107 @@ int tfStrLastIndexOfAny(const struct TStrSpan haystack, const struct TStrSpan ch
     }
     return false;
 }
+
+// minimum length is 7 + precision
+static int doubleToShortStr(struct TStrSpan str, double d, int precision)
+{
+    const int len = snprintf(str.buf, str.len, "%.*f", precision, d);
+    if(len < 0 || len == str.len) 
+        return -1;
+    // remove trailing zeroes
+    int       end = len;
+    for (int i = len - 1; i >= 0; i--)
+    {
+        if (str.buf[i] == '0')
+        {
+            if (end == i + 1)
+                end = i;
+            continue;
+        }
+
+        if (str.buf[i] != '.')
+            continue;
+
+        if (end == i + 1)
+            end = i;
+        str.buf[end] = 0;
+        break;
+    }
+    return end > 0 ? (size_t)end : 0;
+}
+
+int tfPrettyPrintBytes(struct TStrSpan slice, ssize_t numBytes)
+{
+    const TStrSpan strs[] = {
+        tfToRef("B"), tfToRef("KB"), tfToRef("MB"), tfToRef("GB"), tfToRef("TB"),
+    };
+    double   value = (double)numBytes;
+    uint64_t i = 0;
+    while ((value < 0 ? -value : value) >= 1024 && i < sizeof(strs) / sizeof(*strs) - 1)
+    {
+        value /= 1024;
+        ++i;
+    }
+    size_t pos = doubleToShortStr(slice, value, 1);
+    if (pos == -1)
+        return -1;
+    TStrSpan subStr = tfSub(slice, pos, slice.len);
+
+    size_t len = TF_MIN(strs[i].len, subStr.len);
+    if (len < strs[i].len)
+        return -1;
+    memcpy(slice.buf + pos, strs[i].buf, len);
+    pos += len;
+    return pos;
+}
+
+int tfPrettyPrintDuration(struct TStrSpan slice, double ns)
+{
+    const TStrSpan strs[] = { tfToRef("ns"), tfToRef("ms"), tfToRef("s"), tfToRef("m"), tfToRef("h"), tfToRef("d") };
+
+    uint64_t i = 0;
+
+    double capacity = 1000;
+    while ((ns < 0 ? -ns : ns) >= capacity && i < sizeof(strs) / sizeof(*strs) - 1)
+    {
+        ns /= capacity;
+        ++i;
+
+        switch (i)
+        {
+        case 0:
+        case 1:
+        case 2:
+            capacity = 1000;
+            break;
+        case 3:
+            capacity = 60;
+            break;
+        case 4:
+            capacity = 24;
+            break;
+        }
+    }
+
+    const int maxPrecision = 7;
+
+    int    precision = 1;
+    double v = ns;
+    while (v < 100 && precision < maxPrecision)
+    {
+        v *= 100;
+        ++precision;
+    }
+
+    size_t pos = doubleToShortStr(slice, ns, precision);
+    if (pos == -1)
+        return -1;
+    TStrSpan subStr = tfSub(slice, pos, slice.len);
+
+    size_t len = TF_MIN(strs[i].len, subStr.len);
+    if (len < strs[i].len)
+        return -1;
+    memcpy(slice.buf + pos, strs[i].buf, len);
+    pos += len;
+    return pos;
+}
