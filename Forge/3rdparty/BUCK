@@ -101,6 +101,7 @@ prebuilt_cxx_library(
     name = "ags",
     target_compatible_with = ["tf_platform//target:win11"],
     header_namespace = "",
+    shared_lib = "AGS_SDK/ags_lib/lib/amd_ags_x64.dll",
     exported_linker_flags  = ["$(location :ags_lib)"],
     exported_headers  = { "amd_ags.h" : "AGS_SDK/ags_lib/inc/amd_ags.h"}, 
     visibility = ["PUBLIC"],
@@ -109,10 +110,20 @@ prebuilt_cxx_library(
 prebuilt_cxx_library(
     name = "Direct3d12Agility",
     target_compatible_with = ["tf_platform//target:win11"],
+    shared_lib = "Direct3d12Agility/bin/x64/d3d12SDKLayers.dll",
     header_namespace = "",
     exported_headers  = { paths.basename(file): file for file in glob(["Direct3d12Agility/include/*.h"])}, 
     visibility = ["PUBLIC"],
 )
+
+prebuilt_cxx_library(
+    name = "Direct3d12Core",
+    target_compatible_with = ["tf_platform//target:win11"],
+    shared_lib = "Direct3d12Agility/bin/x64/D3D12Core.dll",
+    header_namespace = "",
+    visibility = ["PUBLIC"],
+)
+
 
 export_file(
     name = "dxcompiler.lib",
@@ -127,6 +138,7 @@ prebuilt_cxx_library(
     target_compatible_with = ["tf_platform//target:win11"],
     header_namespace = "",
     exported_linker_flags = ["$(location :dxcompiler.lib)"],
+    shared_lib = "DirectXShaderCompiler/bin/x64/dxcompiler.dll",
     exported_headers  = { paths.basename(file): file for file in glob(["DirectXShaderCompiler/inc/*.h"])}, 
     visibility = ["PUBLIC"],
 )
@@ -142,6 +154,7 @@ prebuilt_cxx_library(
     name = "winpix",
     target_compatible_with = ["tf_platform//target:win11"],
     header_namespace = "",
+    shared_lib = "winpixeventruntime/bin/WinPixEventRuntime.dll",
     exported_linker_flags = ["$(location :WinPixEventRuntime.lib)"],
     exported_headers  = { paths.relativize(file, "winpixeventruntime/Include"): file for file in glob(["winpixeventruntime/Include/WinPixEventRuntime/*.h"])}, 
     visibility = ["PUBLIC"],

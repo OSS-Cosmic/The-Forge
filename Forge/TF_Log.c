@@ -68,7 +68,7 @@ static void _FailedAssertImpl(const char* file, int line, const char* statement,
 }
 
 static void _PrintUnicode(const char* str, bool error) { printf("%s", str); }
-#elif define(TF_TARGET_WINDOWS)
+#elif defined(TF_TARGET_WINDOWS)
 
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 

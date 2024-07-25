@@ -1,4 +1,5 @@
 
+load("@tf//:defs.bzl", "tf_default_shared_deps")
 
 cxx_library(
   name = "TF_utest",
@@ -9,22 +10,13 @@ cxx_library(
   link_style = "static",
 )
 
-cxx_test(
-  name = 'TF_GPUConfigTest',
-  srcs = [
-    'TF_GPUConfigTest.cpp',
-  ],
-  deps = [
-      "@tf//:TF",
-      ":TF_utest"
-  ]
-)
 
 cxx_test(
   name = 'TF_ScratchAllocatorTest',
   srcs = [
     'TF_ScratchAllocatorTest.cpp',
   ],
+  link_style = "static",
   deps = [
       "@tf//:TF",
       ":TF_utest"
@@ -32,10 +24,25 @@ cxx_test(
 )
 
 cxx_test(
+  name = 'TF_GPUConfigTest',
+  srcs = [
+    'TF_GPUConfigTest.cpp',
+  ],
+  link_style = "static",
+  extra_shared_deps = tf_default_shared_deps(),
+  deps = [
+    "@tf//:TF",
+    ":TF_utest"
+  ]
+)
+
+
+cxx_test(
   name = 'TF_StringTest',
   srcs = [
     'TF_StringTest.cpp',
   ],
+  link_style = "static",
   deps = [
       "@tf//:TF",
       ":TF_utest"
