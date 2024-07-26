@@ -1,5 +1,5 @@
 #include "TF_TestMain.h"
-#include "Forge/Core/Mem/TF_Allocators.h"
+#include "Forge/Mem/TF_Allocators.h"
 #include "utest.h"
 
 UTEST(Core, scratchAlloc_1)
@@ -39,7 +39,7 @@ UTEST(TF, scratchAlloc_2)
 
 
 #include "Forge/TF_FileSystem.h"
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 #include "Forge/TF_Log.h"
 UTEST_STATE();
 TF_UTEST_MAIN("TF_ScratchAllocatorTest")

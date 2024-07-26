@@ -39,7 +39,7 @@
 #ifndef TF_STRING_H_INCLUDED
 #define TF_STRING_H_INCLUDED
 
-#include "TF_Types.h"
+#include "Forge/TF_Types.h"
 #include "Forge/TF_Log.h"
 
 #define TFSTR_LLSTR_SIZE 21
@@ -80,11 +80,11 @@ struct TStrSpan tfStrTrim(struct TStrSpan slice);
 struct TStrSpan tfStrRTrim(struct TStrSpan  slice);
 struct TStrSpan tfStrLTrim(struct TStrSpan  slice);
 
-/* Enlarge the free space at the end of the bstr string so that the caller
+/* Enlarge the free space at the end of the TStr string so that the caller
  * is sure that after calling this function can overwrite up to addlen
  * bytes after the end of the string, plus one more byte for nul term.
  *
- * Note: this does not change the *length* of the bstr string as len 
+ * Note: this does not change the *length* of the TStr string as len 
  * but only the free buffer space we have. */
 bool tfStrMakeRoomFor(struct TStr* str, size_t addlen);
 /* 
@@ -97,7 +97,7 @@ bool tfStrMakeRoomFor(struct TStr* str, size_t addlen);
  **/
 bool tfStrSetLen(struct TStr* str, size_t len);
 /**
- * set the amount of memory reserved by the bstr. will only ever increase
+ * set the amount of memory reserved by the TStr. will only ever increase
  * the size of the string 
  * 
  * A reserved string can be assigned with bstrAssign
@@ -105,7 +105,7 @@ bool tfStrSetLen(struct TStr* str, size_t len);
 bool tfStrSetResv(struct TStr* str, size_t reserveLen); 
 
 /** 
- * Modify an bstr string in-place to make it empty (zero length) set null terminator.
+ * Modify an TStr string in-place to make it empty (zero length) set null terminator.
  * However all the existing buffer is not discarded but set as free space
  * so that next append operations will not require allocations up to the
  * number of bytes previously available. 
@@ -113,7 +113,7 @@ bool tfStrSetResv(struct TStr* str, size_t reserveLen);
 bool tfStrClear(struct TStr* str);
 
 /**
- * takes a bstr and duplicates the underlying buffer.
+ * takes a TStr and duplicates the underlying buffer.
  *
  * the buffer is trimmed down to the length of the string.
  *
@@ -126,7 +126,7 @@ bool tfStrInsertChar(struct TStr* str, size_t i, char b);
 bool tfStrInserSlice(struct TStr* str, size_t i, const struct TStrSpan slice);
 bool tfStrAssign(struct TStr* str, struct TStrSpan slice);
 /**
- * resizes the allocation of the bstr will truncate if the allocation is less then the size 
+ * resizes the allocation of the TStr will truncate if the allocation is less then the size 
  *
  * the buffer is trimmed down to the length of the string.
  *
@@ -184,37 +184,37 @@ struct TStrSpan tfStrSplitIter(struct TFStrSplitIterable*);
  **/
 struct TStrSpan tfStrSplitRevIter(struct TFStrSplitIterable*);
 
-/* Set the bstr string length to the length as obtained with strlen(), so
+/* Set the TStr string length to the length as obtained with strlen(), so
  * considering as content only up to the first null term character.
  *
- * This function is useful when the bstr string has been changed where
+ * This function is useful when the TStr string has been changed where
  * the length is not correctly updated. using vsprintf for instance.
  *
- * After the call, slices are not valid if they reference this bstr 
+ * After the call, slices are not valid if they reference this TStr 
  * 
- * s = bstrEmpty();
+ * s = tfEmpty();
  * s[2] = '\0';
- * bstrUpdateLen(s);
+ * tfUpdateLen(s);
  * printf("%d\n", s.len);
  *
- * The output will be "2", but if we comment out the call to bstrUpdateLen()
+ * The output will be "2", but if we comment out the call to tfUpdateLen()
  * the output will be "6" as the string was modified but the logical length
  * remains 6 bytes. 
  ** */
 bool tfStrUpdateLen(struct TStr* str);
 
-/* Append to the bstr string 's' a string obtained using printf-alike format
+/* Append to the TStr string 's' a string obtained using printf-alike format
  * specifier.
  *
- * After the call, the modified bstr string is no longer valid and all the
+ * After the call, the modified TStr string is no longer valid and all the
  * references must be substituted with the new pointer returned by the call.
  *
  * Example:
  *
- * s = bstrCreate("Sum is: ");
- * bstrcatprintf(s,"%d+%d = %d",a,b,a+b)
+ * s = tfCreate("Sum is: ");
+ * tfcatprintf(s,"%d+%d = %d",a,b,a+b)
  *
- * if valid BSTR_OK else BSTR_ERR
+ * if valid true else false
  */
 bool tfstrcatprintf(struct TStr* s, const char *fmt, ...); 
 bool tfstrcatvprintf(struct TStr* str, const char* fmt, va_list ap);
@@ -222,9 +222,9 @@ bool tfstrcatvprintf(struct TStr* str, const char* fmt, va_list ap);
 int tfstrsscanf(struct TStrSpan slice, const char* fmt, ...);
 int tfstrvsscanf(struct TStrSpan slice, const char* fmt, va_list ap);
 
-/* This function is similar to bstrcatprintf, but much faster as it does
+/* This function is similar to tfcatprintf, but much faster as it does
  * not rely on sprintf() family functions implemented by the libc that
- * are often very slow. Moreover directly handling the bstr as
+ * are often very slow. Moreover directly handling the TStr as
  * new data is concatenated provides a performance improvement.
  *
  * However this function only handles an incompatible subset of printf-alike
@@ -232,7 +232,7 @@ int tfstrvsscanf(struct TStrSpan slice, const char* fmt, va_list ap);
  *
  * %c - char
  * %s - C String
- * %S - struct bstr_const_slice_s slice 
+ * %S - struct tf_slice_s slice 
  * %i - signed int
  * %l - signed long
  * %I - 64 bit signed integer (long long, int64_t)
@@ -243,16 +243,15 @@ int tfstrvsscanf(struct TStrSpan slice, const char* fmt, va_list ap);
  */
 bool tfstrcatfmt(struct TStr*, char const *fmt, ...);
 
-
 /*
  * join an array of slices and cat them to bstr. faster since the lengths are known ahead of time.
  * the buffer can be pre-reserved upfront.
  *
- * this modifies bstr so slices that reference this bstr can become invalid.
+ * this modifies TStr so slices that reference this TStr can become invalid.
  **/
 bool tfstrcatjoin(struct TStr*, struct TStrSpan* slices, size_t numSlices, struct TStrSpan sep);
 /*
- * join an array of strings and cat them to bstr 
+ * join an array of strings and cat them to TStr 
  **/
 bool tfstrcatjoinCStr(struct TStr*, const char** argv, size_t argc, struct TStrSpan sep);
 

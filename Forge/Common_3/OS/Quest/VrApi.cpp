@@ -35,7 +35,7 @@
 
 #include "VrApi.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 QuestVR* pQuest = NULL;
 

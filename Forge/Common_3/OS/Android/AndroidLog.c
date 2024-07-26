@@ -35,7 +35,7 @@
 
 #include "Forge/TF_Log.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 static bool gIsInteractiveMode = true;
 

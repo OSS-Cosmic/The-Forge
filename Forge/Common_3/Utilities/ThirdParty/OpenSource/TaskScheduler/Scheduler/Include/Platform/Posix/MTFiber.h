@@ -324,7 +324,7 @@ namespace MT
 #else
 
 #define IMEMORY_FROM_HEADER
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 #include "Forge/TF_Log.h"
 #define MCO_ALLOC(size)         tf_calloc(1, size)
 #define MCO_DEALLOC(ptr, size)  tf_free(ptr)

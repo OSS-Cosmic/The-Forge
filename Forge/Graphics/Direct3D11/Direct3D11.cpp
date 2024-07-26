@@ -36,7 +36,7 @@
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_apis.h"
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_query.h"
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Forge/TF_FileSystem.h"
@@ -66,7 +66,7 @@ extern "C"
     __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #if defined(AUTOMATED_TESTING)
 #include "../../Application/Interfaces/IScreenshot.h"

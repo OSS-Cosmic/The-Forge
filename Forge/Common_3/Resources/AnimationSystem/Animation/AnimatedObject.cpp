@@ -27,7 +27,7 @@
 #include "../ThirdParty/OpenSource/ozz-animation/include/ozz/animation/runtime/ik_aim_job.h"
 #include "../ThirdParty/OpenSource/ozz-animation/include/ozz/animation/runtime/ik_two_bone_job.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 namespace
 {

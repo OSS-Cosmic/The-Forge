@@ -40,13 +40,13 @@
 #define strncpy_s     strncpy
 #endif
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Forge/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
-#include "Forge/Core/Mem/TF_Allocators.h"
+#include "Forge/Mem/TF_Allocators.h"
 
 #include "Common_3/Utilities/Math/MathTypes.h"
 
@@ -93,7 +93,7 @@ extern RenderTarget* pFragmentDensityMask;
 #include "swappy/swappyVk.h"
 #endif
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #if defined(AUTOMATED_TESTING)
 #include "Common_3/Application/Interfaces/IScreenshot.h"

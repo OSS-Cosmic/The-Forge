@@ -28,13 +28,13 @@
 
 #include <string.h>
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Forge/TF_Log.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #define MAX_REFLECT_STRING_LENGTH 128
 #define MAX_BUFFER_BINDINGS       31

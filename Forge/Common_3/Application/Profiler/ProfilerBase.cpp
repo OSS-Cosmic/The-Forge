@@ -42,7 +42,7 @@
 
 #include "../../Utilities/Math/Algorithms.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #ifdef ENABLE_PROFILER
 /////////////////////////////////////////////////////////////////////////////

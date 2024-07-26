@@ -28,6 +28,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "Forge/TF_Types.h"
+
 #include "../../Utilities/ThirdParty/OpenSource/murmurhash3/MurmurHash3_32.h"
 
 #define TF_RAND_MAX     0x7FFFFFFF

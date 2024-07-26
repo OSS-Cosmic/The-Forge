@@ -20,7 +20,7 @@
 #define FONS_H
 
 #define IMEMORY_FROM_HEADER
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -261,7 +261,7 @@ static int fons__tt_getGlyphKernAdvance(FONSttFontImpl *font, int glyph1, int gl
 
 // Using a unified stbtt implementation for fontstash and imgui
 // All we need is the header for the function declarations since they're compiled in Core/stbtt.cpp
-#include "Forge/Core/Nothings/stb_truetype.h"
+#include "Forge/stb/stb_truetype.h"
 
 //Previous implementation:
 //#define STB_TRUETYPE_IMPLEMENTATION

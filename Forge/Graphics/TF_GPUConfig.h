@@ -2,8 +2,8 @@
 /* ------------------------ gpu.data ------------------------ */
 // intel use 3 identifiers 0x163C, 0x8086, 0x8087;
 
-#include "Forge/Core/TF_String.h"
-#include "Forge/Core/Mem/TF_Allocators.h"
+#include "Forge/TF_String.h"
+#include "Forge/Mem/TF_Allocators.h"
 
 #include "Forge/Graphics/TF_Graphics.h"
 

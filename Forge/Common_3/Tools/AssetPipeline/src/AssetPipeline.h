@@ -33,7 +33,7 @@
 #include "../../../Utilities/Interfaces/IToolFileSystem.h"
 
 #include "AssetPipelineConfig.h"
-#include "Forge/Core/TF_Types.h"
+#include "Forge/TF_Types.h"
 
 
 #define STRCMP(a, b)  (stricmp(a, b) == 0)

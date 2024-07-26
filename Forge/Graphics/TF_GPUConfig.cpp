@@ -3,7 +3,8 @@
 
 #include <cstdint>
 
-#include "Forge/Core/TF_String.h"
+#include "Forge/TF_String.h"
+#include "Forge/stb/stb_ds.h"
 
 #define GPUCFG_VERSION_MAJOR 0
 #define GPUCFG_VERSION_MINOR 2

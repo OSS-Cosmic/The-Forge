@@ -26,7 +26,7 @@
 
 #ifdef VULKAN
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Forge/TF_Log.h"
@@ -39,7 +39,7 @@
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Common_3/Graphics/Interfaces/IRay.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 extern VkAllocationCallbacks* GetAllocationCallbacks(VkObjectType objType);
 

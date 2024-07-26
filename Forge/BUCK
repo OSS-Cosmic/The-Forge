@@ -171,7 +171,9 @@ cxx_library(
           "Common_3/Application/ThirdParty/OpenSource/gainput/lib/source/gainput/hid/hidparsers/*.cpp",
         ])
     }) + [
-      "TF_Log.c"
+      "TF_Log.c",
+      "TF_String.cpp",
+      "Mem/TF_Allocators.cpp"
     ],
     deps = select({
       "tf_platform//target:linux": [
@@ -216,6 +218,8 @@ cxx_library(
     exported_headers = 
       {
         "Forge/TF_Config.h":":TF_Config",
+        "Forge/TF_Types.h":"TF_Types.h",
+        "Forge/TF_String.h":"TF_String.h",
         "Forge/Config.h": "Config.h",
         "Forge/TF_FileSystem.h": "TF_FileSystem.h",
         "Forge/TF_Log.h": "TF_Log.h",
@@ -224,9 +228,14 @@ cxx_library(
       } |
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp"]) } |
       { paths.join("Forge",file): file for file in glob([
+          "Mem/*.h",
+          "stb/*.h",
           "Core/**/*.h", 
           "Core/*.h", 
           "System/*.h",
+
+          "Math/*.hpp",
+          "Math/**/*.hpp",
 
           "Graphics/*.h",
           "Graphics/**/*.h",

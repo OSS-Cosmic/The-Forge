@@ -33,7 +33,7 @@
 
 #include "../../OS/Quest/VrApi.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 Queue*        pSynchronisationQueue = NULL;
 RenderTarget* pFragmentDensityMask = NULL;

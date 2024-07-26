@@ -28,7 +28,6 @@
 [project]
   ignore = .git
 
-
 [tf]
   memory-tracking = 1
   log-level = eAll

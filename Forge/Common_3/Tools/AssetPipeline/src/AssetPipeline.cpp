@@ -68,7 +68,7 @@
 
 #include "../../../Resources/ResourceLoader/TextureContainers.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 extern "C"
 {

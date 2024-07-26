@@ -33,7 +33,7 @@
 
 #include "../VisibilityBuffer/Shaders/FSL/vb_structs.h.fsl"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 /************************************************************************/
 // Settings

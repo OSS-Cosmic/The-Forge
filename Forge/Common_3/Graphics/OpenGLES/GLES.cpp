@@ -34,7 +34,7 @@
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_apis.h"
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_query.h"
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 
 #include "Forge/TF_Log.h"
@@ -51,7 +51,7 @@
 #include "OpenGL/GLES2/gl2.h"
 #include "OpenGL/GLES2/gl2ext.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 extern void gles_createShaderReflection(Shader* pProgram, ShaderReflection* pOutReflection, const BinaryShaderDesc* pDesc);
 

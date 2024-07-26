@@ -11,26 +11,17 @@
 #define VECTORMATH_HPP
 
 #include "Forge/Config.h"
+#include "Forge/TF_Config.h"
 #include "vectormath_settings.hpp"
 
 // Sony's library includes:
-#if VECTORMATH_MODE_SCE
-#if defined(ORBIS)
-#include "../../../../../PS4/Common_3/Utilities/ThirdParty/OpenSource/vectormath/VectorMathConfig.h"
-#include "../../../../../PS4/Common_3/Utilities/ThirdParty/OpenSource/vectormath/cpp/vectormath_aos.h"
-#include "../../../../../PS4/Common_3/Utilities/ThirdParty/OpenSource/vectormath/cpp/vectormath_namespace.h"
-#elif defined(PROSPERO)
-#include "../../../../../Prospero/Common_3/Utilities/ThirdParty/OpenSource/vectormath/VectorMathConfig.h"
-#include "../../../../../Prospero/Common_3/Utilities/ThirdParty/OpenSource/vectormath/cpp/vectormath_aos.h"
-#include "../../../../../Prospero/Common_3/Utilities/ThirdParty/OpenSource/vectormath/cpp/vectormath_namespace.h"
-#endif
-#elif (VECTORMATH_CPU_HAS_SSE1_OR_BETTER && !VECTORMATH_FORCE_SCALAR_MODE) // SSE
+#if defined(TF_FEATURE_CPU_SSE) // SSE
     #include "sse/vectormath.hpp"
     using namespace Vectormath::SSE;
-#elif (VECTORMATH_CPU_HAS_NEON && !VECTORMATH_FORCE_SCALAR_MODE) // NEON
+#elif defined(TF_FEATURE_CPU_NEON) 
 	#include "neon/vectormath.hpp"
 	using namespace Vectormath::Neon;
-#else // !SSE
+#else 
     #include "scalar/vectormath.hpp"
     using namespace Vectormath::Scalar;
 #endif // Vectormath mode selection

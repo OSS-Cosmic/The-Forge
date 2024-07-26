@@ -29,7 +29,7 @@
 #include <xmmintrin.h>
 #endif
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 
 #if MT_PLATFORM_WINDOWS 

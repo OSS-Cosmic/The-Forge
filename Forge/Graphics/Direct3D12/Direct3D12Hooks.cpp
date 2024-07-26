@@ -30,7 +30,7 @@
 #include "Forge/Graphics/TF_Graphics.h"
 #include "Common_3/Utilities/Math/MathTypes.h"
 #include "Forge/Graphics/Direct3D12/Direct3D12Hooks.h"
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(p_var) \

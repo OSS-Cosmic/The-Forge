@@ -73,6 +73,4 @@
 #define VECTORMATH_MIN_ALIGN   0
 #endif // Vectormath mode selection
 
-
-
 #endif // VECTORMATH_SETTINGS_HPP

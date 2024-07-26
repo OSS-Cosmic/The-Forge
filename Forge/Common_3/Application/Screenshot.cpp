@@ -46,7 +46,7 @@
 #define STBIW_REALLOC tf_realloc
 #define STBIW_FREE    tf_free
 #define STBIW_ASSERT  ASSERT
-#include "Forge/Core/Nothings/stb_image_write.h"
+#include "Forge/stb/stb_image_write.h"
 
 static Cmd*               gCmd = 0;
 static CmdPool*           pCmdPool = 0;

@@ -35,7 +35,7 @@
 
 #include "../../../include/ozz/base/maths/math_ex.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 namespace ozz {
 namespace memory {
