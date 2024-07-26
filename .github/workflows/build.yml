@@ -30,7 +30,7 @@ jobs:
       - name: Run Test 
         run: |
           cd ${{ github.workspace }}
-          buck2 test --target-platforms tf_platform//:linux_x86_64 tf//...
+          buck2 test --target-platforms tf_platform//:windows_11_x86_64 tf//...
   # macos-build-and-test:
   #   runs-on: macos-latest
   #   steps:
