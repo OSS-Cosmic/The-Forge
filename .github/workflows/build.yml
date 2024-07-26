@@ -13,9 +13,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libgtk-3-dev libudev-dev libx11-dev libxrandr-dev 
-          rustup install nightly-2024-04-28
-          cargo +nightly-2024-04-28 install --git https://github.com/facebook/buck2.git buck2
+          sudo apt-get install libgtk-3-dev libudev-dev libx11-dev libxrandr-dev
+      - uses: dtolnay/install-buck2@latest
       - name: Run Test 
         run: |
           export PATH=$HOME/.cargo/bin:$PATH
