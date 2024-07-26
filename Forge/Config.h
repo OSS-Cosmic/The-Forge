@@ -69,8 +69,6 @@
 #define QUOTE(x)  _QUOTE(x)
 #endif
 
-#define TF_ARRAY_COUNT(array) (sizeof(array) / (sizeof(array[0]) * (sizeof(array) != PTR_SIZE || sizeof(array[0]) <= PTR_SIZE)))
-
 #ifndef TF_MIN
 #define TF_MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif

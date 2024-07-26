@@ -27,7 +27,7 @@
 #include "Interfaces/ICameraController.h"
 
 // Include this file as last include in all cpp files allocating memory
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 static const float k_scrollSpeed = -5.0f;
 

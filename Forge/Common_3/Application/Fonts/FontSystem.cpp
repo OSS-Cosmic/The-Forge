@@ -31,7 +31,7 @@
 // include Fontstash (should be after MemoryTracking so that it also detects memory free/remove in fontstash)
 #define FONTSTASH_IMPLEMENTATION
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_query.h"
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 #include "Common_3/Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "../ThirdParty/OpenSource/Fontstash/src/fontstash.h"
 
@@ -40,7 +40,7 @@
 
 #include "../../Utilities/RingBuffer.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #ifdef ENABLE_FORGE_FONTS
 

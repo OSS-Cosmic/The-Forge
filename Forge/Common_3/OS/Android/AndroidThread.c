@@ -37,7 +37,7 @@
 
 #include "../../Utilities/Threading/UnixThreadID.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #define NSEC_PER_USEC 1000ull
 #define USEC_PER_SEC  1000000ull

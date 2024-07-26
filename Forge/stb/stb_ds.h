@@ -405,7 +405,7 @@ struct bstring;
 
 #ifndef STB_DS_IMPLEMENTATION
 #define IMEMORY_FROM_HEADER
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 #endif
 
 #ifdef _MSC_VER

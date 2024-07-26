@@ -44,11 +44,11 @@
 
 #include "ParallelPrimitives.h"
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 
 #include "../../Common_3/Resources/ResourceLoader/Interfaces/IResourceLoader.h"
 #include "Forge/TF_Log.h"
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 ParallelPrimitives::PipelineComponents::PipelineComponents():
     mNextSetIndex(0), pDescriptorSet(NULL), pShader(NULL), pPipeline(NULL), pRootSignature(NULL)

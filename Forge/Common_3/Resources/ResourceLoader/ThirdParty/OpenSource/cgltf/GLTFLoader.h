@@ -8,7 +8,7 @@
 #include "../../../../../Utilities/Math/MathTypes.h"
 
 #define IMEMORY_FROM_HEADER
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 // MARK: - Materials
 

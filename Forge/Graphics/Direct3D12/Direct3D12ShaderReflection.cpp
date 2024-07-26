@@ -35,7 +35,7 @@
 #include "Common_3/Graphics/ThirdParty/OpenSource/DirectXShaderCompiler/inc/dxcapi.h"
 #endif
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 static DescriptorType sD3D12_TO_DESCRIPTOR[] = {
     DESCRIPTOR_TYPE_UNIFORM_BUFFER,         // D3D_SIT_CBUFFER

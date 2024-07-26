@@ -22,12 +22,12 @@
  * under the License.
  */
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 
 #include "Forge/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 // This file contains shader reflection code that is the same for all platforms.
 // We know it's the same for all platforms since it only interacts with the

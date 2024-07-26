@@ -30,7 +30,7 @@
 #include "Forge/TF_Log.h"
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 static bool        gInitialized = false;
 static const char* gResourceMounts[RM_COUNT];

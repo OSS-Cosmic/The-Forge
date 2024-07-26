@@ -29,7 +29,7 @@ distribution.
 #include <cstddef>
 
 #include "Forge/TF_FileSystem.h"
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 namespace tinyxml2
 {

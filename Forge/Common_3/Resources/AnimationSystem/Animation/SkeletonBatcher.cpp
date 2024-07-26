@@ -24,7 +24,7 @@
 
 #include "SkeletonBatcher.h"
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 
 void SkeletonBatcher::Initialize(const SkeletonRenderDesc& skeletonRenderDesc)
 {

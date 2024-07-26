@@ -37,7 +37,7 @@
 #include "Forge/TF_Thread.h"
 #include "../../Utilities/Interfaces/IToolFileSystem.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 struct FileWatcher
 {

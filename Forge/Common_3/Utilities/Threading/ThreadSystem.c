@@ -24,7 +24,7 @@
 
 #include "ThreadSystem.h"
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 
 #include "Forge/TF_Log.h"
 #include "Forge/TF_Thread.h"

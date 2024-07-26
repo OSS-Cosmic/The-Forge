@@ -25,7 +25,7 @@
 #pragma once
 
 #include "Forge/Graphics/TF_Graphics.h"
-#include "Forge/Core/TF_Types.h"
+#include "Forge/TF_Types.h"
 
 #ifdef METAL
 #import <MetalKit/MetalKit.h>

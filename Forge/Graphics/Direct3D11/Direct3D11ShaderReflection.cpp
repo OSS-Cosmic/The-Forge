@@ -31,7 +31,7 @@
 #include "Forge/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 static DescriptorType sD3D11_TO_DESCRIPTOR[] = {
     DESCRIPTOR_TYPE_UNIFORM_BUFFER, // D3D_SIT_CBUFFER

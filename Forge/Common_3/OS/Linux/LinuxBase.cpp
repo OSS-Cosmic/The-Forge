@@ -56,7 +56,7 @@
 #include "../../Utilities/Math/MathTypes.h"
 #include "Common_3/OS/CPUConfig.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 static IApp*       pApp = NULL;
 static WindowDesc* gWindowDesc = NULL;

@@ -35,7 +35,7 @@
 #pragma comment(lib, "shlwapi.lib")
 #endif
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "../../Utilities/ThirdParty/OpenSource/rmem/inc/rmem.h"
 
@@ -58,7 +58,7 @@
 #endif
 #include "../../Utilities/Math/MathTypes.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #ifdef ENABLE_FORGE_STACKTRACE_DUMP
 #include "WindowsStackTraceDump.h"

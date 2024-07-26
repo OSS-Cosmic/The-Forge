@@ -25,6 +25,8 @@
 #ifndef TF_CONFIG_2_INCLUDE
 #define TF_CONFIG_2_INCLUDE
 
+#include <stdint.h>
+#include <stdlib.h>
 
 #configure TF_DEBUG
 
@@ -42,11 +44,30 @@
 #configure TF_FEATURE_D3D11
 #configure TF_FEATURE_VULKAN
 
-
 #define TF_DEFAULT_LOG_LEVEL ${LOG_LEVEL}
 #configure TF_ENABLE_LOGGING 
 #configure TF_USE_MTUNER
 
 #configure TF_ENABLE_MEMORY_TRACKING
+
+#if (defined(TF_FEATURE_CPU_NEON) + defined(TF_FEATURE_CPU_SSE) + defined(TF_FEATURE_CPU_SCALAR)) == 0 
+  #if defined(TF_TARGET_DARWIN) && defined(__arm__)
+        #define TF_FEATURE_CPU_NEON
+  #elif defined(_MSC_VER)
+      #if (defined(__AVX__) || defined(__AVX2__) || defined(_M_AMD64) || defined(_M_X64) || (_M_IX86_FP == 1) || (_M_IX86_FP == 2))
+          #define TF_FEATURE_CPU_SSE
+      #endif // SSE support
+  #else // !_MSC_VER
+      #if defined(__SSE__)
+          #define TF_FEATURE_CPU_SSE
+      #elif defined(__ANDROID__)
+          #if defined(ANDROID_ARM_NEON)
+              #define TF_FEATURE_CPU_NEON
+          #endif
+      #elif defined(__arm64) || defined(__aarch64__) || defined(__arm__ )
+          #define TF_FEATURE_CPU_NEON
+      #endif // __SSE__
+  #endif // _MSC_VER
+#endif
 
 #endif

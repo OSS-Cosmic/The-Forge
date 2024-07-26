@@ -36,7 +36,7 @@
 #endif
 
 // OS
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 
 #include "Forge/TF_Log.h"
 
@@ -50,7 +50,7 @@
 
 #include "Forge/Graphics/Direct3D12/Direct3D12Hooks.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 // check if WindowsSDK is used which supports raytracing
 #ifdef D3D12_RAYTRACING_AVAILABLE

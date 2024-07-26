@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Forge/Core/TF_Core.h"
 #include "Forge/TF_Log.h"
 
 typedef void* (*TFAllocatorMalloc)(void* self, size_t size);

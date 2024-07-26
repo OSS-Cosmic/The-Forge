@@ -31,7 +31,7 @@
 #include "Forge/TF_Thread.h"
 #include "Forge/Core/TF_Time.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 static bool gIsInteractiveMode = true;
 void _EnableInteractiveMode(bool isInteractiveMode) { gIsInteractiveMode = isInteractiveMode; }

@@ -34,7 +34,7 @@
 #include "Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "Forge/TF_Log.h"
 #include "Forge/TF_Thread.h"
-#include "Forge/Core/TF_Types.h"
+#include "Forge/TF_Types.h"
 
 
 //

@@ -49,12 +49,12 @@
 #define STBI_REALLOC(p, newsz) tf_realloc(p, newsz)
 #define STBI_FREE(p)           tf_free(p)
 #define STB_IMAGE_IMPLEMENTATION
-#include "Forge/Core/Nothings/stb_image.h"
+#include "Forge/stb/stb_image.h"
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "Forge/Core/Nothings/stb_ds.h"
-#include "Forge/Core/Nothings/stb_image_resize.h"
+#include "Forge/stb/stb_ds.h"
+#include "Forge/stb/stb_image_resize.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #define IS_POWER_OF_TWO(x) ((x) != 0 && ((x) & ((x)-1)) == 0)
 

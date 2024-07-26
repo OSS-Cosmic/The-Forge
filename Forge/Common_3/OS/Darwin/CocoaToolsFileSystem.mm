@@ -27,7 +27,7 @@
 #include "Forge/TF_Log.h"
 #include "../../Utilities/Interfaces/IToolFileSystem.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #pragma mark - FileWatcher
 

@@ -22,7 +22,7 @@
  * under the License.
  */
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 #include "../../Utilities/ThirdParty/OpenSource/bstrlib/bstrlib.h"
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_apis.h"
 #include "Forge/Graphics/tinyimageformat/tinyimageformat_base.h"
@@ -51,7 +51,7 @@
 
 #include "TextureContainers.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #ifdef NX64
 #include "../../Utilities/ThirdParty/OpenSource/murmurhash3/MurmurHash3_32.h"

@@ -1,12 +1,14 @@
 
 
-#include "Forge/Core/TF_String.h"
+#include "Forge/TF_String.h"
 
 #include <ctype.h>
 #include <stdarg.h>
 
 #include "Forge/TF_Log.h"
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
+
+#include "Forge/TF_Types.h"
 
 
 #define   upcase(c) (toupper ((unsigned char) c))

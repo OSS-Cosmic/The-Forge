@@ -1,6 +1,6 @@
 #include "TF_TestMain.h"
 #include "Forge/Config.h"
-#include "Forge/Core/TF_String.h"
+#include "Forge/TF_String.h"
 #include "utest.h"
 
 UTEST(Core, tfCaselessCompare)
@@ -488,7 +488,7 @@ UTEST(Core, tfsscanf)
 // }
 
 #include "Forge/TF_FileSystem.h"
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 #include "Forge/TF_Log.h"
 UTEST_STATE();
 TF_UTEST_MAIN("TF_StringTest")

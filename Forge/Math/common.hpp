@@ -10,7 +10,7 @@
 #include <float.h>
 
 #define IMEMORY_FROM_HEADER
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #include "../../../../Utilities/Math/Random.h"
 #include "Forge/TF_Log.h"

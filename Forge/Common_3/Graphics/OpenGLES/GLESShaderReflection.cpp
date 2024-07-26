@@ -31,7 +31,7 @@
 #include "Forge/TF_Log.h"
 #include "Forge/Graphics/TF_Graphics.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 inline const char* util_get_enum_string(GLenum value)
 {

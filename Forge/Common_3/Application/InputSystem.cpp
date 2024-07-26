@@ -23,7 +23,7 @@
  * under the License.
  */
 
-#include "Forge/Core/Nothings/stb_ds.h"
+#include "Forge/stb/stb_ds.h"
 
 #include "Common_3/Graphics/GraphicsConfig.h"
 
@@ -70,7 +70,7 @@
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUI.h"
 
-#include "Forge/Core/Mem/TF_Memory.h"
+#include "Forge/Mem/TF_Memory.h"
 
 #ifdef GAINPUT_PLATFORM_GGP
 namespace gainput
