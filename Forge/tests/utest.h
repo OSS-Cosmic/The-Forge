@@ -332,8 +332,8 @@ static UTEST_INLINE void *utest_realloc(void *const pointer, size_t new_size) {
 
 static UTEST_INLINE utest_int64_t utest_ns(void) {
 #if defined(_MSC_VER) || defined(__MINGW64__) || defined(__MINGW32__)
-  utest_large_integer counter;
-  utest_large_integer frequency;
+  LARGE_INTEGER counter;
+  LARGE_INTEGER frequency;
   QueryPerformanceCounter(&counter);
   QueryPerformanceFrequency(&frequency);
   return UTEST_CAST(utest_int64_t,
