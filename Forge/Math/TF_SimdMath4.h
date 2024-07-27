@@ -69,16 +69,17 @@ inline Simd_FloatType4 tfSimd4fAndNot(Simd_FloatType4 arg1, Simd_FloatType4 arg2
 inline Simd_FloatType4 tfSimd4fOr(Simd_FloatType4 arg1, Simd_FloatType4 arg2) { return arg1; }
 inline Simd_FloatType4 tfSimd4fXor(Simd_FloatType4 arg1, Simd_FloatType4 arg2) { return arg1; }
 
-inline Simd_FloatType4  tfSimd4fToSimd4i(Simd_Int32Type4 value) { 
+inline Simd_FloatType4  tfSimd4fToSimd4i(Simd_Int32Type4 value) {
 #if defined(TF_FEATURE_CPU_SSE)
-    return _mm_castps_si128(value);
+    return _mm_castsi128_ps(value);
 #elif defined(TF_FEATURE_CPU_SCALAR)
     return { (float)value.v[0], (float)value.v[1], (float)value.v[2], (float)value.v[3] };
 #endif
 }
-inline Simd_Int32Type4  tfSimd4iToSimd4f(Simd_FloatType4 value)  {
+inline Simd_Int32Type4 tfSimd4iToSimd4f(Simd_FloatType4 value)
+{
 #if defined(TF_FEATURE_CPU_SSE)
-    return _mm_castsi128_ps(value); 
+    return _mm_castps_si128(value);
 #elif defined(TF_FEATURE_CPU_SCALAR)
     return { (int32_t)value.v[0], (int32_t)value.v[1], (int32_t)value.v[2], (int32_t)value.v[3] };
 #endif
