@@ -33,9 +33,10 @@ cxx_tools_info_toolchain(
     cxx_tools_info = select({
         "config//os:linux": ":clang_tools",
         "config//os:windows": ":msvc_tools",
-    }),  
+    }), 
     c_flags = select({
-        "config//os:linux": [],
+        "config//os:linux": [
+        ],
         "config//os:windows": [
             "/c",
             "/Z7",
@@ -48,7 +49,7 @@ cxx_tools_info_toolchain(
             "/TC",
             "/Od"
         ],
-    }), 
+    }) + ["-msse4.1"], 
     cxx_flags = select({
         "config//os:linux": select({
           "tf_platform//build:debug": [
@@ -89,8 +90,8 @@ cxx_tools_info_toolchain(
               "/MD",
               "/Gy",
           ]
-        })
-    }),
+        }) 
+    }) + ["-msse4.1"],
     link_flags = select({
         "config//os:linux": [],
         "config//os:windows": [

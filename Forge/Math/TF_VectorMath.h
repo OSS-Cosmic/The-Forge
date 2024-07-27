@@ -13,8 +13,6 @@
 #include "Forge/Config.h"
 #include "Forge/TF_Config.h"
 
-#include "Forge/Math/TF_SimdMath4.h"
-
 // Sony's library includes:
 #if defined(TF_FEATURE_CPU_SSE) // SSE
     #include "sse/vectormath.hpp"
