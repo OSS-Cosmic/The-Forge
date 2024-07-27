@@ -5,14 +5,11 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-
 #include "TF_TestMain.h"
 #include "utest.h"
 
 #include "Forge/Math/TF_SimdMath4.h"
 #include "TF_MathUtils.h"
-
-
 
 UTEST(Vector4, tfSimd4fReplaceIndex0Simd4) {
   Simd_FloatType4 value0 = tfSimd4fLoadImmediate(5.1f, 1.0f, 2.0f, 3.0f);
