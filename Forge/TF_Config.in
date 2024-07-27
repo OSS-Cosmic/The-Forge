@@ -50,24 +50,40 @@
 
 #configure TF_ENABLE_MEMORY_TRACKING
 
+
+
 #if (defined(TF_FEATURE_CPU_NEON) + defined(TF_FEATURE_CPU_SSE) + defined(TF_FEATURE_CPU_SCALAR)) == 0 
-  #if defined(TF_TARGET_DARWIN) && defined(__arm__)
-        #define TF_FEATURE_CPU_NEON
-  #elif defined(_MSC_VER)
-      #if (defined(__AVX__) || defined(__AVX2__) || defined(_M_AMD64) || defined(_M_X64) || (_M_IX86_FP == 1) || (_M_IX86_FP == 2))
-          #define TF_FEATURE_CPU_SSE
-      #endif // SSE support
-  #else // !_MSC_VER
-      #if defined(__SSE__)
-          #define TF_FEATURE_CPU_SSE
-      #elif defined(__ANDROID__)
-          #if defined(ANDROID_ARM_NEON)
-              #define TF_FEATURE_CPU_NEON
-          #endif
-      #elif defined(__arm64) || defined(__aarch64__) || defined(__arm__ )
+
+#configure TF_FEATURE_CPU_NEON 
+#configure TF_FEATURE_CPU_SSE
+#configure TF_FEATURE_CPU_SCALAR
+  
+  #if (defined(TF_FEATURE_CPU_NEON) + defined(TF_FEATURE_CPU_SSE) + defined(TF_FEATURE_CPU_SCALAR)) == 0 
+    #if defined(TF_TARGET_DARWIN) && defined(__arm__)
           #define TF_FEATURE_CPU_NEON
-      #endif // __SSE__
-  #endif // _MSC_VER
+    #elif defined(_MSC_VER)
+        #if (defined(__AVX__) || defined(__AVX2__) || defined(_M_AMD64) || defined(_M_X64) || (_M_IX86_FP == 1) || (_M_IX86_FP == 2))
+            #define TF_FEATURE_CPU_SSE
+        #else
+            #define TF_FEATURE_CPU_SCALAR
+        #endif // SSE support
+    #else // !_MSC_VER
+        #if defined(__SSE__)
+            #define TF_FEATURE_CPU_SSE
+        #elif defined(__ANDROID__)
+            #if defined(ANDROID_ARM_NEON)
+                #define TF_FEATURE_CPU_NEON
+            #else
+                #define TF_FEATURE_CPU_SCALAR
+            #endif
+        #elif defined(__arm64) || defined(__aarch64__) || defined(__arm__ )
+            #define TF_FEATURE_CPU_NEON
+        #else
+            #define TF_FEATURE_CPU_SCALAR
+        #endif // __SSE__
+    #endif // _MSC_VER
+  #endif
 #endif
+
 
 #endif

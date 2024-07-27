@@ -7,12 +7,13 @@
 // Brief: This header exposes the Sony Vectormath library types and functions into the global scope.
 // ================================================================================================
 
-#ifndef VECTORMATH_HPP
-#define VECTORMATH_HPP
+#ifndef TF_VECTORMATH_HPP
+#define TF_VECTORMATH_HPP
 
 #include "Forge/Config.h"
 #include "Forge/TF_Config.h"
-#include "vectormath_settings.hpp"
+
+#include "Forge/Math/TF_SimdMath4.h"
 
 // Sony's library includes:
 #if defined(TF_FEATURE_CPU_SSE) // SSE

@@ -7,9 +7,10 @@ cxx_library(
     "TF_TestMain.h":"TF_TestMain.h",
     "utest.h":"utest.h" 
   },
+  header_namespace = "",
   link_style = "static",
+  visibility = ['PUBLIC']
 )
-
 
 cxx_test(
   name = 'TF_ScratchAllocatorTest',
@@ -20,7 +21,8 @@ cxx_test(
   deps = [
       "@tf//:TF",
       ":TF_utest"
-  ]
+  ],
+  visibility = ['PUBLIC']
 )
 
 cxx_test(
@@ -33,7 +35,8 @@ cxx_test(
   deps = [
     "@tf//:TF",
     ":TF_utest"
-  ]
+  ],
+  visibility = ['PUBLIC']
 )
 
 
@@ -46,5 +49,6 @@ cxx_test(
   deps = [
       "@tf//:TF",
       ":TF_utest"
-  ]
+  ],
+  visibility = ['PUBLIC']
 )
