@@ -6,6 +6,8 @@ inline Simd_Int32Type4 tfSimd4iSplat(int32_t value);
 inline Simd_FloatType  tfSimd4fToSimd1f(Simd_FloatType4 value);
 inline Simd_FloatType2 tfSimd4fToSimd2f(Simd_FloatType4 value);
 inline Simd_FloatType3 tfSimd4fToSimd3f(Simd_FloatType4 value);
+inline Simd_FloatType4 tfSimd4fToSimd4i(Simd_Int32Type4 value);
+inline Simd_Int32Type4  tfSimd4iToSimd4f(Simd_FloatType4 value);
 
 inline Simd_FloatType4 tfSimd4fSplatIndex0(Simd_FloatType4 value);
 inline Simd_FloatType4 tfSimd4fSplatIndex1(Simd_FloatType4 value);
@@ -19,13 +21,6 @@ inline float tfSimd4fSelectIndex3(Simd_FloatType4 value);
 
 inline Simd_FloatType4 tfSimd4fLoadImmediate(float x, float y, float z, float w);
 
-inline float tfSimd4fSelectIndex0(Simd_FloatType4 value) { 
-#if defined(TF_FEATURE_CPU_SSE)
-  return _mm_cvtss_f32(value);
-#elif defined(TF_FEATURE_CPU_SCALAR)
-  return value.v[0];
-#endif
-}
 inline float tfSimd4fSelectIndex1(Simd_FloatType4 value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex1(value)); }
 inline float tfSimd4fSelectIndex2(Simd_FloatType4 value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex2(value)); }
 inline float tfSimd4fSelectIndex3(Simd_FloatType4 value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex3(value)); }
@@ -39,14 +34,66 @@ inline Simd_FloatType4 tfSimd4fReplaceIndex1Simd4(Simd_FloatType4 a, Simd_FloatT
 inline Simd_FloatType4 tfSimd4fReplaceIndex2Simd4(Simd_FloatType4 a, Simd_FloatType4 b);
 inline Simd_FloatType4 tfSimd4fReplaceIndex3Simd4(Simd_FloatType4 a, Simd_FloatType4 b);
 
-inline Simd_FloatType4 tfSimd4fAddSimd4f(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
-inline Simd_FloatType4 tfSimd4fSubSimd4f(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
-inline Simd_FloatType4 tfSimd4fMulSimd4(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
-inline Simd_FloatType4 tfSimd4fMaddSimd4(Simd_FloatType4 mul1, Simd_FloatType4 mul2, Simd_FloatType4 add);
-inline Simd_FloatType4 tfSimd4fDivSimd4(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
-inline Simd_FloatType4 tfSimd4fAbsSimd4(Simd_FloatType4 value);
+inline Simd_FloatType4 tfSimd4fAdd(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
+inline Simd_FloatType4 tfSimd4fSub(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
+inline Simd_FloatType4 tfSimd4fMul(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
+inline Simd_FloatType4 tfSimd4fMadd(Simd_FloatType4 mul1, Simd_FloatType4 mul2, Simd_FloatType4 add);
+inline Simd_FloatType4 tfSimd4fDiv(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
+inline Simd_FloatType4 tfSimd4fAbs(Simd_FloatType4 value);
 
-inline Simd_FloatType4 tfSimd4fAddSimd4f(Simd_FloatType4 arg1, Simd_FloatType4 arg2) { 
+inline Simd_FloatType4 tfSimd4fNot(Simd_FloatType4 value);
+inline Simd_FloatType4 tfSimd4fAnd(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
+inline Simd_FloatType4 tfSimd4fAndNot(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
+inline Simd_FloatType4 tfSimd4fOr(Simd_FloatType4 arg1, Simd_FloatType4 arg2);
+inline Simd_FloatType4 tfSimd4fXor(Simd_FloatType4 arg1, Simd_FloatType4  arg2);
+
+inline Simd_Int32Type4 tfSimd4fNot(Simd_Int32Type4 value);
+inline Simd_Int32Type4 tfSimd4fAnd(Simd_Int32Type4 arg1, Simd_Int32Type4 arg2);
+inline Simd_Int32Type4 tfSimd4fAndNot(Simd_Int32Type4 arg1, Simd_Int32Type4 arg2);
+inline Simd_Int32Type4 tfSimd4fOr(Simd_Int32Type4 arg1, Simd_Int32Type4 arg2);
+inline Simd_Int32Type4 tfSimd4fXor(Simd_Int32Type4 arg1, Simd_Int32Type4 arg2);
+
+inline Simd_FloatType4 tfSimd4fFloor(Simd_Int32Type4 value);
+inline Simd_FloatType4 tfSimd4fCeil(Simd_Int32Type4 value);
+inline Simd_FloatType4 tfSimd4fRound(Simd_Int32Type4 value); // Ties to even (banker's rounding)
+inline Simd_FloatType4 tfSimd4fTruncate(Simd_Int32Type4  value);
+inline Simd_FloatType4 tfSimd4fMin(Simd_Int32Type4 arg1, Simd_Int32Type4 arg2);
+inline Simd_FloatType4 tfSimd4fMax(Simd_Int32Type4 arg1, Simd_Int32Type4 arg2);
+inline Simd_FloatType4 tfSimd4fClamp(Simd_Int32Type4  value, Simd_Int32Type4 min, Simd_Int32Type4 max);
+
+inline Simd_FloatType4 tfSimd4fNot(Simd_FloatType4 value) { 
+    return value; 
+}
+inline Simd_FloatType4 tfSimd4fAnd(Simd_FloatType4 arg1, Simd_FloatType4 arg2) { return arg1; }
+inline Simd_FloatType4 tfSimd4fAndNot(Simd_FloatType4 arg1, Simd_FloatType4 arg2) { return arg1; }
+inline Simd_FloatType4 tfSimd4fOr(Simd_FloatType4 arg1, Simd_FloatType4 arg2) { return arg1; }
+inline Simd_FloatType4 tfSimd4fXor(Simd_FloatType4 arg1, Simd_FloatType4 arg2) { return arg1; }
+
+inline Simd_FloatType4  tfSimd4fToSimd4i(Simd_Int32Type4 value) { 
+#if defined(TF_FEATURE_CPU_SSE)
+                return _mm_castps_si128(value);
+#elif defined(TF_FEATURE_CPU_SCALAR)
+    return { (float)value.v[0], (float)value.v[1], (float)value.v[2], (float)value.v[3] };
+#endif
+}
+inline Simd_Int32Type4  tfSimd4iToSimd4f(Simd_FloatType4 value)  {
+#if defined(TF_FEATURE_CPU_SSE)
+    return _mm_castsi128_ps(value); 
+#elif defined(TF_FEATURE_CPU_SCALAR)
+    return { (int32_t)value.v[0], (int32_t)value.v[1], (int32_t)value.v[2], (int32_t)value.v[3] };
+#endif
+}
+
+inline float tfSimd4fSelectIndex0(Simd_FloatType4 value) { 
+#if defined(TF_FEATURE_CPU_SSE)
+  return _mm_cvtss_f32(value);
+#elif defined(TF_FEATURE_CPU_SCALAR)
+  return value.v[0];
+#endif
+}
+
+
+inline Simd_FloatType4 tfSimd4fAdd(Simd_FloatType4 arg1, Simd_FloatType4 arg2) { 
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_add_ps(arg1, arg2); 
 #else
@@ -58,7 +105,7 @@ inline Simd_FloatType4 tfSimd4fAddSimd4f(Simd_FloatType4 arg1, Simd_FloatType4 a
     };
 #endif
 }
-inline Simd_FloatType4 tfSimd4fSubSimd4f(Simd_FloatType4 arg1, Simd_FloatType4 arg2) {
+inline Simd_FloatType4 tfSimd4fSub(Simd_FloatType4 arg1, Simd_FloatType4 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_sub_ps(arg1, arg2); 
 #else
@@ -70,7 +117,7 @@ inline Simd_FloatType4 tfSimd4fSubSimd4f(Simd_FloatType4 arg1, Simd_FloatType4 a
     };
 #endif
 }
-inline Simd_FloatType4 tfSimd4fMulSimd4(Simd_FloatType4 arg1, Simd_FloatType4 arg2) {
+inline Simd_FloatType4 tfSimd4fMul(Simd_FloatType4 arg1, Simd_FloatType4 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_mul_ps(arg1, arg2); 
 #else
@@ -83,15 +130,15 @@ inline Simd_FloatType4 tfSimd4fMulSimd4(Simd_FloatType4 arg1, Simd_FloatType4 ar
 #endif
 
 }
-inline Simd_FloatType4 tfSimd4fMaddSimd4(Simd_FloatType4 mul1, Simd_FloatType4 mul2, Simd_FloatType4 add)
+inline Simd_FloatType4 tfSimd4fMadd(Simd_FloatType4 mul1, Simd_FloatType4 mul2, Simd_FloatType4 add)
 {
 #if 0
     return _mm_fmadd_ps(mul1, mul2, add); // Requires FMA CPUID
 #else
-    return tfSimd4fAddSimd4f(tfSimd4fMulSimd4(mul1, mul2), add);
+    return tfSimd4fAdd(tfSimd4fMul(mul1, mul2), add);
 #endif
 }
-inline Simd_FloatType4 tfSimd4fDivSimd4(Simd_FloatType4 arg1, Simd_FloatType4 arg2) {
+inline Simd_FloatType4 tfSimd4fDiv(Simd_FloatType4 arg1, Simd_FloatType4 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_div_ps(arg1, arg2);
 #else
@@ -103,9 +150,11 @@ inline Simd_FloatType4 tfSimd4fDivSimd4(Simd_FloatType4 arg1, Simd_FloatType4 ar
     };
 #endif
 }
-inline Simd_FloatType4 tfSimd4fAbsSimd4(Simd_FloatType4 value) { 
+
+inline Simd_FloatType4 tfSimd4fAbs(Simd_FloatType4 value) { 
 #if defined(TF_FEATURE_CPU_SSE)
-    return _mm_abs_epi32(value); 
+    return value;
+    //return _mm_abs_epi32(value); 
 #else
     return {
         abs(value.v[0]),
