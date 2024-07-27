@@ -159,10 +159,10 @@ typedef union {
   utest_int64_t QuadPart;
 } utest_large_integer;
 
-UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceCounter(
-    utest_large_integer *);
-UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceFrequency(
-    utest_large_integer *);
+//UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceCounter(
+//    utest_large_integer *);
+//UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceFrequency(
+//    utest_large_integer *);
 
 #if defined(__MINGW64__) || defined(__MINGW32__)
 #pragma GCC diagnostic pop
