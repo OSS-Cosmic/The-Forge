@@ -34,6 +34,41 @@ cxx_test(
 )
 
 cxx_test(
+  name = 'TF_Simd2',
+  srcs = [
+    'TF_Simd2.cpp',
+  ],
+  link_style = "static",
+  deps = [
+      "@tf//:TF",
+      "@tf//tests:TF_utest"
+  ],
+  header_namespace = "",
+  headers = math_utils_header,
+  visibility = ['PUBLIC']
+)
+
+cxx_test(
+  name = 'TF_Simd2_Scalar',
+  srcs = [
+    'TF_Simd2.cpp',
+  ],
+  link_style = "static",
+  preprocessor_flags = [
+    "-DTF_FEATURE_CPU_SCALAR=1"
+  ],
+  deps = [
+      "@tf//:TF",
+      "@tf//tests:TF_utest"
+  ],
+  header_namespace = "",
+  headers = math_utils_header,
+  visibility = ['PUBLIC']
+)
+
+
+
+cxx_test(
   name = 'TF_Simd3',
   srcs = [
     'TF_Simd3.cpp',

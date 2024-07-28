@@ -9,11 +9,11 @@
 #include "utest.h"
 
 #include "Forge/Math/Internal/Types.h"
-#include "Forge/Math/TF_SimdMath4.h"
+#include "Forge/Math/TF_Simd4.h"
 #include "TF_MathUtils.h"
 
 
-UTEST(Vector4, tfSimd4iCmpGt)
+UTEST(TF_Simd4, tfSimd4iCmpGt)
 {
   struct {
     Simd_Int32Type4 a;
@@ -36,7 +36,7 @@ UTEST(Vector4, tfSimd4iCmpGt)
   }
 }
 
-UTEST(Vector4, tfSimd4iCmpLt)
+UTEST(TF_Simd4, tfSimd4iCmpLt)
 {
   struct {
     Simd_Int32Type4 a;
@@ -60,7 +60,7 @@ UTEST(Vector4, tfSimd4iCmpLt)
 
 
 
-UTEST(Vector4, tfSimd4iCmpEq)
+UTEST(TF_Simd4, tfSimd4iCmpEq)
 {
   struct {
     Simd_Int32Type4 a;
@@ -83,7 +83,7 @@ UTEST(Vector4, tfSimd4iCmpEq)
   }
 }
 
-UTEST(Vector4, tfSimd4fZero)
+UTEST(TF_Simd4, tfSimd4fZero)
 {
     Simd_FloatType4 value = tfSimd4fZero();
     EXPECT_NEAR(tfSimd4fSelectIndex0(value), 0.0f, DEFAULT_EPSILON);
@@ -92,7 +92,7 @@ UTEST(Vector4, tfSimd4fZero)
     EXPECT_NEAR(tfSimd4fSelectIndex3(value), 0.0f, DEFAULT_EPSILON);
 }
 
-UTEST(Vector4, tfSimdSplat4f)
+UTEST(TF_Simd4, tfSimdSplat4f)
 {
     Simd_FloatType4 value = tfSimd4fSplat(23.f);
     EXPECT_NEAR(tfSimd4fSelectIndex0(value), 23.f, DEFAULT_EPSILON);
@@ -112,7 +112,7 @@ UTEST(Vector4, tfSimdSplat4f)
     EXPECT_NEAR(tfSimd4fSelectIndex3(value2), 3.0f, DEFAULT_EPSILON);
 }
 
-UTEST(Vector4, tfSimd4iNot) {
+UTEST(TF_Simd4, tfSimd4iNot) {
   struct {
     Simd_Int32Type4 test;
     Simd_Int32Type4 expect;
@@ -125,7 +125,7 @@ UTEST(Vector4, tfSimd4iNot) {
   }
 }
 
-UTEST(Vector4, tfSimd4iSelect) {
+UTEST(TF_Simd4, tfSimd4iSelect) {
   struct {
     Simd_Int32Type4 a;
     Simd_Int32Type4 b;
@@ -143,7 +143,7 @@ UTEST(Vector4, tfSimd4iSelect) {
   }
 }
 
-//UTEST(Vector4, tfSimd4fSelect) {
+//UTEST(TF_Simd4, tfSimd4fSelect) {
 //  struct {
 //    Simd_FloatType4 a;
 //    Simd_FloatType4 b;
@@ -166,4 +166,4 @@ UTEST(Vector4, tfSimd4iSelect) {
 #include "Forge/TF_FileSystem.h"
 #include "Forge/TF_Log.h"
 UTEST_STATE();
-TF_UTEST_MAIN("TF_Vector4")
+TF_UTEST_MAIN("TF_Simd4")
