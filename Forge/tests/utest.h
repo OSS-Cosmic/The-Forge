@@ -144,34 +144,6 @@ typedef uint32_t utest_uint32_t;
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-//#if defined(_WINDOWS_) || defined(_WINDOWS_H)
-//typedef LARGE_INTEGER utest_large_integer;
-//#else
-//// use old QueryPerformanceCounter definitions (not sure is this needed in some
-//// edge cases or not) on Win7 with VS2015 these extern declaration cause "second
-//// C linkage of overloaded function not allowed" error
-//typedef union {
-//  struct {
-//    unsigned long LowPart;
-//    long HighPart;
-//  } DUMMYSTRUCTNAME;
-//  struct {
-//    unsigned long LowPart;
-//    long HighPart;
-//  } u;
-//  utest_int64_t QuadPart;
-//} utest_large_integer;
-//
-//UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceCounter(
-//    utest_large_integer *);
-//UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceFrequency(
-//    utest_large_integer *);
-//
-//#if defined(__MINGW64__) || defined(__MINGW32__)
-//#pragma GCC diagnostic pop
-//#endif
-//#endif
-
 #elif defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||    \
     defined(__NetBSD__) || defined(__DragonFly__) || defined(__sun__) ||       \
     defined(__HAIKU__)

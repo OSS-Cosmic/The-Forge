@@ -10,7 +10,12 @@
     #include <pmmintrin.h>
     #include <emmintrin.h>
     #include <smmintrin.h>
+   
+    #define TF_SIMD_TRUE 0xFFFFFFFF
+    #define TF_SIMD_FALSE 0x0
     
+    #define TF_SIMDI_MAX 0xFFFFFFFF
+
     typedef __m128 Simd_FloatType4;
     typedef __m128i Simd_Int32Type4;
 
@@ -25,6 +30,11 @@
 #elif defined(TF_FEATURE_CPU_NEON)
     #include <arm_neon.h>
     
+    #define TF_SIMD_TRUE 0xFFFFFFFF
+    #define TF_SIMD_FALSE 0x0
+    
+    #define TF_SIMDI_MAX 0xFFFFFFFF
+    
     typedef float32x4_t Simd_FloatType4;
     typedef int32x4_t Simd_Int32Type4;
 
@@ -37,6 +47,13 @@
     typedef float Simd_FloatType;
     typedef int32_t Simd_Int32Type;
 #elif defined(TF_FEATURE_CPU_SCALAR)
+    #include <cmath>
+    
+    #define TF_SIMD_TRUE 0xFFFFFFFF
+    #define TF_SIMD_FALSE 0x0
+    
+    #define TF_SIMDI_MAX 0xFFFFFFFF
+    
     typedef struct { float   v[4]; } Simd_FloatType4;
     typedef struct { int32_t v[4]; } Simd_Int32Type4;
 
