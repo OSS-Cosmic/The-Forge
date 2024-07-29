@@ -59,4 +59,31 @@
     typedef struct { int32_t v[2]; } TSimdi32x2;
 #endif
 
+struct simd_float4
+{
+  TSimdf32x4 mCol0; 
+};
+
+struct simd_float4x2
+{
+  TSimdf32x4 mCol0; 
+  TSimdf32x4 mCol1; 
+};
+
+struct simd_float4x3
+{
+  TSimdf32x4 mCol0; 
+  TSimdf32x4 mCol1; 
+  TSimdf32x4 mCol2; 
+};
+
+struct simd_float4x4
+{
+  TSimdf32x4 mCol0; 
+  TSimdf32x4 mCol1; 
+  TSimdf32x4 mCol2; 
+  TSimdf32x4 mCol3; 
+};
+
+
 #endif
