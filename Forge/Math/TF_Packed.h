@@ -1,4 +1,9 @@
-#include "Forge/Math/TF_Type.h"
+
+#pragma once
+#ifndef TF_MATH_PACKED_H
+#define TF_MATH_PACKED_H
+
+#include <float.h>
 
 struct TFloat2;
 
@@ -136,3 +141,5 @@ inline bool operator!=(const TFloat3 &a, const TFloat3 &b)
 {
     return !(a == b);
 }
+
+#endif

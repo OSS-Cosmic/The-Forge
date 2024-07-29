@@ -5,6 +5,10 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+#pragma once
+#ifndef TF_SIMD_3_32_H
+#define TF_SIMD_3_32_H
+
 #include "Forge/Math/Internal/SimdTypes.h"
 
 inline TSimdf32x3 tfSimd3fSplat(float value);
@@ -616,3 +620,5 @@ inline bool tfSimd3iCmpAllEq(TSimdi32x3 arg1, TSimdi32x3 arg2)
     return true;
 #endif
 }
+
+#endif

@@ -31,12 +31,10 @@
 using namespace Vectormath::Soa;
 //========================================= #TheForgeAnimationMathExtensionsEnd =======================================
 //========================================= #TheForgeMathExtensionsEnd ================================================
-
 #include "TF_Packed.h"
 
 #include "vec2d.hpp"  // - Extended 2D vector and point classes; not aligned and always in scalar floats mode.
 #include "common.hpp" 
-#include "Forge/Math/TF_Type.h" 
 
 
 using namespace Vectormath;
