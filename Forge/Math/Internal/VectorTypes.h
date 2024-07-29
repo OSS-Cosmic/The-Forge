@@ -1,25 +1,33 @@
+
+
+#pragma once
+#ifndef TF_MATH_INTERNAL_VECTORTYPE_H_
+#define TF_MATH_INTERNAL_VECTORTYPE_H_
+
 #include "SimdTypes.h"
 
-struct TVector3U {
-  TSimdu32x3 mValue;
+struct TVector3i {
+  TSimdi32x4 mValue;
 };
 
-struct TVector3F {
+struct TVector3f {
   TSimdf32x3 mValue;
 };
 
-struct TVector2U {
+struct TVector2i {
   TSimdu32x2 mValue;
 };
 
-struct TVector2F {
+struct TVector2f {
   TSimdf32x2 mValue;
 };
 
-struct TVector4U {
+struct TVector4i {
   TSimdu32x4 mValue;
 };
 
-struct TVector4F {
+struct TVector4f {
   TSimdf32x4 mValue;
 };
+
+#endif

@@ -1,9 +1,9 @@
+#pragma once
+#ifndef TF_MATH_INTERNAL_SIMDTYPE_H_
+#define TF_MATH_INTERNAL_SIMDTYPE_H_
+
 #include "Forge/TF_Config.h"
 #include "Forge/TF_Types.h"
-
-#pragma once
-#ifndef TF_MATH_INTERNAL_TYPE_H_INCLUDED
-#define TF_MATH_INTERNAL_TYPE_H_INCLUDED
 
 #if defined(TF_FEATURE_CPU_SSE) 
     #include <xmmintrin.h>
