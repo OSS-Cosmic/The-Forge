@@ -8,7 +8,7 @@
 #include "TF_TestMain.h"
 #include "utest.h"
 
-#include "Forge/Math/TF_Simd3x32.h"
+#include "Forge/Math/TF_Simd3.h"
 #include "TF_MathUtils.h"
 
 

@@ -35,3 +35,18 @@ struct float4x4
 };
 
 
+struct half
+{
+};
+
+struct half2
+{
+};
+
+struct half3
+{
+};
+
+struct half4
+{
+};

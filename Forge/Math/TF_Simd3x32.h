@@ -11,79 +11,79 @@
 
 #include "Forge/Math/Internal/SimdTypes.h"
 
-inline TSimdf32x3 tfSimd3fSplat(float value);
-inline TSimdi32x3 tfSimd3iSplat(int32_t value);
+inline TSimdFloat3 tfSimd3fSplat(float value);
+inline TSimdInt3 tfSimd3iSplat(int32_t value);
 
-inline TSimdf32x3 tfSimd3fZero();
-inline TSimdi32x3 tfSimd3iZero();
+inline TSimdFloat3 tfSimd3fZero();
+inline TSimdInt3 tfSimd3iZero();
 
-inline TSimdf32x2 tfSimd3fToSimd2f(TSimdf32x3 value);
-inline TSimdi32x3 tfSimd3fToSimd3i(TSimdf32x3 value);
-inline TSimdf32x3 tfSimd3iToSimd3f(TSimdi32x3 value);
+inline TSimdFloat2 tfSimd3fToSimd2f(TSimdFloat3 value);
+inline TSimdInt3 tfSimd3fToSimd3i(TSimdFloat3 value);
+inline TSimdFloat3 tfSimd3iToSimd3f(TSimdInt3 value);
 
-inline TSimdf32x3 tfSimd3fSplatIndex0(TSimdf32x3 value);
-inline TSimdf32x3 tfSimd3fSplatIndex1(TSimdf32x3 value);
-inline TSimdf32x3 tfSimd3fSplatIndex2(TSimdf32x3 value);
+inline TSimdFloat3 tfSimd3fSplatIndex0(TSimdFloat3 value);
+inline TSimdFloat3 tfSimd3fSplatIndex1(TSimdFloat3 value);
+inline TSimdFloat3 tfSimd3fSplatIndex2(TSimdFloat3 value);
 
-inline TSimdf32x3 tfSimd3fSelect(TSimdf32x3 arg0, TSimdf32x3 arg1, TSimdf32x3 mask);
-inline TSimdi32x3 tfSimd3iSelect(TSimdi32x3 arg0, TSimdi32x3 arg1, TSimdi32x3 mask);
+inline TSimdFloat3 tfSimd3fSelect(TSimdFloat3 arg0, TSimdFloat3 arg1, TSimdFloat3 mask);
+inline TSimdInt3 tfSimd3iSelect(TSimdInt3 arg0, TSimdInt3 arg1, TSimdInt3 mask);
 
-inline float tfSimd3fSelectIndex0(TSimdf32x3 value);
-inline float tfSimd3fSelectIndex1(TSimdf32x3 value);
-inline float tfSimd3fSelectIndex2(TSimdf32x3 value);
+inline float tfSimd3fSelectIndex0(TSimdFloat3 value);
+inline float tfSimd3fSelectIndex1(TSimdFloat3 value);
+inline float tfSimd3fSelectIndex2(TSimdFloat3 value);
 
-inline TSimdf32x3 tfSimd3fLoadImmediate(float x, float y, float z);
-inline TSimdi32x3 tfSimd3iLoadImmediate(int32_t x, int32_t y, int32_t z);
+inline TSimdFloat3 tfSimd3fLoadImmediate(float x, float y, float z);
+inline TSimdInt3 tfSimd3iLoadImmediate(int32_t x, int32_t y, int32_t z);
 
-inline TSimdf32x3 tfSimd3fAdd(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fSub(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fMul(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fMadd(TSimdf32x3 mul1, TSimdf32x3 mul2, TSimdf32x3 add);
-inline TSimdf32x3 tfSimd3fDiv(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fAbs(TSimdf32x3 value);
+inline TSimdFloat3 tfSimd3fAdd(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fSub(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fMul(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fMadd(TSimdFloat3 mul1, TSimdFloat3 mul2, TSimdFloat3 add);
+inline TSimdFloat3 tfSimd3fDiv(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fAbs(TSimdFloat3 value);
 
-inline TSimdf32x3 tfSimd3fNot(TSimdf32x3 value);
-inline TSimdf32x3 tfSimd3fAnd(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fAndNot(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fOr(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fXor(TSimdf32x3 arg1, TSimdf32x3 arg2);
+inline TSimdFloat3 tfSimd3fNot(TSimdFloat3 value);
+inline TSimdFloat3 tfSimd3fAnd(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fAndNot(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fOr(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fXor(TSimdFloat3 arg1, TSimdFloat3 arg2);
 
-inline TSimdi32x3 tfSimd3iNot(TSimdi32x3 value);
-inline TSimdi32x3 tfSimd3iAnd(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline TSimdi32x3 tfSimd3iAndNot(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline TSimdi32x3 tfSimd3iOr(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline TSimdi32x3 tfSimd3iXor(TSimdi32x3 arg1, TSimdi32x3 arg2);
+inline TSimdInt3 tfSimd3iNot(TSimdInt3 value);
+inline TSimdInt3 tfSimd3iAnd(TSimdInt3 arg1, TSimdInt3 arg2);
+inline TSimdInt3 tfSimd3iAndNot(TSimdInt3 arg1, TSimdInt3 arg2);
+inline TSimdInt3 tfSimd3iOr(TSimdInt3 arg1, TSimdInt3 arg2);
+inline TSimdInt3 tfSimd3iXor(TSimdInt3 arg1, TSimdInt3 arg2);
 
-inline TSimdf32x3 tfSimd3fFloor(TSimdf32x3 value);
-inline TSimdf32x3 tfSimd3fCeil(TSimdf32x3 value);
-inline TSimdf32x3 tfSimd3fRound(TSimdf32x3 value); // Ties to even (banker's rounding)
-inline TSimdf32x3 tfSimd3fTruncate(TSimdf32x3 value);
-inline TSimdf32x3 tfSimd3fMin(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fMax(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fClamp(TSimdf32x3 value, TSimdf32x3 min, TSimdf32x3 max);
+inline TSimdFloat3 tfSimd3fFloor(TSimdFloat3 value);
+inline TSimdFloat3 tfSimd3fCeil(TSimdFloat3 value);
+inline TSimdFloat3 tfSimd3fRound(TSimdFloat3 value); // Ties to even (banker's rounding)
+inline TSimdFloat3 tfSimd3fTruncate(TSimdFloat3 value);
+inline TSimdFloat3 tfSimd3fMin(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fMax(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fClamp(TSimdFloat3 value, TSimdFloat3 min, TSimdFloat3 max);
 
-inline TSimdi32x3 tfSimd3iCmpEq(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline TSimdi32x3 tfSimd3iCmpNeq(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline TSimdi32x3 tfSimd3iCmpGt(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline TSimdi32x3 tfSimd3iCmpGtEq(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline TSimdi32x3 tfSimd3iCmpLt(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline TSimdi32x3 tfSimd3iCmpLtEq(TSimdi32x3 arg1, TSimdi32x3 arg2);
+inline TSimdInt3 tfSimd3iCmpEq(TSimdInt3 arg1, TSimdInt3 arg2);
+inline TSimdInt3 tfSimd3iCmpNeq(TSimdInt3 arg1, TSimdInt3 arg2);
+inline TSimdInt3 tfSimd3iCmpGt(TSimdInt3 arg1, TSimdInt3 arg2);
+inline TSimdInt3 tfSimd3iCmpGtEq(TSimdInt3 arg1, TSimdInt3 arg2);
+inline TSimdInt3 tfSimd3iCmpLt(TSimdInt3 arg1, TSimdInt3 arg2);
+inline TSimdInt3 tfSimd3iCmpLtEq(TSimdInt3 arg1, TSimdInt3 arg2);
 
-inline TSimdf32x3 tfSimd3fCmpEq(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fCmpNeq(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fCmpGt(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fCmpGtEq(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fCmpLt(TSimdf32x3 arg1, TSimdf32x3 arg2);
-inline TSimdf32x3 tfSimd3fCmpLtEq(TSimdf32x3 arg1, TSimdf32x3 arg2);
+inline TSimdFloat3 tfSimd3fCmpEq(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fCmpNeq(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fCmpGt(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fCmpGtEq(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fCmpLt(TSimdFloat3 arg1, TSimdFloat3 arg2);
+inline TSimdFloat3 tfSimd3fCmpLtEq(TSimdFloat3 arg1, TSimdFloat3 arg2);
 
-inline bool tfSimd3iCmpAllEq(TSimdi32x3 arg1, TSimdi32x3 arg2);
-inline bool tfSimd3fCmpAllEq(TSimdf32x3 arg1, TSimdf32x3 arg2);
+inline bool tfSimd3iCmpAllEq(TSimdInt3 arg1, TSimdInt3 arg2);
+inline bool tfSimd3fCmpAllEq(TSimdFloat3 arg1, TSimdFloat3 arg2);
 
 // ----------------------------------------------------------------
 // --------------------- Implementaion ----------------------------
 // ----------------------------------------------------------------
 
-inline TSimdi32x3 tfSimd3iSelect(TSimdi32x3 arg0, TSimdi32x3 arg1, TSimdi32x3 mask) {
+inline TSimdInt3 tfSimd3iSelect(TSimdInt3 arg0, TSimdInt3 arg1, TSimdInt3 mask) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_blendv_epi8(arg0, arg1, mask);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -94,21 +94,21 @@ inline TSimdi32x3 tfSimd3iSelect(TSimdi32x3 arg0, TSimdi32x3 arg1, TSimdi32x3 ma
             , (mask.v[2] == 0) ? arg0.v[2] : arg1.v[2]};
 #endif
 }
-inline TSimdf32x3 tfSimd3fSelect(TSimdf32x3 arg0, TSimdf32x3 arg1, TSimdf32x3 mask)
+inline TSimdFloat3 tfSimd3fSelect(TSimdFloat3 arg0, TSimdFloat3 arg1, TSimdFloat3 mask)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_blendv_ps(arg0, arg1, mask);
 #elif defined(TF_FEATURE_CPU_NEON)
     return vbslq_f32(mask, arg1, arg2);
 #else
-    TSimdi32x3 intMask =  tfSimd3fToSimd3i(mask);
+    TSimdInt3 intMask =  tfSimd3fToSimd3i(mask);
     return { (intMask.v[0] == 0) ? arg0.v[0] : arg1.v[0]
             , (intMask.v[1] == 0) ? arg0.v[1] : arg1.v[1]
             , (intMask.v[2] == 0) ? arg0.v[2] : arg1.v[2] };
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fZero() { 
+inline TSimdFloat3 tfSimd3fZero() { 
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_setzero_ps();
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -117,7 +117,7 @@ inline TSimdf32x3 tfSimd3fZero() {
     return { 0, 0, 0 };
 #endif
 }
-inline TSimdi32x3 tfSimd3iZero()
+inline TSimdInt3 tfSimd3iZero()
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_setzero_si128();
@@ -128,7 +128,7 @@ inline TSimdi32x3 tfSimd3iZero()
 #endif
 }
 
-inline TSimdi32x3 tfSimd3iNot(TSimdi32x3 value)
+inline TSimdInt3 tfSimd3iNot(TSimdInt3 value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_andnot_si128(value, _mm_set1_epi32(TF_SIMDI_MAX));
@@ -138,7 +138,7 @@ inline TSimdi32x3 tfSimd3iNot(TSimdi32x3 value)
     return { ~value.v[0], ~value.v[1], ~value.v[2] };
 #endif
 }
-inline TSimdi32x3 tfSimd3iAnd(TSimdi32x3 arg1, TSimdi32x3 arg2) {
+inline TSimdInt3 tfSimd3iAnd(TSimdInt3 arg1, TSimdInt3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_and_si128(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -148,7 +148,7 @@ inline TSimdi32x3 tfSimd3iAnd(TSimdi32x3 arg1, TSimdi32x3 arg2) {
 #endif
 
 }
-inline TSimdi32x3 tfSimd3iAndNot(TSimdi32x3 arg1, TSimdi32x3 arg2) {
+inline TSimdInt3 tfSimd3iAndNot(TSimdInt3 arg1, TSimdInt3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_andnot_si128(arg1, arg2); 
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -157,7 +157,7 @@ inline TSimdi32x3 tfSimd3iAndNot(TSimdi32x3 arg1, TSimdi32x3 arg2) {
     return { ~arg1.v[0] & arg2.v[0], ~arg1.v[1] & arg2.v[1], ~arg1.v[2] & arg2.v[2]};
 #endif
 }
-inline TSimdi32x3 tfSimd3iOr(TSimdi32x3 arg1, TSimdi32x3 arg2)
+inline TSimdInt3 tfSimd3iOr(TSimdInt3 arg1, TSimdInt3 arg2)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_or_si128(arg1, arg2);
@@ -167,7 +167,7 @@ inline TSimdi32x3 tfSimd3iOr(TSimdi32x3 arg1, TSimdi32x3 arg2)
     return { arg1.v[0] | arg2.v[0], arg1.v[1] | arg2.v[1], arg1.v[2] | arg2.v[2]};
 #endif
 }
-inline TSimdi32x3 tfSimd3iXor(TSimdi32x3 arg1, TSimdi32x3 arg2){
+inline TSimdInt3 tfSimd3iXor(TSimdInt3 arg1, TSimdInt3 arg2){
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_xor_si128(arg1, arg2); 
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -177,67 +177,67 @@ inline TSimdi32x3 tfSimd3iXor(TSimdi32x3 arg1, TSimdi32x3 arg2){
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fNot(TSimdf32x3 value) {
+inline TSimdFloat3 tfSimd3fNot(TSimdFloat3 value) {
 #if defined(TF_FEATURE_CPU_SSE)
-    const TSimdf32x3 invert = tfSimd3fSplat((float)(0xFFFFFFFF));
+    const TSimdFloat3 invert = tfSimd3fSplat((float)(0xFFFFFFFF));
     return _mm_andnot_ps(value, invert);
 #elif defined(TF_FEATURE_CPU_NEON)
     return vreinterpretq_f32_s32(vmvnq_s32(vreinterpretq_s32_f32(value)));
 #else
-    TSimdi32x3 result = {{ ~((int32_t)value.v[0]), ~((int32_t)value.v[1]),
+    TSimdInt3 result = {{ ~((int32_t)value.v[0]), ~((int32_t)value.v[1]),
                                  ~((int32_t)value.v[2])} } ;
     return tfSimd3iToSimd3f(result);
 #endif
 }
-inline TSimdf32x3 tfSimd3fAnd(TSimdf32x3 arg1, TSimdf32x3 arg2) {
+inline TSimdFloat3 tfSimd3fAnd(TSimdFloat3 arg1, TSimdFloat3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_and_ps(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
     return vreinterpretq_f32_s32(vandq_s32(vreinterpretq_s32_f32(arg1), vreinterpretq_s32_f32(arg2)));
 #else
-    TSimdi32x3 result = { ((int32_t)arg1.v[0]) & ((int32_t)arg2.v[0]), ((int32_t)arg1.v[1]) & ((int32_t)arg2.v[1]),
+    TSimdInt3 result = { ((int32_t)arg1.v[0]) & ((int32_t)arg2.v[0]), ((int32_t)arg1.v[1]) & ((int32_t)arg2.v[1]),
                                ((int32_t)arg1.v[2]) & ((int32_t)arg2.v[2]) };
     return tfSimd3iToSimd3f(result);
 #endif
 }
-inline TSimdf32x3 tfSimd3fAndNot(TSimdf32x3 arg1, TSimdf32x3 arg2) {
+inline TSimdFloat3 tfSimd3fAndNot(TSimdFloat3 arg1, TSimdFloat3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_andnot_ps(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
     return vreinterpretq_f32_s32(vandq_s32(vmvnq_s32(vreinterpretq_s32_f32(arg1)), vreinterpretq_s32_f32(arg2)));
 #else
-    TSimdi32x3 result = { { ~((int32_t)arg1.v[0]) & ((int32_t)arg2.v[0]),
+    TSimdInt3 result = { { ~((int32_t)arg1.v[0]) & ((int32_t)arg2.v[0]),
                                  ~((int32_t)arg1.v[1]) & ((int32_t)arg2.v[1]),
                                  ~((int32_t)arg1.v[2]) & ((int32_t)arg2.v[2]) } };
     return tfSimd3iToSimd3f(result);
 #endif
 }
-inline TSimdf32x3 tfSimd3fOr(TSimdf32x3 arg1, TSimdf32x3 arg2) {
+inline TSimdFloat3 tfSimd3fOr(TSimdFloat3 arg1, TSimdFloat3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_or_ps(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
     return vreinterpretq_f32_s32(vorrq_s32(vreinterpretq_s32_f32(arg1), vreinterpretq_s32_f32(arg2)));
 #else
-    TSimdi32x3 result = { { ((int32_t)arg1.v[0]) | ((int32_t)arg2.v[0]),
+    TSimdInt3 result = { { ((int32_t)arg1.v[0]) | ((int32_t)arg2.v[0]),
                                  ((int32_t)arg1.v[1]) | ((int32_t)arg2.v[1]),
                                  ((int32_t)arg1.v[2]) | ((int32_t)arg2.v[2]) } };
     return tfSimd3iToSimd3f(result);
 #endif
 }
-inline TSimdf32x3 tfSimd3fXor(TSimdf32x3 arg1, TSimdf32x3 arg2) {
+inline TSimdFloat3 tfSimd3fXor(TSimdFloat3 arg1, TSimdFloat3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_xor_ps(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
     return vreinterpretq_f32_s32(veorq_s32(vreinterpretq_s32_f32(arg1), vreinterpretq_s32_f32(arg2)));
 #else
-    TSimdi32x3 result = { { ((int32_t)arg1.v[0]) ^ ((int32_t)arg2.v[0]),
+    TSimdInt3 result = { { ((int32_t)arg1.v[0]) ^ ((int32_t)arg2.v[0]),
                                  ((int32_t)arg1.v[1]) ^ ((int32_t)arg2.v[1]),
                                  ((int32_t)arg1.v[2]) ^ ((int32_t)arg2.v[2]) } };
     return tfSimd3iToSimd3f(result);
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fFloor(TSimdf32x3 value) {
+inline TSimdFloat3 tfSimd3fFloor(TSimdFloat3 value) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_floor_ps(value);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -246,7 +246,7 @@ inline TSimdf32x3 tfSimd3fFloor(TSimdf32x3 value) {
     return { { floorf(value.v[0]), floorf(value.v[1]), floorf(value.v[2]) } };
 #endif
 }
-inline TSimdf32x3 tfSimd3fCeil(TSimdf32x3 value) {
+inline TSimdFloat3 tfSimd3fCeil(TSimdFloat3 value) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_ceil_ps(value);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -255,7 +255,7 @@ inline TSimdf32x3 tfSimd3fCeil(TSimdf32x3 value) {
     return { { ceilf(value.v[0]), ceilf(value.v[1]), ceilf(value.v[2]) } };
 #endif
 }
-inline TSimdf32x3 tfSimd3fRound(TSimdf32x3 value) {
+inline TSimdFloat3 tfSimd3fRound(TSimdFloat3 value) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_round_ps(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -267,8 +267,8 @@ inline TSimdf32x3 tfSimd3fRound(TSimdf32x3 value) {
     return { { rintf(value.v[0]), rintf(value.v[1]), rintf(value.v[2]) } };
 #endif
 }
-inline TSimdf32x3 tfSimd3fTruncate(TSimdf32x3 value) { return tfSimd3iToSimd3f(tfSimd3fToSimd3i(value)); }
-inline TSimdf32x3 tfSimd3fMin(TSimdf32x3 arg1, TSimdf32x3 arg2) {
+inline TSimdFloat3 tfSimd3fTruncate(TSimdFloat3 value) { return tfSimd3iToSimd3f(tfSimd3fToSimd3i(value)); }
+inline TSimdFloat3 tfSimd3fMin(TSimdFloat3 arg1, TSimdFloat3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_min_ps(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -277,7 +277,7 @@ inline TSimdf32x3 tfSimd3fMin(TSimdf32x3 arg1, TSimdf32x3 arg2) {
     return { { fminf(arg1.v[0], arg2.v[0]), fminf(arg1.v[1], arg2.v[1]), fminf(arg1.v[2], arg2.v[2]) } };
 #endif
 }
-inline TSimdf32x3 tfSimd3fMax(TSimdf32x3 arg1, TSimdf32x3 arg2) {
+inline TSimdFloat3 tfSimd3fMax(TSimdFloat3 arg1, TSimdFloat3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_max_ps(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -286,11 +286,11 @@ inline TSimdf32x3 tfSimd3fMax(TSimdf32x3 arg1, TSimdf32x3 arg2) {
     return { { fmaxf(arg1.v[0], arg2.v[0]), fmaxf(arg1.v[1], arg2.v[1]), fmaxf(arg1.v[2], arg2.v[2]) } };
 #endif
 }
-inline TSimdf32x3 tfSimd3fClamp(TSimdf32x3 value, TSimdf32x3 min, TSimdf32x3 max) {
+inline TSimdFloat3 tfSimd3fClamp(TSimdFloat3 value, TSimdFloat3 min, TSimdFloat3 max) {
     return tfSimd3fMax(min, tfSimd3fMin(value, max));
 }
 
-inline TSimdi32x3 tfSimd3fToSimd3i(TSimdf32x3 value)
+inline TSimdInt3 tfSimd3fToSimd3i(TSimdFloat3 value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_castps_si128(value);
@@ -301,7 +301,7 @@ inline TSimdi32x3 tfSimd3fToSimd3i(TSimdf32x3 value)
 #endif
 }
 
-inline TSimdf32x3 tfSimd3iToSimd3f(TSimdi32x3 value)
+inline TSimdFloat3 tfSimd3iToSimd3f(TSimdInt3 value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_castsi128_ps(value);
@@ -312,7 +312,7 @@ inline TSimdf32x3 tfSimd3iToSimd3f(TSimdi32x3 value)
 #endif
 }
 
-inline float tfSimd3fSelectIndex0(TSimdf32x3 value) { 
+inline float tfSimd3fSelectIndex0(TSimdFloat3 value) { 
 #if defined(TF_FEATURE_CPU_SSE)
   return _mm_cvtss_f32(value);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -322,7 +322,7 @@ inline float tfSimd3fSelectIndex0(TSimdf32x3 value) {
 #endif
 }
 
-inline float tfSimd3fSelectIndex1(TSimdf32x3 value) {
+inline float tfSimd3fSelectIndex1(TSimdFloat3 value) {
 #if defined(TF_FEATURE_CPU_SSE)
     return tfSimd3fSelectIndex0(tfSimd3fSplatIndex1(value)); 
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -332,7 +332,7 @@ inline float tfSimd3fSelectIndex1(TSimdf32x3 value) {
 #endif
 }
 
-inline float tfSimd3fSelectIndex2(TSimdf32x3 value) { 
+inline float tfSimd3fSelectIndex2(TSimdFloat3 value) { 
 #if defined(TF_FEATURE_CPU_SSE)
     return tfSimd3fSelectIndex0(tfSimd3fSplatIndex2(value)); 
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -342,7 +342,7 @@ inline float tfSimd3fSelectIndex2(TSimdf32x3 value) {
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fAdd(TSimdf32x3 arg1, TSimdf32x3 arg2)
+inline TSimdFloat3 tfSimd3fAdd(TSimdFloat3 arg1, TSimdFloat3 arg2)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_add_ps(arg1, arg2);
@@ -356,7 +356,7 @@ inline TSimdf32x3 tfSimd3fAdd(TSimdf32x3 arg1, TSimdf32x3 arg2)
     };
 #endif
 }
-inline TSimdf32x3 tfSimd3fSub(TSimdf32x3 arg1, TSimdf32x3 arg2)
+inline TSimdFloat3 tfSimd3fSub(TSimdFloat3 arg1, TSimdFloat3 arg2)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_sub_ps(arg1, arg2);
@@ -370,7 +370,7 @@ inline TSimdf32x3 tfSimd3fSub(TSimdf32x3 arg1, TSimdf32x3 arg2)
     };
 #endif
 }
-inline TSimdf32x3 tfSimd3fMul(TSimdf32x3 arg1, TSimdf32x3 arg2)
+inline TSimdFloat3 tfSimd3fMul(TSimdFloat3 arg1, TSimdFloat3 arg2)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_mul_ps(arg1, arg2);
@@ -384,7 +384,7 @@ inline TSimdf32x3 tfSimd3fMul(TSimdf32x3 arg1, TSimdf32x3 arg2)
     };
 #endif
 }
-inline TSimdf32x3 tfSimd3fMadd(TSimdf32x3 mul1, TSimdf32x3 mul2, TSimdf32x3 add) 
+inline TSimdFloat3 tfSimd3fMadd(TSimdFloat3 mul1, TSimdFloat3 mul2, TSimdFloat3 add) 
 {
 #if defined(TF_FEATURE_CPU_SSE)
 #if 0
@@ -399,7 +399,7 @@ inline TSimdf32x3 tfSimd3fMadd(TSimdf32x3 mul1, TSimdf32x3 mul2, TSimdf32x3 add)
 #endif
 
 }
-inline TSimdf32x3 tfSimd3fDiv(TSimdf32x3 arg1, TSimdf32x3 arg2) {
+inline TSimdFloat3 tfSimd3fDiv(TSimdFloat3 arg1, TSimdFloat3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_div_ps(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -413,7 +413,7 @@ inline TSimdf32x3 tfSimd3fDiv(TSimdf32x3 arg1, TSimdf32x3 arg2) {
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fAbs(TSimdf32x3 value) {
+inline TSimdFloat3 tfSimd3fAbs(TSimdFloat3 value) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_and_ps(value, _mm_set1_ps((float)(0x7FFFFFFF)));
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -427,7 +427,7 @@ inline TSimdf32x3 tfSimd3fAbs(TSimdf32x3 value) {
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fLoadImmediate(float x, float y, float z) {
+inline TSimdFloat3 tfSimd3fLoadImmediate(float x, float y, float z) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_set_ps(0.0f, z, y, x);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -439,7 +439,7 @@ inline TSimdf32x3 tfSimd3fLoadImmediate(float x, float y, float z) {
 }
 
 
-inline TSimdi32x3 tfSimd3iLoadImmediate(int32_t x, int32_t y, int32_t z) {
+inline TSimdInt3 tfSimd3iLoadImmediate(int32_t x, int32_t y, int32_t z) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_set_epi32(0.0f, x, y, z);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -450,7 +450,7 @@ inline TSimdi32x3 tfSimd3iLoadImmediate(int32_t x, int32_t y, int32_t z) {
 #endif
 }
 
-inline TSimdf32x2 tfSimd3fToSimd2f(TSimdf32x3 value)
+inline TSimdFloat2 tfSimd3fToSimd2f(TSimdFloat3 value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return value;
@@ -461,7 +461,7 @@ inline TSimdf32x2 tfSimd3fToSimd2f(TSimdf32x3 value)
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fSplatIndex0(TSimdf32x3 value)
+inline TSimdFloat3 tfSimd3fSplatIndex0(TSimdFloat3 value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_shuffle_ps(value, value, _MM_SHUFFLE(0, 0, 0, 0));
@@ -472,7 +472,7 @@ inline TSimdf32x3 tfSimd3fSplatIndex0(TSimdf32x3 value)
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fSplatIndex1(TSimdf32x3 value)
+inline TSimdFloat3 tfSimd3fSplatIndex1(TSimdFloat3 value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_shuffle_ps(value, value, _MM_SHUFFLE(1, 1, 1, 1));
@@ -483,7 +483,7 @@ inline TSimdf32x3 tfSimd3fSplatIndex1(TSimdf32x3 value)
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fSplatIndex2(TSimdf32x3 value)
+inline TSimdFloat3 tfSimd3fSplatIndex2(TSimdFloat3 value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_shuffle_ps(value, value, _MM_SHUFFLE(2, 2, 2, 2));
@@ -494,7 +494,7 @@ inline TSimdf32x3 tfSimd3fSplatIndex2(TSimdf32x3 value)
 #endif
 }
 
-inline TSimdi32x3 tfSimd3iSplat(int32_t value)
+inline TSimdInt3 tfSimd3iSplat(int32_t value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_set1_epi32(value);
@@ -505,7 +505,7 @@ inline TSimdi32x3 tfSimd3iSplat(int32_t value)
 #endif
 }
 
-inline TSimdf32x3 tfSimd3fSplat(float value)
+inline TSimdFloat3 tfSimd3fSplat(float value)
 {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_set1_ps(value);
@@ -516,7 +516,7 @@ inline TSimdf32x3 tfSimd3fSplat(float value)
 #endif
 }
 
-inline TSimdi32x3 tfSimd3iCmpEq(TSimdi32x3 arg1, TSimdi32x3 arg2) {
+inline TSimdInt3 tfSimd3iCmpEq(TSimdInt3 arg1, TSimdInt3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_cmpeq_epi32(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -527,7 +527,7 @@ inline TSimdi32x3 tfSimd3iCmpEq(TSimdi32x3 arg1, TSimdi32x3 arg2) {
                (arg1.v[2] == arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000} };
 #endif
 }
-inline TSimdi32x3 tfSimd3iCmpNeq(TSimdi32x3 arg1, TSimdi32x3 arg2) {
+inline TSimdInt3 tfSimd3iCmpNeq(TSimdInt3 arg1, TSimdInt3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_xor_si128(
         _mm_cmpeq_epi32(arg1, arg2), 
@@ -540,7 +540,7 @@ inline TSimdi32x3 tfSimd3iCmpNeq(TSimdi32x3 arg1, TSimdi32x3 arg2) {
                (arg1.v[2] != arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000} };
 #endif
 }
-inline TSimdi32x3 tfSimd3iCmpGt(TSimdi32x3 arg1, TSimdi32x3 arg2) {
+inline TSimdInt3 tfSimd3iCmpGt(TSimdInt3 arg1, TSimdInt3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_cmpgt_epi32(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -551,7 +551,7 @@ inline TSimdi32x3 tfSimd3iCmpGt(TSimdi32x3 arg1, TSimdi32x3 arg2) {
                (arg1.v[2] > arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000} };
 #endif
 }
-inline TSimdi32x3 tfSimd3iCmpGtEq(TSimdi32x3 arg1, TSimdi32x3 arg2) {
+inline TSimdInt3 tfSimd3iCmpGtEq(TSimdInt3 arg1, TSimdInt3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_or_si128(
         _mm_cmpgt_epi32(arg1, arg2), 
@@ -564,7 +564,7 @@ inline TSimdi32x3 tfSimd3iCmpGtEq(TSimdi32x3 arg1, TSimdi32x3 arg2) {
                (arg1.v[2] >= arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000} };
 #endif
 }
-inline TSimdi32x3 tfSimd3iCmpLt(TSimdi32x3 arg1, TSimdi32x3 arg2) {
+inline TSimdInt3 tfSimd3iCmpLt(TSimdInt3 arg1, TSimdInt3 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_cmplt_epi32(arg1, arg2);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -575,7 +575,7 @@ inline TSimdi32x3 tfSimd3iCmpLt(TSimdi32x3 arg1, TSimdi32x3 arg2) {
                (arg1.v[2] < arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000 } };
 #endif
 }
-inline TSimdi32x3 tfSimd3iCmpLtEq(TSimdi32x3 arg1, TSimdi32x3 arg2) {
+inline TSimdInt3 tfSimd3iCmpLtEq(TSimdInt3 arg1, TSimdInt3 arg2) {
 
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_or_si128(
@@ -590,9 +590,9 @@ inline TSimdi32x3 tfSimd3iCmpLtEq(TSimdi32x3 arg1, TSimdi32x3 arg2) {
 #endif
 
 }
-inline bool tfSimd3fCmpAllEq(TSimdf32x4 arg1, TSimdf32x4 arg2) {
+inline bool tfSimd3fCmpAllEq(TSimdFloat4 arg1, TSimdFloat4 arg2) {
 #if defined(TF_FEATURE_CPU_SSE)
-    TSimdf32x4  compare = tfSimd3fCmpEq(arg1, arg2);
+    TSimdFloat4  compare = tfSimd3fCmpEq(arg1, arg2);
     return (_mm_movemask_ps(compare) & 0b0111) == 0b0111;
 #else
     for(int i = 0; i < 3; i++) {
@@ -605,10 +605,10 @@ inline bool tfSimd3fCmpAllEq(TSimdf32x4 arg1, TSimdf32x4 arg2) {
 #endif
 }
 
-inline bool tfSimd3iCmpAllEq(TSimdi32x3 arg1, TSimdi32x3 arg2)
+inline bool tfSimd3iCmpAllEq(TSimdInt3 arg1, TSimdInt3 arg2)
 {
 #if defined(TF_FEATURE_CPU_SSE)
-    const TSimdi32x3 compare = tfSimd3iCmpEq(arg1, arg2);
+    const TSimdInt3 compare = tfSimd3iCmpEq(arg1, arg2);
     return (_mm_movemask_epi8(compare) & 0b0111) == 0b0111;
 #else
     for(int i = 0; i < 3; i++) {
