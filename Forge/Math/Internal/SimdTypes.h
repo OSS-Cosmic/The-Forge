@@ -15,6 +15,7 @@
     #define TF_SIMD_FALSE 0x0
     
     #define TF_SIMDI_MAX 0xFFFFFFFF
+    #define TF_SIMDF_MAX 0xFFFFFFFF
 
     typedef __m128 Simd_FloatType4;
     typedef __m128i Simd_Int32Type4;
@@ -24,9 +25,6 @@
 
     typedef __m128 Simd_FloatType2;
     typedef __m128i Simd_Int32Type2;
-
-    typedef __m128 Simd_FloatType;
-    typedef __m128i Simd_Int32Type;
 #elif defined(TF_FEATURE_CPU_NEON)
     #include <arm_neon.h>
     
@@ -43,9 +41,6 @@
 
     typedef float32x2_t Simd_FloatType2;
     typedef int32x2_t Simd_Int32Type2;
-    
-    typedef float Simd_FloatType;
-    typedef int32_t Simd_Int32Type;
 #elif defined(TF_FEATURE_CPU_SCALAR)
     #include <cmath>
     
@@ -62,9 +57,6 @@
     
     typedef struct { float   v[2]; } Simd_FloatType2;
     typedef struct { int32_t v[2]; } Simd_Int32Type2;
-    
-    typedef float Simd_FloatType;
-    typedef int32_t Simd_Int32Type;
 #endif
 
 #endif

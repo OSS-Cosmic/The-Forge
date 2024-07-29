@@ -36,7 +36,7 @@ cxx_test(
 cxx_test(
   name = 'TF_Simd2',
   srcs = [
-    'TF_Simd2.cpp',
+    'TF_Simd2Test.cpp',
   ],
   link_style = "static",
   deps = [
@@ -51,7 +51,7 @@ cxx_test(
 cxx_test(
   name = 'TF_Simd2_Scalar',
   srcs = [
-    'TF_Simd2.cpp',
+    'TF_Simd2Test.cpp',
   ],
   link_style = "static",
   preprocessor_flags = [
@@ -71,7 +71,7 @@ cxx_test(
 cxx_test(
   name = 'TF_Simd3',
   srcs = [
-    'TF_Simd3.cpp',
+    'TF_Simd3Test.cpp',
   ],
   link_style = "static",
   deps = [
@@ -86,7 +86,7 @@ cxx_test(
 cxx_test(
   name = 'TF_Simd3_Scalar',
   srcs = [
-    'TF_Simd3.cpp',
+    'TF_Simd3Test.cpp',
   ],
   link_style = "static",
   preprocessor_flags = [
@@ -105,7 +105,7 @@ cxx_test(
 cxx_test(
   name = 'TF_Simd4',
   srcs = [
-    'TF_Simd4.cpp',
+    'TF_Simd4Test.cpp',
   ],
   link_style = "static",
   deps = [
@@ -120,7 +120,7 @@ cxx_test(
 cxx_test(
   name = 'TF_Simd4_Scalar',
   srcs = [
-    'TF_Simd4.cpp',
+    'TF_Simd4Test.cpp',
   ],
   link_style = "static",
   preprocessor_flags = [
