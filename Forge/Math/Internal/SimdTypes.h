@@ -17,14 +17,14 @@
     #define TF_SIMDI_MAX 0xFFFFFFFF
     #define TF_SIMDF_MAX 0xFFFFFFFF
 
-    typedef __m128 Simd_FloatType4;
-    typedef __m128i Simd_Int32Type4;
+    typedef __m128 TSimdf32x4;
+    typedef __m128i TSimdi32x4;
 
-    typedef __m128 Simd_FloatType3;
-    typedef __m128i Simd_Int32Type3;
+    typedef __m128 TSimdf32x3;
+    typedef __m128i TSimdi32x3;
 
-    typedef __m128 Simd_FloatType2;
-    typedef __m128i Simd_Int32Type2;
+    typedef __m128 TSimdf32x2;
+    typedef __m128i TSimdi32x2;
 #elif defined(TF_FEATURE_CPU_NEON)
     #include <arm_neon.h>
     
@@ -33,14 +33,14 @@
     
     #define TF_SIMDI_MAX 0xFFFFFFFF
     
-    typedef float32x4_t Simd_FloatType4;
-    typedef int32x4_t Simd_Int32Type4;
+    typedef float32x4_t TSimdf32x4;
+    typedef int32x4_t TSimdi32x4;
 
-    typedef float32x4_t Simd_FloatType3;
-    typedef int32x4_t Simd_Int32Type3;
+    typedef float32x4_t TSimdf32x3;
+    typedef int32x4_t TSimdi32x3;
 
-    typedef float32x2_t Simd_FloatType2;
-    typedef int32x2_t Simd_Int32Type2;
+    typedef float32x2_t TSimdf32x2;
+    typedef int32x2_t TSimdi32x2;
 #elif defined(TF_FEATURE_CPU_SCALAR)
     #include <cmath>
     
@@ -49,14 +49,14 @@
     
     #define TF_SIMDI_MAX 0xFFFFFFFF
     
-    typedef struct { float   v[4]; } Simd_FloatType4;
-    typedef struct { int32_t v[4]; } Simd_Int32Type4;
+    typedef struct { float   v[4]; } TSimdf32x4;
+    typedef struct { int32_t v[4]; } TSimdi32x4;
 
-    typedef struct { float   v[3]; } Simd_FloatType3;
-    typedef struct { int32_t v[3]; } Simd_Int32Type3;
+    typedef struct { float   v[3]; } TSimdf32x3;
+    typedef struct { int32_t v[3]; } TSimdi32x3;
     
-    typedef struct { float   v[2]; } Simd_FloatType2;
-    typedef struct { int32_t v[2]; } Simd_Int32Type2;
+    typedef struct { float   v[2]; } TSimdf32x2;
+    typedef struct { int32_t v[2]; } TSimdi32x2;
 #endif
 
 #endif

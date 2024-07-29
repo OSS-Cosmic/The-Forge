@@ -15,9 +15,9 @@
 UTEST(TF_Simd3, tfSimd3iCmpGt)
 {
   struct {
-    Simd_Int32Type3 a;
-    Simd_Int32Type3 b;
-    Simd_Int32Type3 test;
+    TSimdi32x3 a;
+    TSimdi32x3 b;
+    TSimdi32x3 test;
   } tests[] = {
       // ... existing test cases ...
       // Edge cases:
@@ -38,9 +38,9 @@ UTEST(TF_Simd3, tfSimd3iCmpGt)
 UTEST(TF_Simd3, tfSimd3iCmpLt)
 {
   struct {
-    Simd_Int32Type3 a;
-    Simd_Int32Type3 b;
-    Simd_Int32Type3 test;
+    TSimdi32x3 a;
+    TSimdi32x3 b;
+    TSimdi32x3 test;
   } tests[] = {
       // Less than
       {tfSimd3iLoadImmediate(12, 13, 14), tfSimd3iLoadImmediate(16, 17, 18), tfSimd3iLoadImmediate(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
@@ -62,9 +62,9 @@ UTEST(TF_Simd3, tfSimd3iCmpLt)
 UTEST(TF_Simd3, tfSimd3iCmpEq)
 {
   struct {
-    Simd_Int32Type3 a;
-    Simd_Int32Type3 b;
-    Simd_Int32Type3 test;
+    TSimdi32x3 a;
+    TSimdi32x3 b;
+    TSimdi32x3 test;
   } tests[] = {
        // Equal elements
       {tfSimd3iLoadImmediate(12, 13, 14), tfSimd3iLoadImmediate(12, 13, 14), tfSimd3iLoadImmediate(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
@@ -84,7 +84,7 @@ UTEST(TF_Simd3, tfSimd3iCmpEq)
 
 UTEST(TF_Simd3, tfSimd3fZero)
 {
-    Simd_FloatType3 value = tfSimd3fZero();
+    TSimdf32x3 value = tfSimd3fZero();
     EXPECT_NEAR(tfSimd3fSelectIndex0(value), 0.0f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex1(value), 0.0f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex2(value), 0.0f, DEFAULT_EPSILON);
@@ -92,16 +92,16 @@ UTEST(TF_Simd3, tfSimd3fZero)
 
 UTEST(TF_Simd3, tfSimdSplat4f)
 {
-    Simd_FloatType3 value = tfSimd3fSplat(23.f);
+    TSimdf32x3 value = tfSimd3fSplat(23.f);
     EXPECT_NEAR(tfSimd3fSelectIndex0(value), 23.f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex1(value), 23.f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex2(value), 23.f, DEFAULT_EPSILON);
-    Simd_FloatType3 value1 = tfSimd3fSplat(5.1f);
+    TSimdf32x3 value1 = tfSimd3fSplat(5.1f);
     EXPECT_NEAR(tfSimd3fSelectIndex0(value1), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex1(value1), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex2(value1), 5.1f, DEFAULT_EPSILON);
 
-    Simd_FloatType3 value2 = tfSimd3fLoadImmediate(5.1f, 1.0f, 2.0f);
+    TSimdf32x3 value2 = tfSimd3fLoadImmediate(5.1f, 1.0f, 2.0f);
     EXPECT_NEAR(tfSimd3fSelectIndex0(value2), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex1(value2), 1.0f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex2(value2), 2.0f, DEFAULT_EPSILON);
@@ -109,8 +109,8 @@ UTEST(TF_Simd3, tfSimdSplat4f)
 
 UTEST(TF_Simd3, tfSimd3iNot) {
   struct {
-    Simd_Int32Type3 test;
-    Simd_Int32Type3 expect;
+    TSimdi32x3 test;
+    TSimdi32x3 expect;
   } tests[] = {
        {tfSimd3iLoadImmediate(0xFFFFFFFF, 0x0000FFFF, 0xFFFF0000), tfSimd3iLoadImmediate(0, 0xFFFF0000, 0x0000FFFF)},
   };   
@@ -122,10 +122,10 @@ UTEST(TF_Simd3, tfSimd3iNot) {
 
 UTEST(TF_Simd3, tfSimd3iSelect) {
   struct {
-    Simd_Int32Type3 a;
-    Simd_Int32Type3 b;
-    Simd_Int32Type3 mask;
-    Simd_Int32Type3 expect;
+    TSimdi32x3 a;
+    TSimdi32x3 b;
+    TSimdi32x3 mask;
+    TSimdi32x3 expect;
   } tests[] = {
        {tfSimd3iLoadImmediate(10, 11, -13), tfSimd3iLoadImmediate(123, -149, 0), tfSimd3iLoadImmediate(0,0,0), tfSimd3iLoadImmediate(10, 11, -13)},
        {tfSimd3iLoadImmediate(10, 11, -13), tfSimd3iLoadImmediate(123, -149, 0), tfSimd3iLoadImmediate(TF_SIMD_TRUE,0,0), tfSimd3iLoadImmediate(123, 11, -13)},
@@ -140,10 +140,10 @@ UTEST(TF_Simd3, tfSimd3iSelect) {
 
 //UTEST(TF_Simd3, tfSimd3fSelect) {
 //  struct {
-//    Simd_FloatType4 a;
-//    Simd_FloatType4 b;
-//    Simd_FloatType4 mask;
-//    Simd_FloatType4 expect;
+//    TSimdf32x4 a;
+//    TSimdf32x4 b;
+//    TSimdf32x4 mask;
+//    TSimdf32x4 expect;
 //  } tests[] = {
 //       {tfSimd3fLoadImmediate(10, 11, -13, 32), tfSimd3fLoadImmediate(123, -149, 0, 12), tfSimd3fLoadImmediate(0,0,0,0), tfSimd3fLoadImmediate(10, 11, -13, 32)},
 //       {tfSimd3fLoadImmediate(10, 11, -13, 32), tfSimd3fLoadImmediate(123, -149, 0, 12), tfSimd3fLoadImmediate(TF_SIMD_TRUE,0,0,0), tfSimd3fLoadImmediate(123, 11, -13, 32)},

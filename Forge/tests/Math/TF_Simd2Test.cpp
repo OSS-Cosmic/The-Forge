@@ -15,9 +15,9 @@
 UTEST(TF_Simd2, tfSimd2iCmpGt)
 {
   struct {
-    Simd_Int32Type2 a;
-    Simd_Int32Type2 b;
-    Simd_Int32Type2 test;
+    TSimdi32x2 a;
+    TSimdi32x2 b;
+    TSimdi32x2 test;
   } tests[] = {
       // ... existing test cases ...
       // Edge cases:
@@ -38,9 +38,9 @@ UTEST(TF_Simd2, tfSimd2iCmpGt)
 UTEST(TF_Simd2, tfSimd2iCmpLt)
 {
   struct {
-    Simd_Int32Type2 a;
-    Simd_Int32Type2 b;
-    Simd_Int32Type2 test;
+    TSimdi32x2 a;
+    TSimdi32x2 b;
+    TSimdi32x2 test;
   } tests[] = {
       // Less than
       {tfSimd2iLoadImmediate(12, 13), tfSimd2iLoadImmediate(16, 17), tfSimd2iLoadImmediate(TF_SIMD_TRUE, TF_SIMD_TRUE)},
@@ -62,9 +62,9 @@ UTEST(TF_Simd2, tfSimd2iCmpLt)
 UTEST(TF_Simd2, tfSimd2iCmpEq)
 {
   struct {
-    Simd_Int32Type2 a;
-    Simd_Int32Type2 b;
-    Simd_Int32Type2 test;
+    TSimdi32x2 a;
+    TSimdi32x2 b;
+    TSimdi32x2 test;
   } tests[] = {
        // Equal elements
       {tfSimd2iLoadImmediate(12, 13), tfSimd2iLoadImmediate(12, 13), tfSimd2iLoadImmediate(TF_SIMD_TRUE, TF_SIMD_TRUE)},
@@ -84,29 +84,29 @@ UTEST(TF_Simd2, tfSimd2iCmpEq)
 
 UTEST(TF_Simd2, tfSimd2fZero)
 {
-    Simd_FloatType2 value = tfSimd2fZero();
+    TSimdf32x2 value = tfSimd2fZero();
     EXPECT_NEAR(tfSimd2fSelectIndex0(value), 0.0f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd2fSelectIndex1(value), 0.0f, DEFAULT_EPSILON);
 }
 
 UTEST(TF_Simd2, tfSimd2fSplat)
 {
-    Simd_FloatType2 value = tfSimd2fSplat(23.f);
+    TSimdf32x2 value = tfSimd2fSplat(23.f);
     EXPECT_NEAR(tfSimd2fSelectIndex0(value), 23.f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd2fSelectIndex1(value), 23.f, DEFAULT_EPSILON);
-    Simd_FloatType2 value1 = tfSimd2fSplat(5.1f);
+    TSimdf32x2 value1 = tfSimd2fSplat(5.1f);
     EXPECT_NEAR(tfSimd2fSelectIndex0(value1), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd2fSelectIndex1(value1), 5.1f, DEFAULT_EPSILON);
 
-    Simd_FloatType2 value2 = tfSimd2fLoadImmediate(5.1f, 1.0f);
+    TSimdf32x2 value2 = tfSimd2fLoadImmediate(5.1f, 1.0f);
     EXPECT_NEAR(tfSimd2fSelectIndex0(value2), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd2fSelectIndex1(value2), 1.0f, DEFAULT_EPSILON);
 }
 
 UTEST(TF_Simd2, tfSimd3iNot) {
   struct {
-    Simd_Int32Type2 test;
-    Simd_Int32Type2 expect;
+    TSimdi32x2 test;
+    TSimdi32x2 expect;
   } tests[] = {
        {tfSimd2iLoadImmediate(0xFFFFFFFF, 0x0000FFFF), tfSimd2iLoadImmediate(0, 0xFFFF0000)},
   };   
@@ -118,10 +118,10 @@ UTEST(TF_Simd2, tfSimd3iNot) {
 
 UTEST(TF_Simd2, tfSimd2iSelect) {
   struct {
-    Simd_Int32Type2 a;
-    Simd_Int32Type2 b;
-    Simd_Int32Type2 mask;
-    Simd_Int32Type2 expect;
+    TSimdi32x2 a;
+    TSimdi32x2 b;
+    TSimdi32x2 mask;
+    TSimdi32x2 expect;
   } tests[] = {
        {tfSimd2iLoadImmediate(10, 11), tfSimd2iLoadImmediate(123, -149), tfSimd2iLoadImmediate(0,0), tfSimd2iLoadImmediate(10, 11)},
        {tfSimd2iLoadImmediate(10, 11), tfSimd2iLoadImmediate(123, -149), tfSimd2iLoadImmediate(TF_SIMD_TRUE,0), tfSimd2iLoadImmediate(123, 11)},
@@ -136,10 +136,10 @@ UTEST(TF_Simd2, tfSimd2iSelect) {
 
 //UTEST(TF_Simd2, tfSimd3fSelect) {
 //  struct {
-//    Simd_FloatType4 a;
-//    Simd_FloatType4 b;
-//    Simd_FloatType4 mask;
-//    Simd_FloatType4 expect;
+//    TSimdf32x4 a;
+//    TSimdf32x4 b;
+//    TSimdf32x4 mask;
+//    TSimdf32x4 expect;
 //  } tests[] = {
 //       {tfSimd3fLoadImmediate(10, 11, -13, 32), tfSimd3fLoadImmediate(123, -149, 0, 12), tfSimd3fLoadImmediate(0,0,0,0), tfSimd3fLoadImmediate(10, 11, -13, 32)},
 //       {tfSimd3fLoadImmediate(10, 11, -13, 32), tfSimd3fLoadImmediate(123, -149, 0, 12), tfSimd3fLoadImmediate(TF_SIMD_TRUE,0,0,0), tfSimd3fLoadImmediate(123, 11, -13, 32)},
