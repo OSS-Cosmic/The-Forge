@@ -56,7 +56,6 @@ struct TStrSpan {
   size_t len;
 }; 
 
-//static inline struct TStrSpan tfToRef(char* c) { return (struct TStrSpan){ c, strlen(c) }; }
 static inline struct TStrSpan tfToRef(const char* c) { return TStrSpan{ (char*)c, (size_t)strlen(c) }; }
 static inline struct TStrSpan tfToRef(struct TStr str) { return TStrSpan{ str.buf, str.len }; }
 

@@ -15,9 +15,9 @@
 UTEST(TF_Simd4, tfSimd4iCmpGt)
 {
   struct {
-    TSimdInt4 a;
-    TSimdInt4 b;
-    TSimdInt4 test;
+    TSimdInt32x4 a;
+    TSimdInt32x4 b;
+    TSimdInt32x4 test;
   } tests[] = {
       // ... existing test cases ...
       // Edge cases:
@@ -38,9 +38,9 @@ UTEST(TF_Simd4, tfSimd4iCmpGt)
 UTEST(TF_Simd4, tfSimd4iCmpLt)
 {
   struct {
-    TSimdInt4 a;
-    TSimdInt4 b;
-    TSimdInt4 test;
+    TSimdInt32x4 a;
+    TSimdInt32x4 b;
+    TSimdInt32x4 test;
   } tests[] = {
       // Less than
       {tfSimdInt4Load(12, 13, 14, 15), tfSimdInt4Load(16, 17, 18, 19), tfSimdInt4Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
@@ -62,9 +62,9 @@ UTEST(TF_Simd4, tfSimd4iCmpLt)
 UTEST(TF_Simd4, tfSimd4iCmpEq)
 {
   struct {
-    TSimdInt4 a;
-    TSimdInt4 b;
-    TSimdInt4 test;
+    TSimdInt32x4 a;
+    TSimdInt32x4 b;
+    TSimdInt32x4 test;
   } tests[] = {
        // Equal elements
       {tfSimdInt4Load(12, 13, 14, 15), tfSimdInt4Load(12, 13, 14, 15), tfSimdInt4Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
@@ -84,7 +84,7 @@ UTEST(TF_Simd4, tfSimd4iCmpEq)
 
 UTEST(TF_Simd4, tfSimd4fZero)
 {
-    TSimdFloat4 value = tfSimd4fZero();
+    TSimdFloat32x4 value = tfSimd4fZero();
     EXPECT_NEAR(tfSimd4fSelectIndex0(value), 0.0f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex1(value), 0.0f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex2(value), 0.0f, DEFAULT_EPSILON);
@@ -93,18 +93,18 @@ UTEST(TF_Simd4, tfSimd4fZero)
 
 UTEST(TF_Simd4, tfSimdSplat4f)
 {
-    TSimdFloat4 value = tfSimd4fSplat(23.f);
+    TSimdFloat32x4 value = tfSimd4fSplat(23.f);
     EXPECT_NEAR(tfSimd4fSelectIndex0(value), 23.f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex1(value), 23.f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex2(value), 23.f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex3(value), 23.f, DEFAULT_EPSILON);
-    TSimdFloat4 value1 = tfSimd4fSplat(5.1f);
+    TSimdFloat32x4 value1 = tfSimd4fSplat(5.1f);
     EXPECT_NEAR(tfSimd4fSelectIndex0(value1), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex1(value1), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex2(value1), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex3(value1), 5.1f, DEFAULT_EPSILON);
 
-    TSimdFloat4 value2 = tfSimdFloat4Load(5.1f, 1.0f, 2.0f, 3.0f);
+    TSimdFloat32x4 value2 = tfSimdFloat4Load(5.1f, 1.0f, 2.0f, 3.0f);
     EXPECT_NEAR(tfSimd4fSelectIndex0(value2), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex1(value2), 1.0f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd4fSelectIndex2(value2), 2.0f, DEFAULT_EPSILON);
@@ -113,8 +113,8 @@ UTEST(TF_Simd4, tfSimdSplat4f)
 
 UTEST(TF_Simd4, tfSimd4iNot) {
   struct {
-    TSimdInt4 test;
-    TSimdInt4 expect;
+    TSimdInt32x4 test;
+    TSimdInt32x4 expect;
   } tests[] = {
        {tfSimdInt4Load(0xFFFFFFFF, 0x0000FFFF, 0xFFFF0000, 0x000000FF), tfSimdInt4Load(0, 0xFFFF0000, 0x0000FFFF, 0xFFFFFF00)},
   };   
@@ -126,10 +126,10 @@ UTEST(TF_Simd4, tfSimd4iNot) {
 
 UTEST(TF_Simd4, tfSimd4iSelect) {
   struct {
-    TSimdInt4 a;
-    TSimdInt4 b;
-    TSimdInt4 mask;
-    TSimdInt4 expect;
+    TSimdInt32x4 a;
+    TSimdInt32x4 b;
+    TSimdInt32x4 mask;
+    TSimdInt32x4 expect;
   } tests[] = {
        {tfSimdInt4Load(10, 11, -13, 32), tfSimdInt4Load(123, -149, 0, 12), tfSimdInt4Load(0,0,0,0), tfSimdInt4Load(10, 11, -13, 32)},
        {tfSimdInt4Load(10, 11, -13, 32), tfSimdInt4Load(123, -149, 0, 12), tfSimdInt4Load(TF_SIMD_TRUE,0,0,0), tfSimdInt4Load(123, 11, -13, 32)},
@@ -144,10 +144,10 @@ UTEST(TF_Simd4, tfSimd4iSelect) {
 
 //UTEST(TF_Simd4, tfSimd4fSelect) {
 //  struct {
-//    TSimdFloat4 a;
-//    TSimdFloat4 b;
-//    TSimdFloat4 mask;
-//    TSimdFloat4 expect;
+//    TSimdFloat32x4 a;
+//    TSimdFloat32x4 b;
+//    TSimdFloat32x4 mask;
+//    TSimdFloat32x4 expect;
 //  } tests[] = {
 //       {tfSimdFloat4Load(10, 11, -13, 32), tfSimdFloat4Load(123, -149, 0, 12), tfSimdFloat4Load(0,0,0,0), tfSimdFloat4Load(10, 11, -13, 32)},
 //       {tfSimdFloat4Load(10, 11, -13, 32), tfSimdFloat4Load(123, -149, 0, 12), tfSimdFloat4Load(TF_SIMD_TRUE,0,0,0), tfSimdFloat4Load(123, 11, -13, 32)},

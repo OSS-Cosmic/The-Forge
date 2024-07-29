@@ -12,6 +12,10 @@ struct float4
     };
 };
 
+struct float4x1 {
+  float4 mCol0;
+};
+
 struct float4x2
 {
   float4 mCol0;
