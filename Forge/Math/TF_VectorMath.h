@@ -7,12 +7,11 @@
 // Brief: This header exposes the Sony Vectormath library types and functions into the global scope.
 // ================================================================================================
 
-#ifndef VECTORMATH_HPP
-#define VECTORMATH_HPP
+#ifndef TF_VECTORMATH_HPP
+#define TF_VECTORMATH_HPP
 
 #include "Forge/Config.h"
 #include "Forge/TF_Config.h"
-#include "vectormath_settings.hpp"
 
 // Sony's library includes:
 #if defined(TF_FEATURE_CPU_SSE) // SSE
@@ -34,7 +33,8 @@ using namespace Vectormath::Soa;
 //========================================= #TheForgeMathExtensionsEnd ================================================
 
 #include "vec2d.hpp"  // - Extended 2D vector and point classes; not aligned and always in scalar floats mode.
-#include "common.hpp" // - Miscellaneous helper functions.
+#include "common.hpp" 
+
 
 using namespace Vectormath;
 

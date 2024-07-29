@@ -12,7 +12,7 @@
 #define IMEMORY_FROM_HEADER
 #include "Forge/Mem/TF_Memory.h"
 
-#include "../../../../Utilities/Math/Random.h"
+#include "TF_Random.h"
 #include "Forge/TF_Log.h"
 
 namespace Vectormath
@@ -274,7 +274,7 @@ static const float piMulTwo = 6.283185307179586476925f;        //!< pi*2 constan
 static const float piDivTwo = 1.570796326794896619231f;        //!< pi/2 constant
 
 // Range [0.f, 1.f]
-inline float randomFloat01() { return (float)getRandomInt() / (float)TF_RAND_MAX; }
+inline float randomFloat01() { return (float)tfRandomInt() / (float)TF_RAND_MAX; }
 
 // Range [mn, mx]
 inline float randomFloat(float mn, float mx) { return randomFloat01() * (mx - mn) + mn; }
@@ -282,7 +282,7 @@ inline float randomFloat(float mn, float mx) { return randomFloat01() * (mx - mn
 // Range [mn, mx)
 inline int randomInt(int mn, int mx) { 
 	ASSERT(((long long)mx - (long long)mn) <= TF_RAND_MAX);
-	return getRandomInt() % (mx - mn) + mn; 
+	return tfRandomInt() % (mx - mn) + mn; 
 }
 
 //----------------------------------------------------------------------------
@@ -293,7 +293,7 @@ inline bool operator != (const Vector2 &u, const Vector2 &v) { return !(u == v);
 inline bool operator == (const Vector3 &u, const Vector3 &v) 
 {
 	//Compare the X, Y, and Z values
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return
 		u.getX() == v.getX() &&
 		u.getY() == v.getY() &&
@@ -305,7 +305,7 @@ inline bool operator == (const Vector3 &u, const Vector3 &v)
 }
 inline bool operator != (const Vector3 &u, const Vector3 &v)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return !operator==(u, v);
 #else
 	//Compare the X, Y, and Z values
@@ -315,7 +315,7 @@ inline bool operator != (const Vector3 &u, const Vector3 &v)
 }
 inline bool operator == (const Vector4 &u, const Vector4 &v)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return
 		u.getX() == v.getX() &&
 		u.getY() == v.getY() &&
@@ -328,7 +328,7 @@ inline bool operator == (const Vector4 &u, const Vector4 &v)
 }
 inline bool operator != (const Vector4 &u, const Vector4 &v)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return !operator==(u, v);
 #else
 	//Compare the X, Y, Z, and W values
@@ -722,7 +722,7 @@ inline float4 normalize(const float4& x)
 inline float2 v2ToF2(const Vector2& v2) { return float2(v2.getX(), v2.getY()); }
 inline float3 v3ToF3(const Vector3& v3)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return float3(v3.getX(), v3.getY(), v3.getZ());
 #else
 	DEFINE_ALIGNED(float array[4], 16);
@@ -732,7 +732,7 @@ inline float3 v3ToF3(const Vector3& v3)
 }
 inline float4 v4ToF4(const Vector4& v4)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return float4(v4.getX(), v4.getY(), v4.getZ(), v4.getW());
 #else
 	DEFINE_ALIGNED(float4 result, 16);
@@ -1150,7 +1150,7 @@ constexpr float4 max<>(const float4 &x, const float4 &y) { return { max(x.x, y.x
 
 inline Vector3 min(const Vector3 &a, const Vector3 &b)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return Vector3(
 		min(a.getX(), b.getX()),
 		min(a.getY(), b.getY()),
@@ -1161,7 +1161,7 @@ inline Vector3 min(const Vector3 &a, const Vector3 &b)
 }
 inline Vector3 max(const Vector3 &a, const Vector3 &b)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return Vector3(
 		max(a.getX(), b.getX()),
 		max(a.getY(), b.getY()),
@@ -1173,7 +1173,7 @@ inline Vector3 max(const Vector3 &a, const Vector3 &b)
 
 inline Vector4 min(const Vector4& a, const Vector4& b)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return Vector4(
 		min(a.getX(), b.getX()),
 		min(a.getY(), b.getY()),
@@ -1185,7 +1185,7 @@ inline Vector4 min(const Vector4& a, const Vector4& b)
 }
 inline Vector4 max(const Vector4& a, const Vector4& b)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return Vector4(
 		max(a.getX(), b.getX()),
 		max(a.getY(), b.getY()),
@@ -1224,7 +1224,7 @@ inline float smoothstep(float edge0, float edge1, float x)
 }
 
 inline float rsqrtf(const float v) {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	union {
 		float vh;
 		int i0;
@@ -1496,7 +1496,7 @@ inline unsigned int rgbToRGB9E5(const Vector3 &rgb)
 
 inline unsigned int toRGBA(const Vector4 &u)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return
 		(int(u.getX() * 255) << 0) |
 		(int(u.getY() * 255) << 8) |
@@ -1518,7 +1518,7 @@ inline unsigned int toRGBA(const Vector4 &u)
 }
 inline unsigned int toBGRA(const Vector4 &u)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return
 		(int(u.getZ() * 255) << 0) |
 		(int(u.getY() * 255) << 8) |
@@ -2259,7 +2259,7 @@ inline float lineProjection(const Vector3& line0, const Vector3& line1, const Ve
 // Defining USE_POSITIVE_PLANE_SIGN changes the equation to ax + by + cz + d = 0;
 inline float planeDistance(const Vector4& plane, const Vector3& point)
 {
-#if VECTORMATH_MODE_SCALAR
+#ifdef TF_FEATURE_CPU_SCALAR
 	return
 		point.getX() * plane.getX() +
 		point.getY() * plane.getY() +
@@ -2843,7 +2843,7 @@ inline void decomposeMatrix(const Matrix4& matrix, Vector3& translation, Vector4
 		}
 	}
 	// Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/christian.htm
-#if !VECTORMATH_MODE_SCALAR
+#ifndef TF_FEATURE_CPU_SCALAR
 	rotation.setW(sqrt((FloatInVec)max(0.0f, 1 + matrix[0][0] + matrix[1][1] + matrix[2][2])) / 2);
 	rotation.setX(sqrt((FloatInVec)max(0.0f, 1 + matrix[0][0] - matrix[1][1] - matrix[2][2])) / 2);
 	rotation.setY(sqrt((FloatInVec)max(0.0f, 1 - matrix[0][0] + matrix[1][1] - matrix[2][2])) / 2);

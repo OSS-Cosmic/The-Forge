@@ -141,33 +141,8 @@ typedef uint32_t utest_uint32_t;
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #endif
 
-#if defined(_WINDOWS_) || defined(_WINDOWS_H)
-typedef LARGE_INTEGER utest_large_integer;
-#else
-// use old QueryPerformanceCounter definitions (not sure is this needed in some
-// edge cases or not) on Win7 with VS2015 these extern declaration cause "second
-// C linkage of overloaded function not allowed" error
-typedef union {
-  struct {
-    unsigned long LowPart;
-    long HighPart;
-  } DUMMYSTRUCTNAME;
-  struct {
-    unsigned long LowPart;
-    long HighPart;
-  } u;
-  utest_int64_t QuadPart;
-} utest_large_integer;
-
-UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceCounter(
-    utest_large_integer *);
-UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceFrequency(
-    utest_large_integer *);
-
-#if defined(__MINGW64__) || defined(__MINGW32__)
-#pragma GCC diagnostic pop
-#endif
-#endif
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 #elif defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||    \
     defined(__NetBSD__) || defined(__DragonFly__) || defined(__sun__) ||       \
@@ -329,8 +304,8 @@ static UTEST_INLINE void *utest_realloc(void *const pointer, size_t new_size) {
 
 static UTEST_INLINE utest_int64_t utest_ns(void) {
 #if defined(_MSC_VER) || defined(__MINGW64__) || defined(__MINGW32__)
-  utest_large_integer counter;
-  utest_large_integer frequency;
+  LARGE_INTEGER counter;
+  LARGE_INTEGER frequency;
   QueryPerformanceCounter(&counter);
   QueryPerformanceFrequency(&frequency);
   return UTEST_CAST(utest_int64_t,
