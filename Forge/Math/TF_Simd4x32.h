@@ -36,6 +36,11 @@ inline float tfSimd4fSelectIndex1(TSimdFloat32x4 value);
 inline float tfSimd4fSelectIndex2(TSimdFloat32x4 value);
 inline float tfSimd4fSelectIndex3(TSimdFloat32x4 value);
 
+static inline TSimdFloat32x4 tfSimd4fReplaceIndex0ByValue(TSimdFloat32x4 input, float value);
+static inline TSimdFloat32x4 tfSimd4fReplaceIndex1ByValue(TSimdFloat32x4 input, float value);
+static inline TSimdFloat32x4 tfSimd4fReplaceIndex2ByValue(TSimdFloat32x4 input, float value);
+static inline TSimdFloat32x4 tfSimd4fReplaceIndex3ByValue(TSimdFloat32x4 input, float value);
+
 inline TSimdFloat32x4 tfSimdFloat4Load(float x, float y, float z, float w);
 inline TSimdInt32x4 tfSimdInt4Load(int32_t x, int32_t y, int32_t z, int32_t w);
 
@@ -81,13 +86,55 @@ inline TSimdFloat32x4 tfSimd4fCmpLt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline TSimdFloat32x4 tfSimd4fCmpLtEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 
 inline bool tfSimd4iCmpAllEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2);
+
 inline bool tfSimd4fCmpAllEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline bool tfSimd4fCmpAllLt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline bool tfSimd4fCmpAllGt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 
+static inline bool tfSimd4fCmpEqEpsilon(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2, float epsilon);
+
 // ----------------------------------------------------------------
 // --------------------- Implementaion ----------------------------
 // ----------------------------------------------------------------
+
+static inline TSimdFloat32x4 tfSimd4fReplaceIndex0ByValue(TSimdFloat32x4 input, float value) {
+#if defined(TF_FEATURE_CPU_SSE)
+    return _mm_blend_ps(input, tfSimd4fSplat(value), 0b0001);
+#elif defined(TF_FEATURE_CPU_NEON)
+    return vsetq_lane_f32(b, a, 0);
+#else
+    return { value, input.v[1], input.v[2], input.v[3] };
+#endif
+}
+static inline TSimdFloat32x4 tfSimd4fReplaceIndex1ByValue(TSimdFloat32x4 input, float value) {
+#if defined(TF_FEATURE_CPU_SSE)
+    return _mm_blend_ps(input, tfSimd4fSplat(value), 0b0010);
+#elif defined(TF_FEATURE_CPU_NEON)
+    return vsetq_lane_f32(b, a, 1);
+#else
+    return { input.v[0], value, input.v[2], input.v[3] };
+#endif
+}
+static inline TSimdFloat32x4 tfSimd4fReplaceIndex2ByValue(TSimdFloat32x4 input, float value) {
+#if defined(TF_FEATURE_CPU_SSE)
+    return _mm_blend_ps(input, tfSimd4fSplat(value), 0b0100);
+#elif defined(TF_FEATURE_CPU_NEON)
+    return vsetq_lane_f32(b, a, 2);
+#else
+    return { input.v[0], input.v[1], value, input.v[3] };
+#endif
+}
+static inline TSimdFloat32x4 tfSimd4fReplaceIndex3ByValue(TSimdFloat32x4 input, float value) {
+#if defined(TF_FEATURE_CPU_SSE)
+    return _mm_blend_ps(input, tfSimd4fSplat(value), 0b1000);
+#elif defined(TF_FEATURE_CPU_NEON)
+    return vsetq_lane_f32(b, a, 3);
+#else
+    return { input.v[0], input.v[1], input.v[2], value };
+#endif
+}
+
+
 inline TSimdInt32x4 tfSimd4iSelect(TSimdInt32x4 arg0, TSimdInt32x4 arg1, TSimdInt32x4 mask) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_blendv_epi8(arg0, arg1, mask);
@@ -780,5 +827,11 @@ inline bool tfSimd4iCmpAllEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2)
     return true;
 #endif
 }
+
+static inline bool tfSimd4fCmpEqEpsilon(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2, float epsilon) {
+    return tfSimd4fCmpAllLt(tfSimd4fAbs(tfSimd4fSub(arg1, arg2)), tfSimd4fSplat(epsilon));
+
+}
+
 
 #endif

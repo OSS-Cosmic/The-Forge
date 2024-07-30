@@ -30,7 +30,7 @@ inline TSimdInt32x2 tfSimd2iSelect(TSimdInt32x2 arg0, TSimdInt32x2 arg1, TSimdIn
 inline float tfSimd2fSelectIndex0(TSimdFloat32x2 value);
 inline float tfSimd2fSelectIndex1(TSimdFloat32x2 value);
 
-inline TSimdFloat32x2 tfSimd2fLoadImmediate(float x, float y);
+inline TSimdFloat32x2 tfSimdFloat2Load(float x, float y);
 inline TSimdInt32x2 tfSimd2iLoadImmediate(int32_t x, int32_t y);
 
 inline TSimdFloat32x2 tfSimd2fAdd(TSimdFloat32x2 arg1, TSimdFloat32x2 arg2);
@@ -405,7 +405,7 @@ inline TSimdFloat32x2 tfSimd2fAbs(TSimdFloat32x2 value) {
 #endif
 }
 
-inline TSimdFloat32x2 tfSimd2fLoadImmediate(float x, float y) {
+inline TSimdFloat32x2 tfSimdFloat2Load(float x, float y) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_set_ps(0.0f, 0.0f, y, x);
 #elif defined(TF_FEATURE_CPU_NEON)

@@ -32,8 +32,8 @@ inline float tfSimd3fSelectIndex0(TSimdFloat32x3 value);
 inline float tfSimd3fSelectIndex1(TSimdFloat32x3 value);
 inline float tfSimd3fSelectIndex2(TSimdFloat32x3 value);
 
-inline TSimdFloat32x3 tfSimd3fLoadImmediate(float x, float y, float z);
-inline TSimdInt32x3 tfSimd3iLoadImmediate(int32_t x, int32_t y, int32_t z);
+inline TSimdFloat32x3 tfSimdFloat3Load(float x, float y, float z);
+inline TSimdInt32x3 tfSimdInt3Load(int32_t x, int32_t y, int32_t z);
 
 inline TSimdFloat32x3 tfSimd3fAdd(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
 inline TSimdFloat32x3 tfSimd3fSub(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
@@ -428,7 +428,7 @@ inline TSimdFloat32x3 tfSimd3fAbs(TSimdFloat32x3 value) {
 #endif
 }
 
-inline TSimdFloat32x3 tfSimd3fLoadImmediate(float x, float y, float z) {
+inline TSimdFloat32x3 tfSimdFloat3Load(float x, float y, float z) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_set_ps(0.0f, z, y, x);
 #elif defined(TF_FEATURE_CPU_NEON)
@@ -440,7 +440,7 @@ inline TSimdFloat32x3 tfSimd3fLoadImmediate(float x, float y, float z) {
 }
 
 
-inline TSimdInt32x3 tfSimd3iLoadImmediate(int32_t x, int32_t y, int32_t z) {
+inline TSimdInt32x3 tfSimdInt3Load(int32_t x, int32_t y, int32_t z) {
 #if defined(TF_FEATURE_CPU_SSE)
     return _mm_set_epi32(0.0f, x, y, z);
 #elif defined(TF_FEATURE_CPU_NEON)

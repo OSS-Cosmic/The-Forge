@@ -10,10 +10,9 @@
 
 #include "TF_MathUtils.h"
 #include "Forge/Math/TF_Matrix.h"
-#include "Forge/Math/TF_SimdCommon.h"
+#include "Forge/Math/TF_SimdFloat4.h"
 
 #include "Forge/TF_Log.h"
-
 
 static inline void debugPrintSimd4F(TSimdFloat4 input) {
   DLOGF(LogLevel::eDEBUG, "%.3f, %.3f, %.3f, %.3f",
@@ -23,7 +22,7 @@ static inline void debugPrintSimd4F(TSimdFloat4 input) {
           tfSimd4fSelectIndex3(input.mRow));
 }
 static inline void debugPrintSimd4x4F(TSimdFloat4x4 input) {
-  DLOGF(LogLevel::eDEBUG,"%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
+    DLOGF(LogLevel::eDEBUG,"%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
           tfSimd4fSelectIndex0(input.mCol0),
           tfSimd4fSelectIndex0(input.mCol1),
           tfSimd4fSelectIndex0(input.mCol2),
@@ -43,8 +42,40 @@ static inline void debugPrintSimd4x4F(TSimdFloat4x4 input) {
           tfSimd4fSelectIndex3(input.mCol1),
           tfSimd4fSelectIndex3(input.mCol2),
           tfSimd4fSelectIndex3(input.mCol3)
-        );
+    );
 }
+
+UTEST(TF_Simd4, tfSetElemSimd4x4F) {
+    TSimdFloat4x4 a = tfLoadIdentitySimd4x4F();
+
+    // Set element at (0, 0)
+    tfSetElemSimd4x4F(&a, 0, 0, 10.1f);
+    debugPrintSimd4x4F(a);
+    EXPECT_TRUE(tfIsCloseSimd4x4F(a, tfLoadSimd4x4F(10.1f, 0, 0, 0, 
+                                                    0, 1.0f, 0, 0, 
+                                                    0, 0, 1.0f, 0, 
+                                                    0, 0, 0, 1.0f), DEFAULT_EPSILON));
+
+    // Set element at (1, 2)
+    tfSetElemSimd4x4F(&a, 1, 2, -5.2f);
+    debugPrintSimd4x4F(a);
+    EXPECT_TRUE(tfIsCloseSimd4x4F(a, tfLoadSimd4x4F(10.1f, 0, 0, 0, 
+                                                    0, 1.0f, -5.2f, 0, 
+                                                    0, 0, 1.0f, 0, 
+                                                    0, 0, 0, 1.0f), DEFAULT_EPSILON));
+
+    // Set element to zero
+    tfSetElemSimd4x4F(&a, 1, 1, 0.0f);
+    debugPrintSimd4x4F(a);
+    EXPECT_TRUE(tfIsCloseSimd4x4F(a, tfLoadSimd4x4F(10.1f, 0, 0, 0, 
+                                                    0, 0.0f, -5.2f, 0, 
+                                                    0, 0, 1.0f, 0, 
+                                                    0, 0, 0, 1.0f), DEFAULT_EPSILON));
+
+
+}
+
+
 UTEST(TF_Simd4, tfVectorMul4x4F)
 {
     struct {
@@ -79,9 +110,9 @@ UTEST(TF_Simd4, tfVectorMul4x4F)
     };
     for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++)
     {
-        TSimdFloat4 result = tfVectorMul4x4F(&tests[i].a, &tests[i].b);
+        TSimdFloat4 result = tfVectorMul4x4F(tests[i].a, tests[i].b);
         debugPrintSimd4F(result);
-        EXPECT_TRUE(tfCmpEqSimd4F(result, tests[i].test, DEFAULT_EPSILON));
+        EXPECT_TRUE(tfIsCloseSimd4F(result, tests[i].test, DEFAULT_EPSILON));
     }
 }
 

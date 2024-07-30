@@ -98,7 +98,7 @@ UTEST(TF_Simd2, tfSimd2fSplat)
     EXPECT_NEAR(tfSimd2fSelectIndex0(value1), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd2fSelectIndex1(value1), 5.1f, DEFAULT_EPSILON);
 
-    TSimdFloat32x2 value2 = tfSimd2fLoadImmediate(5.1f, 1.0f);
+    TSimdFloat32x2 value2 = tfSimdFloat2Load(5.1f, 1.0f);
     EXPECT_NEAR(tfSimd2fSelectIndex0(value2), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd2fSelectIndex1(value2), 1.0f, DEFAULT_EPSILON);
 }
