@@ -134,3 +134,36 @@ cxx_test(
   headers = math_utils_header,
   visibility = ['PUBLIC']
 )
+
+cxx_test(
+  name = 'TF_Matrix',
+  srcs = [
+    'TF_MatrixTest.cpp',
+  ],
+  link_style = "static",
+  deps = [
+      "@tf//:TF",
+      "@tf//tests:TF_utest"
+  ],
+  header_namespace = "",
+  headers = math_utils_header,
+  visibility = ['PUBLIC']
+)
+
+cxx_test(
+  name = 'TF_Matrix_Scalar',
+  srcs = [
+    'TF_MatrixTest.cpp',
+  ],
+  link_style = "static",
+  preprocessor_flags = [
+    "-DTF_FEATURE_CPU_SCALAR=1"
+  ],
+  deps = [
+      "@tf//:TF",
+      "@tf//tests:TF_utest"
+  ],
+  header_namespace = "",
+  headers = math_utils_header,
+  visibility = ['PUBLIC']
+)

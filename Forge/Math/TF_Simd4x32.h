@@ -10,6 +10,7 @@
 #define TF_SIMD_4_32_H
 
 #include "Forge/Math/Internal/SimdTypes.h"
+#include "Forge/TF_Log.h"
 
 inline TSimdFloat32x4 tfSimd4fSplat(float value);
 inline TSimdInt32x4 tfSimd4iSplat(int32_t value);
@@ -81,6 +82,8 @@ inline TSimdFloat32x4 tfSimd4fCmpLtEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 
 inline bool tfSimd4iCmpAllEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2);
 inline bool tfSimd4fCmpAllEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
+inline bool tfSimd4fCmpAllLt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
+inline bool tfSimd4fCmpAllGt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 
 // ----------------------------------------------------------------
 // --------------------- Implementaion ----------------------------
@@ -434,7 +437,8 @@ inline TSimdFloat32x4 tfSimd4fDiv(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
 
 inline TSimdFloat32x4 tfSimd4fAbs(TSimdFloat32x4 value) { 
 #if defined(TF_FEATURE_CPU_SSE)
-    return _mm_and_ps(value, _mm_set1_ps((float)(0x7FFFFFFF)));
+    const TSimdFloat32x4 signMask = tfSimd4iToSimd4f(tfSimd4iSplat(0x7FFFFFFF));
+    return _mm_and_ps(value, signMask );
 #elif defined(TF_FEATURE_CPU_NEON)
     return vabsq_f32(value);
 #else
@@ -710,6 +714,38 @@ inline TSimdInt32x4 tfSimd4iCmpLtEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2) {
                (arg1.v[1] < arg2.v[1]) ? (int32_t)0xFFFFFFFF : 0x00000000,
                (arg1.v[2] < arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000, 
                (arg1.v[3] < arg2.v[3]) ? (int32_t)0xFFFFFFFF : 0x00000000 } };
+#endif
+
+}
+
+inline bool tfSimd4fCmpAllLt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
+#if defined(TF_FEATURE_CPU_SSE)
+    TSimdFloat32x4  compare = tfSimd4fCmpLt(arg1, arg2);
+    return (_mm_movemask_ps(compare) & 0xf) == 0xf;
+#else
+    for(int i = 0; i < 4; i++) {
+        if (arg1.v[i] >= arg2.v[i])
+        {
+            return false;
+        }
+    }
+    return true;
+#endif
+
+}
+
+inline bool tfSimd4fCmpAllGt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
+#if defined(TF_FEATURE_CPU_SSE)
+    TSimdFloat32x4 compare = tfSimd4fCmpGt(arg1, arg2);
+    return (_mm_movemask_ps(compare) & 0xf) == 0xf;
+#else
+    for(int i = 0; i < 4; i++) {
+        if (arg1.v[i] <= arg2.v[i])
+        {
+            return false;
+        }
+    }
+    return true;
 #endif
 
 }

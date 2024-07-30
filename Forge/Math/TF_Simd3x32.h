@@ -415,7 +415,8 @@ inline TSimdFloat32x3 tfSimd3fDiv(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
 
 inline TSimdFloat32x3 tfSimd3fAbs(TSimdFloat32x3 value) {
 #if defined(TF_FEATURE_CPU_SSE)
-    return _mm_and_ps(value, _mm_set1_ps((float)(0x7FFFFFFF)));
+    const TSimdFloat32x4 signMask = tfSimd3iToSimd3f(tfSimd3iSplat(0x7FFFFFFF));
+    return _mm_and_ps(value, signMask );
 #elif defined(TF_FEATURE_CPU_NEON)
     return vabsq_f32(value);
 #else

@@ -74,7 +74,6 @@ struct TSimdFloat1x4 {
   TSimdFloat32x4 mCol0; 
 };
 
-
 struct TSimdFloat2x4 {
   TSimdFloat32x4 mCol0; 
   TSimdFloat32x4 mCol1; 
@@ -101,7 +100,7 @@ struct TSimdFloat4x4
 
 struct TSimdFloat3
 {
-  TSimdFloat32x3 mValue; 
+  TSimdFloat32x3 mRow; 
 };
 
 struct TSimdFloat1x3
@@ -138,6 +137,7 @@ struct TSimdFloat2x2
   TSimdFloat32x2 mCol0; 
   TSimdFloat32x2 mCol1; 
 };
+
 
 
 #endif

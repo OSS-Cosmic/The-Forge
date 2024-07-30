@@ -39,7 +39,6 @@ cxx_test(
   visibility = ['PUBLIC']
 )
 
-
 cxx_test(
   name = 'TF_StringTest',
   srcs = [
