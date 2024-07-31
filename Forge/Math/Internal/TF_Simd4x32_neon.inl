@@ -62,12 +62,12 @@ inline TSimdFloat32x4 tfSimd4fMadd(TSimdFloat32x4 mul1, TSimdFloat32x4 mul2, TSi
 inline TSimdFloat32x4 tfSimd4fDiv(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return vdivq_f32(arg1, arg2); }
 
 inline TSimdFloat32x4 tfSimd4fAbs(TSimdFloat32x4 value) { return vabsq_f32(value); }
-inline TSimdFloat32x4 tfSimdFloat4Load(float x, float y, float z, float w) {
+inline TSimdFloat32x4 tfSimdFloat32x4Load(float x, float y, float z, float w) {
     const float values[4] = { x, y, z, w };
     return vld1q_f32(values);
 }
 
-inline TSimdInt32x4 tfSimdInt4Load(int32_t x, int32_t y, int32_t z, int32_t w) {
+inline TSimdInt32x4 tfSimdInt32x4Load(int32_t x, int32_t y, int32_t z, int32_t w) {
     const int32_t values[4] = { x, y, z, w };
     return vld1q_s32(values);
 }

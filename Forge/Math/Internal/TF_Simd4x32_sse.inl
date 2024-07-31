@@ -48,7 +48,6 @@ inline TSimdFloat32x4 tfSimd4fClamp(TSimdFloat32x4 value, TSimdFloat32x4 min, TS
 }
 
 inline TSimdInt32x4 tfSimd4fToSimd4i(TSimdFloat32x4 value) { return _mm_castps_si128(value); }
-
 inline TSimdFloat32x4 tfSimd4iToSimd4f(TSimdInt32x4 value) { return _mm_castsi128_ps(value); }
 
 inline float tfSimd4fSelectIndex0(TSimdFloat32x4 value) { return _mm_cvtss_f32(value); }
@@ -73,8 +72,8 @@ inline TSimdFloat32x4 tfSimd4fAbs(TSimdFloat32x4 value) {
     const TSimdFloat32x4 signMask = tfSimd4iToSimd4f(tfSimd4iSplat(0x7FFFFFFF));
     return _mm_and_ps(value, signMask);
 }
-inline TSimdFloat32x4 tfSimdFloat4Load(float x, float y, float z, float w) { return _mm_set_ps(w, z, y, x); }
-inline TSimdInt32x4 tfSimdInt4Load(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
+inline TSimdFloat32x4 tfSimdFloat32x4Load(float x, float y, float z, float w) { return _mm_set_ps(w, z, y, x); }
+inline TSimdInt32x4 tfSimdInt32x4Load(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
 
 inline TSimdFloat32x2 tfSimd4fToSimd2f(TSimdFloat32x4 value) { return value; }
 inline TSimdFloat32x3 tfSimd4fToSimd3f(TSimdFloat32x4 value) { return value; }

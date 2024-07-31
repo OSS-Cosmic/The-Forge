@@ -2,12 +2,6 @@
 #include "../TF_Matrix.h"
 #endif
 
-// conviences if cpp is avaliable
-#ifdef __cplusplus
-static inline TSimdFloat4 operator*(const TSimdFloat4x4 a0, const TSimdFloat4 a1) { return tfVectorMul4x4F(a0, a1); }
-static inline TSimdFloat3 operator*(const TSimdFloat3x3 a0, const TSimdFloat3 a1) { return tfVectorMul3x3F(a0, a1); }
-static inline TSimdFloat2 operator*(const TSimdFloat2x2 a0, const TSimdFloat2 a1) { return tfVectorMul2x2F(a0, a1); }
-#endif
 
 
 static inline TSimdFloat4x4 tfMatMul4x4F_4x4F(TSimdFloat4x4 a0, TSimdFloat4x4 a1) {

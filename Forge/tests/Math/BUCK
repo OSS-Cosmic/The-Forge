@@ -34,7 +34,7 @@ cxx_test(
 )
 
 cxx_test(
-  name = 'TF_Simd2',
+  name = 'TF_Simd32x2',
   srcs = [
     'TF_Simd2Test.cpp',
   ],
@@ -49,7 +49,7 @@ cxx_test(
 )
 
 cxx_test(
-  name = 'TF_Simd2_Scalar',
+  name = 'TF_Simd32x2_Scalar',
   srcs = [
     'TF_Simd2Test.cpp',
   ],
@@ -69,7 +69,7 @@ cxx_test(
 
 
 cxx_test(
-  name = 'TF_Simd3',
+  name = 'TF_Simd32x3',
   srcs = [
     'TF_Simd3Test.cpp',
   ],
@@ -84,7 +84,7 @@ cxx_test(
 )
 
 cxx_test(
-  name = 'TF_Simd3_Scalar',
+  name = 'TF_Simd32x3_Scalar',
   srcs = [
     'TF_Simd3Test.cpp',
   ],
@@ -101,11 +101,10 @@ cxx_test(
   visibility = ['PUBLIC']
 )
 
-
 cxx_test(
-  name = 'TF_Simd4',
+  name = 'TF_Simd32x4',
   srcs = [
-    'TF_Simd4Test.cpp',
+    'TF_SimdFloat4x32Test.cpp',
   ],
   link_style = "static",
   deps = [
@@ -118,9 +117,9 @@ cxx_test(
 )
 
 cxx_test(
-  name = 'TF_Simd4_Scalar',
+  name = 'TF_Simd32x4_Scalar',
   srcs = [
-    'TF_Simd4Test.cpp',
+    'TF_SimdFloat4x32Test.cpp',
   ],
   link_style = "static",
   preprocessor_flags = [
@@ -154,6 +153,39 @@ cxx_test(
   name = 'TF_Matrix_Scalar',
   srcs = [
     'TF_MatrixTest.cpp',
+  ],
+  link_style = "static",
+  preprocessor_flags = [
+    "-DTF_FEATURE_CPU_SCALAR=1"
+  ],
+  deps = [
+      "@tf//:TF",
+      "@tf//tests:TF_utest"
+  ],
+  header_namespace = "",
+  headers = math_utils_header,
+  visibility = ['PUBLIC']
+)
+
+cxx_test(
+  name = 'TF_SimdFloat4Test',
+  srcs = [
+    'TF_SimdFloat4Test.cpp',
+  ],
+  link_style = "static",
+  deps = [
+      "@tf//:TF",
+      "@tf//tests:TF_utest"
+  ],
+  header_namespace = "",
+  headers = math_utils_header,
+  visibility = ['PUBLIC']
+)
+
+cxx_test(
+  name = 'TF_SimdFloat4Test_Scalar',
+  srcs = [
+    'TF_SimdFloat4Test.cpp',
   ],
   link_style = "static",
   preprocessor_flags = [

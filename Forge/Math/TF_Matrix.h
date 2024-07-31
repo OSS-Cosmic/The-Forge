@@ -43,6 +43,13 @@ static inline TSimdFloat4 tfVectorEleMul4F(TSimdFloat4 a0, TSimdFloat4  a1);
 static inline TSimdFloat3 tfVectorEleMul3F(TSimdFloat3 a0, TSimdFloat3  a1);
 static inline TSimdFloat2 tfVectorEleMul2F(TSimdFloat2 a0, TSimdFloat2  a1);
 
+// conviences if cpp is avaliable
+#ifdef __cplusplus
+static inline TSimdFloat4 operator*(const TSimdFloat4x4 a0, const TSimdFloat4 a1) { return tfVectorMul4x4F(a0, a1); }
+static inline TSimdFloat3 operator*(const TSimdFloat3x3 a0, const TSimdFloat3 a1) { return tfVectorMul3x3F(a0, a1); }
+static inline TSimdFloat2 operator*(const TSimdFloat2x2 a0, const TSimdFloat2 a1) { return tfVectorMul2x2F(a0, a1); }
+#endif
+
 
 #include "Internal/TF_Matrix.inl"
 #if defined(TF_FEATURE_CPU_SSE)

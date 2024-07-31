@@ -1,9 +1,10 @@
 #pragma once
-#ifndef TF_MATH_SIMD_H
-#define TF_MATH_SIMD_H
+#ifndef TF_SIMD_FLOAT4_H
+#define TF_SIMD_FLOAT4_H
 
 #include "TF_Simd2x32.h"
 #include "TF_Simd3x32.h"
+#include "TF_Simd2x32.h"
 
 #include "Internal/SimdTypes.h"
 
@@ -41,12 +42,32 @@ static inline TSimdFloat4x4 tfLoadSimd1x4F(
   float m30
 );
 static inline TSimdFloat4 tfLoadSimd4F(float x, float y, float z, float w);
+static inline TSimdFloat3 tfLoadSimd3F(float x, float y, float z, float w);
+static inline TSimdFloat2 tfLoadSimd2F(float x, float y, float z, float w);
+
+static inline float tfGetElemSimd4F(TSimdFloat4 a, int elem);
+static inline float tfGetXSimd4F(TSimdFloat4 a);
+static inline float tfGetYSimd4F(TSimdFloat4 a);
+static inline float tfGetZSimd4F(TSimdFloat4 a);
+static inline float tfGetWSimd4F(TSimdFloat4 a);
+
+static inline float tfGetElemSimd3F(TSimdFloat3 a,int elem);
+static inline float tfGetXSimd3F(TSimdFloat3 a);
+static inline float tfGetYSimd3F(TSimdFloat3 a);
+static inline float tfGetZSimd3F(TSimdFloat3 a);
+
+static inline float tfGetElemSimd2F(TSimdFloat2 a,int elem);
+static inline float tfGetXSimd2F(TSimdFloat2 a);
+static inline float tfGetYSimd2F(TSimdFloat2 a);
 
 static inline bool tfIsCloseSimd4x4F(TSimdFloat4x4 a, TSimdFloat4x4 b, float epsilon);
 static inline bool tfIsCloseSimd3x4F(TSimdFloat3x4 a, TSimdFloat3x4 b, float epsilon);
 static inline bool tfIsCloseSimd2x4F(TSimdFloat2x4 a, TSimdFloat2x4 b, float epsilon);
 static inline bool tfIsCloseSimd1x4F(TSimdFloat1x4 a, TSimdFloat1x4 b, float epsilon);
+
 static inline bool tfIsCloseSimd4F(TSimdFloat4 a, TSimdFloat4 b, float epsilon);
+static inline bool tfIsCloseSimd3F(TSimdFloat3 a, TSimdFloat3 b, float epsilon);
+static inline bool tfIsCloseSimd2F(TSimdFloat2 a, TSimdFloat2 b, float epsilon);
 
 static inline void tfSetElemSimd4x4F(TSimdFloat4x4* input, int col, int row, float value);
 static inline void tfSetElemSimd3x4F(TSimdFloat3x4* input, int col, int row, float value);
