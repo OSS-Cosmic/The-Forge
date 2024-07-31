@@ -45,7 +45,61 @@ static inline void debugPrintSimd4x4F(TSimdFloat4x4 input) {
     );
 }
 
-UTEST(TF_Simd4, tfSetElemSimd4x4F) {
+
+UTEST(TF_Matrix, tfVectorEleAdd4F)
+{
+    struct {
+        TSimdFloat4 a;
+        TSimdFloat4 b;
+        TSimdFloat4 test;
+    } tests[] = {
+        { tfLoadSimd4F(1, 0, 0, 0), tfLoadSimd4F(0, 1, 0, 0), tfLoadSimd4F(1, 1, 0, 0) },       // Original test case
+        { tfLoadSimd4F(2, 3, 4, 5), tfLoadSimd4F(6, 7, 8, 9), tfLoadSimd4F(8, 10, 12, 14) },    // Test with larger numbers
+        { tfLoadSimd4F(-1, 2, -3, 4), tfLoadSimd4F(5, -6, 7, -8), tfLoadSimd4F(4, -4, 4, -4) }, // Test with negative numbers
+    };
+
+    for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++) {
+        TSimdFloat4 result = tfVectorEleAdd4F(tests[i].a, tests[i].b);
+        debugPrintSimd4F(result);
+        EXPECT_TRUE(tfIsCloseSimd4F(result, tests[i].test, DEFAULT_EPSILON));
+    }
+}
+
+
+UTEST(TF_Matrix, tfMatMul4x4F_4x4F)
+{
+    struct
+    {
+        TSimdFloat4x4 a;
+        TSimdFloat4x4 b;
+        TSimdFloat4x4 test;
+    } tests[] = {
+        { tfLoadSimd4x4F(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1), 
+          tfLoadSimd4x4F(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1),
+          tfLoadSimd4x4F(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1) },
+        // Scaling matrices
+        { tfLoadSimd4x4F(2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1), 
+          tfLoadSimd4x4F(5, 0, 0, 0, 0, 6, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1),
+          tfLoadSimd4x4F(10, 0, 0, 0, 0, 18, 0, 0, 0, 0, 28, 0, 0, 0, 0, 1) },
+        { tfLoadSimd4x4F(0.5, 0, 0, 0, 0, 0.25, 0, 0, 0, 0, 0.125, 0, 0, 0, 0, 1),
+          tfLoadSimd4x4F(2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1), 
+          tfLoadSimd4x4F(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1) },
+
+
+        { tfLoadSimd4x4F(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f),
+          tfLoadSimd4x4F(7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f, 21.0f, 22.0f), 
+          tfLoadSimd4x4F(150.0f, 160.0f, 170.0f, 180.0f, 358.0f, 384.0f, 410.0f, 436.0f, 566.0f, 608.0f, 650.0f, 692.0f, 774.0f, 832.0f, 890.0f, 948.0f) },
+    };
+
+    for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++)
+    {
+        TSimdFloat4x4 result = tfMatMul4x4F_4x4F(tests[i].a, tests[i].b);
+        debugPrintSimd4x4F(result);
+        EXPECT_TRUE(tfIsCloseSimd4x4F(result, tests[i].test, DEFAULT_EPSILON));
+    }
+}
+
+UTEST(TF_Matrix, tfSetElemSimd4x4F) {
     TSimdFloat4x4 a = tfLoadIdentitySimd4x4F();
 
     // Set element at (0, 0)
@@ -76,7 +130,7 @@ UTEST(TF_Simd4, tfSetElemSimd4x4F) {
 }
 
 
-UTEST(TF_Simd4, tfVectorMul4x4F)
+UTEST(TF_Matrix, tfVectorMul4x4F)
 {
     struct {
       TSimdFloat4x4 a;
