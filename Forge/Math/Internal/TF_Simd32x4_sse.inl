@@ -1,7 +1,7 @@
 #if defined(__CLANGD__)
 #define TF_FEATURE_CPU_SSE  
 #include "Forge/TF_Config.h"
-#include "../TF_Simd4x32.h"
+#include "../TF_Simd32x4.h"
 #endif
 
 static inline TSimdFloat32x4 tfSimd4fReplaceIndex0ByValue(TSimdFloat32x4 input, float value) {
@@ -66,14 +66,14 @@ inline TSimdFloat32x4 tfSimd4fMadd(TSimdFloat32x4 mul1, TSimdFloat32x4 mul2, TSi
 #endif
 }
 
-inline TSimdFloat32x4 tfSimd4fDiv(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_div_ps(arg1, arg2); }
+inline TSimdFloat32x4 tfSimdFloat4x32Div(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_div_ps(arg1, arg2); }
 
 inline TSimdFloat32x4 tfSimd4fAbs(TSimdFloat32x4 value) {
     const TSimdFloat32x4 signMask = tfSimd4iToSimd4f(tfSimd4iSplat(0x7FFFFFFF));
     return _mm_and_ps(value, signMask);
 }
-inline TSimdFloat32x4 tfSimdFloat32x4Load(float x, float y, float z, float w) { return _mm_set_ps(w, z, y, x); }
-inline TSimdInt32x4 tfSimdInt32x4Load(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
+inline TSimdFloat32x4 tfSimdFloat4x32Load(float x, float y, float z, float w) { return _mm_set_ps(w, z, y, x); }
+inline TSimdInt32x4 tfSimdInt4x32Load(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
 
 inline TSimdFloat32x2 tfSimd4fToSimd2f(TSimdFloat32x4 value) { return value; }
 inline TSimdFloat32x3 tfSimd4fToSimd3f(TSimdFloat32x4 value) { return value; }

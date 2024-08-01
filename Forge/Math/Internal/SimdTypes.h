@@ -70,7 +70,7 @@ struct TSimdQuatFloat {
   TSimdFloat32x4 mValue; 
 };
 
-struct TSimdFloat1x4 {
+struct TSimdFloat4x1 {
     union
     {
         struct
@@ -81,7 +81,7 @@ struct TSimdFloat1x4 {
     };
 };
 
-struct TSimdFloat2x4
+struct TSimdFloat4x2
 {
     union
     {
@@ -94,7 +94,7 @@ struct TSimdFloat2x4
     };
 };
 
-struct TSimdFloat3x4 {
+struct TSimdFloat4x3 {
   union {
     struct {
       TSimdFloat32x4 mCol0; 
@@ -125,12 +125,16 @@ struct TSimdFloat3
   TSimdFloat32x3 mRow; 
 };
 
-struct TSimdFloat1x3
-{
-  TSimdFloat32x3 mCol0; 
+struct TSimdFloat3x1 {
+    union {
+        struct {
+            TSimdFloat32x3 mCol0;
+        };
+        TSimdFloat32x3 mCol[1];
+    };
 };
 
-struct TSimdFloat2x3
+struct TSimdFloat3x2
 {
     union
     {
@@ -161,15 +165,25 @@ struct TSimdFloat2 {
   TSimdFloat32x2 mRow; 
 };
 
-struct TSimdFloat1x2
+struct TSimdFloat2x1
 {
-  TSimdFloat32x2 mCol0; 
+    union {
+        struct {
+          TSimdFloat32x2 mCol0; 
+        };
+        TSimdFloat32x2 mCol[1];
+    };
 };
 
 struct TSimdFloat2x2
 {
-  TSimdFloat32x2 mCol0; 
-  TSimdFloat32x2 mCol1; 
+    union {
+        struct {
+            TSimdFloat32x2 mCol0;
+            TSimdFloat32x2 mCol1;
+        };
+        TSimdFloat32x2 mCol[2];
+    };
 };
 
 

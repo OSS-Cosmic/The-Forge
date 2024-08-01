@@ -3,7 +3,7 @@
 #undef TF_FEATURE_CPU_NEON  
 #undef TF_FEATURE_CPU_SSE  
 #define TF_FEATURE_CPU_SCALAR  
-#include "../TF_Simd4x32.h"
+#include "../TF_Simd32x4.h"
 #endif
 
 static inline TSimdFloat32x4 tfSimd4fReplaceIndex0ByValue(TSimdFloat32x4 input, float value) {
@@ -152,8 +152,8 @@ inline TSimdFloat32x4 tfSimd4fAbs(TSimdFloat32x4 value) {
         abs(value.v[3]),
     };
 }
-inline TSimdFloat32x4 tfSimdFloat32x4Load(float x, float y, float z, float w) { return { x, y, z, w }; }
-inline TSimdInt32x4 tfSimdInt32x4Load(int32_t x, int32_t y, int32_t z, int32_t w) { return { x, y, z, w }; }
+inline TSimdFloat32x4 tfSimdFloat4x32Load(float x, float y, float z, float w) { return { x, y, z, w }; }
+inline TSimdInt32x4 tfSimdInt4x32Load(int32_t x, int32_t y, int32_t z, int32_t w) { return { x, y, z, w }; }
 
 inline TSimdFloat32x2 tfSimd4fToSimd2f(TSimdFloat32x4 value) { return { value.v[0], value.v[1] }; }
 inline TSimdFloat32x3 tfSimd4fToSimd3f(TSimdFloat32x4 value) { return { value.v[0], value.v[1], value.v[2] }; }

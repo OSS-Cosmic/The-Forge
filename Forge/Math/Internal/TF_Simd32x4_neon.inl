@@ -1,7 +1,7 @@
 #if defined(__CLANGD__)
 #define TF_FEATURE_CPU_NEON  
 #include "Forge/TF_Config.h"
-#include "../TF_Simd4x32.h"
+#include "../TF_Simd32x4.h"
 #endif
 
 static inline TSimdFloat32x4 tfSimd4fReplaceIndex0ByValue(TSimdFloat32x4 input, float value) { return vsetq_lane_f32(value, input, 0); }
@@ -62,12 +62,12 @@ inline TSimdFloat32x4 tfSimd4fMadd(TSimdFloat32x4 mul1, TSimdFloat32x4 mul2, TSi
 inline TSimdFloat32x4 tfSimd4fDiv(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return vdivq_f32(arg1, arg2); }
 
 inline TSimdFloat32x4 tfSimd4fAbs(TSimdFloat32x4 value) { return vabsq_f32(value); }
-inline TSimdFloat32x4 tfSimdFloat32x4Load(float x, float y, float z, float w) {
+inline TSimdFloat32x4 tfSimdFloat4x32Load(float x, float y, float z, float w) {
     const float values[4] = { x, y, z, w };
     return vld1q_f32(values);
 }
 
-inline TSimdInt32x4 tfSimdInt32x4Load(int32_t x, int32_t y, int32_t z, int32_t w) {
+inline TSimdInt32x4 tfSimdInt4x32Load(int32_t x, int32_t y, int32_t z, int32_t w) {
     const int32_t values[4] = { x, y, z, w };
     return vld1q_s32(values);
 }
@@ -105,41 +105,17 @@ inline TSimdInt32x4 tfSimd4iCmpLt(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return
 inline TSimdInt32x4 tfSimd4iCmpLtEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return vcleq_s32(arg1, arg2); }
 
 inline bool tfSimd4fCmpAllLt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
-    //    for(int i = 0; i < 4; i++) {
-    //        if (arg1.v[i] >= arg2.v[i])
-    //        {
-    //            return false;
-    //        }
-    //    }
-    return true;
+    return vminv_u32(vcltq_f32(arg1, arg2)) != 0;
 }
 
 inline bool tfSimd4fCmpAllGt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
-    //    for(int i = 0; i < 4; i++) {
-    //        if (arg1.v[i] <= arg2.v[i])
-    //        {
-    //            return false;
-    //        }
-    //    }
-    return true;
+    return vminv_u32(vcgtq_f32(arg1, arg2)) != 0;
 }
 
 inline bool tfSimd4fCmpAllEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
-    //    for(int i = 0; i < 4; i++) {
-    //        if (arg1.v[i] != arg2.v[i])
-    //        {
-    //            return false;
-    //        }
-    //    }
-    return true;
+    return vminv_u32(vceqq_f32(arg1, arg2)) != 0;
 }
 
 inline bool tfSimd4iCmpAllEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2) {
-    //    for(int i = 0; i < 4; i++) {
-    //        if (arg1.v[i] != arg2.v[i])
-    //        {
-    //            return false;
-    //        }
-    //    }
-    return true;
+    return vminv_u32(vceqq_s32(arg1, arg2)) != 0;
 }

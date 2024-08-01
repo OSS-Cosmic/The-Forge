@@ -5,5 +5,6 @@
 #endif
 
 static inline float tfVectorDot4F(TSimdFloat4 a0, TSimdFloat4  a1) {
-  return vaddvq_f32(vmulq_f32(arg1, arg2))
+  return vaddvq_f32(vmulq_f32(a0, a1));
 }
+

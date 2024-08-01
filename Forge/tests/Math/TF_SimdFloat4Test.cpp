@@ -8,7 +8,7 @@
 #include "TF_TestMain.h"
 #include "utest.h"
 
-#include "Forge/Math/TF_SimdFloat4.h"
+#include "Forge/Math/TF_SimdFloat.h"
 #include "TF_MathUtils.h"
 
 
@@ -27,6 +27,27 @@ UTEST(TSimdFloat4 , tfLoadSimd4F)
   EXPECT_NEAR(tfGetWSimd4F(value), 12.5f, DEFAULT_EPSILON);
 }
 
+UTEST(TF_Matrix, tfVectorEleAdd4F)
+{
+    struct {
+        TSimdFloat4 a;
+        TSimdFloat4 b;
+        TSimdFloat4 test;
+    } tests[] = {
+        { tfLoadSimd4F(1, 0, 0, 0), tfLoadSimd4F(0, 1, 0, 0), tfLoadSimd4F(1, 1, 0, 0) },       // Original test case
+        { tfLoadSimd4F(2, 3, 4, 5), tfLoadSimd4F(6, 7, 8, 9), tfLoadSimd4F(8, 10, 12, 14) },    // Test with larger numbers
+        { tfLoadSimd4F(-1, 2, -3, 4), tfLoadSimd4F(5, -6, 7, -8), tfLoadSimd4F(4, -4, 4, -4) }, // Test with negative numbers
+    };
+
+    for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++) {
+        TSimdFloat4 result = tfVectorEleAdd4F(tests[i].a, tests[i].b);
+        debugPrintSimd4F(result);
+        EXPECT_TRUE(tfIsCloseSimd4F(result, tests[i].test, DEFAULT_EPSILON));
+    }
+}
+
+
+
 UTEST(TSimdFloat4, tfGetRowSimd4x4F) {
     TSimdFloat4x4 mat =
         tfLoadSimd4x4F(1.0f, 2.0f, 3.0f, 4.0f, 
@@ -41,7 +62,7 @@ UTEST(TSimdFloat4, tfGetRowSimd4x4F) {
 }
 
 //UTEST(TSimdFloat4, tfIsCloseSimd3x4F) {
-//    TSimdFloat3x4 mat =
+//    TSimdFloat4x3 mat =
 //        tfLoadSimd3x4F(1.0f, 2.0f, 3.0f,  
 //                       5.0f, 6.0f, 7.0f,  
 //                       9.0f, 10.0f, 11.0f,  

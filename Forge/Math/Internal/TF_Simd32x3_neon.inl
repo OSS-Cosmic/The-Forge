@@ -1,7 +1,7 @@
 #if defined(__CLANGD__)
 #define TF_FEATURE_CPU_NEON
 #include "Forge/TF_Config.h"
-#include "../TF_Simd3x32.h"
+#include "../TF_Simd32x3.h"
 #endif
 
 inline TSimdInt32x3   tfSimd3iSelect(TSimdInt32x3 arg0, TSimdInt32x3 arg1, TSimdInt32x3 mask) { return vbslq_s32(mask, arg0, arg1); }

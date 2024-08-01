@@ -36,8 +36,12 @@ inline float tfSimd3fSelectIndex0(TSimdFloat32x3 value);
 inline float tfSimd3fSelectIndex1(TSimdFloat32x3 value);
 inline float tfSimd3fSelectIndex2(TSimdFloat32x3 value);
 
-inline TSimdFloat32x3 tfSimdFloat3Load(float x, float y, float z);
-inline TSimdInt32x3 tfSimdInt3Load(int32_t x, int32_t y, int32_t z);
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex0ByValue(TSimdFloat32x3 input, float value);
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex1ByValue(TSimdFloat32x3 input, float value);
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex2ByValue(TSimdFloat32x3 input, float value);
+
+inline TSimdFloat32x3 tfSimdFloat3x32Load(float x, float y, float z);
+inline TSimdInt32x3 tfSimdInt3x32Load(int32_t x, int32_t y, int32_t z);
 
 inline TSimdFloat32x3 tfSimd3fAdd(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
 inline TSimdFloat32x3 tfSimd3fSub(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
@@ -83,17 +87,14 @@ inline TSimdFloat32x3 tfSimd3fCmpLtEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
 inline bool tfSimd3iCmpAllEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
 inline bool tfSimd3fCmpAllEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
 
-// ----------------------------------------------------------------
-// --------------------- Implementaion ----------------------------
-// ----------------------------------------------------------------
-
+static inline bool tfSimdFloat32x3CmpAllLt(TSimdFloat32x3 a, TSimdFloat32x3 b);
 
 #if defined(TF_FEATURE_CPU_SSE)
-#include "Internal/TF_Simd3x32_sse.inl"
+#include "Internal/TF_Simd32x3_sse.inl"
 #elif defined(TF_FEATURE_CPU_NEON)
-#include "Internal/TF_Simd3x32_neon.inl"
+#include "Internal/TF_Simd32x3_neon.inl"
 #else
-#include "Internal/TF_Simd3x32_scalar.inl"
+#include "Internal/TF_Simd32x3_scalar.inl"
 #endif
 
 #endif

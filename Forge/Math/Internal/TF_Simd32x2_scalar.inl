@@ -1,7 +1,7 @@
 #if defined(__CLANGD__)
 #define TF_FEATURE_CPU_SCALAR  
 #include "Forge/TF_Config.h"
-#include "../TF_Simd2x32.h"
+#include "../TF_Simd32x2.h"
 #endif
 
 inline TSimdInt32x2 tfSimd2iSelect(TSimdInt32x2 arg0, TSimdInt32x2 arg1, TSimdInt32x2 mask) {
@@ -147,6 +147,15 @@ inline bool tfSimd2fCmpAllEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
 inline bool tfSimd2iCmpAllEq(TSimdInt32x2 arg1, TSimdInt32x2 arg2) {
     for (int i = 0; i < 2; i++) {
         if (arg1.v[i] != arg2.v[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static inline bool tfSimdFloat32x2CmpAllLt(TSimdFloat32x2 arg1, TSimdFloat32x2 arg2) {
+    for (int i = 0; i < 2; i++) {
+        if (arg1.v[i] >= arg2.v[i]) {
             return false;
         }
     }

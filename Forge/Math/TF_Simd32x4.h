@@ -41,14 +41,14 @@ static inline TSimdFloat32x4 tfSimd4fReplaceIndex1ByValue(TSimdFloat32x4 input, 
 static inline TSimdFloat32x4 tfSimd4fReplaceIndex2ByValue(TSimdFloat32x4 input, float value);
 static inline TSimdFloat32x4 tfSimd4fReplaceIndex3ByValue(TSimdFloat32x4 input, float value);
 
-inline TSimdFloat32x4 tfSimdFloat32x4Load(float x, float y, float z, float w);
-inline TSimdInt32x4 tfSimdInt32x4Load(int32_t x, int32_t y, int32_t z, int32_t w);
+inline TSimdFloat32x4 tfSimdFloat4x32Load(float x, float y, float z, float w);
+inline TSimdInt32x4 tfSimdInt4x32Load(int32_t x, int32_t y, int32_t z, int32_t w);
 
 inline TSimdFloat32x4 tfSimd4fAdd(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline TSimdFloat32x4 tfSimd4fSub(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline TSimdFloat32x4 tfSimd4fMul(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline TSimdFloat32x4 tfSimd4fMadd(TSimdFloat32x4 mul1, TSimdFloat32x4 mul2, TSimdFloat32x4 add);
-inline TSimdFloat32x4 tfSimd4fDiv(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
+inline TSimdFloat32x4 tfSimdFloat4x32Div(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline TSimdFloat32x4 tfSimd4fAbs(TSimdFloat32x4 value);
 
 inline TSimdFloat32x4 tfSimd4fNot(TSimdFloat32x4 value);
@@ -91,22 +91,12 @@ inline bool tfSimd4fCmpAllEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline bool tfSimd4fCmpAllLt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 inline bool tfSimd4fCmpAllGt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2);
 
-static inline bool tfSimd4fCmpEqEpsilon(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2, float epsilon);
-
-// ----------------------------------------------------------------
-// --------------------- Implementaion ----------------------------
-// ----------------------------------------------------------------
-
-static inline bool tfSimd4fCmpEqEpsilon(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2, float epsilon) {
-    return tfSimd4fCmpAllLt(tfSimd4fAbs(tfSimd4fSub(arg1, arg2)), tfSimd4fSplat(epsilon));
-}
-
 #if defined(TF_FEATURE_CPU_SSE)
-#include "Internal/TF_Simd4x32_sse.inl"
+#include "Internal/TF_Simd32x4_sse.inl"
 #elif defined(TF_FEATURE_CPU_NEON)
-#include "Internal/TF_Simd4x32_neon.inl"
+#include "Internal/TF_Simd32x4_neon.inl"
 #else
-#include "Internal/TF_Simd4x32_scalar.inl"
+#include "Internal/TF_Simd32x4_scalar.inl"
 #endif
 
 #endif

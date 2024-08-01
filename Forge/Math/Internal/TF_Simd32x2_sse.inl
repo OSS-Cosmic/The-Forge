@@ -1,7 +1,7 @@
 #if defined(__CLANGD__)
 #define TF_FEATURE_CPU_SSE  
 #include "Forge/TF_Config.h"
-#include "../TF_Simd2x32.h"
+#include "../TF_Simd32x2.h"
 #endif
 
 inline TSimdInt32x2   tfSimd2iSelect(TSimdInt32x2 arg0, TSimdInt32x2 arg1, TSimdInt32x2 mask) { return _mm_blendv_epi8(arg0, arg1, mask); }
@@ -100,3 +100,9 @@ inline bool tfSimd2iCmpAllEq(TSimdInt32x2 arg1, TSimdInt32x2 arg2) {
     const TSimdInt32x2 compare = tfSimd2iCmpEq(arg1, arg2);
     return (_mm_movemask_epi8(compare) & 0b0011) == 0b0011;
 }
+
+static inline bool tfSimdFloat32x2CmpAllLt(TSimdFloat32x2 a, TSimdFloat32x2 b) {
+    TSimdFloat32x3 compare = tfSimd2fCmpLt(a, b);
+    return (_mm_movemask_ps(compare) & 0b0011) == 0b0011;
+}
+

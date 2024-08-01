@@ -8,7 +8,7 @@
 #include "TF_TestMain.h"
 #include "utest.h"
 
-#include "Forge/Math/TF_Simd3x32.h"
+#include "Forge/Math/TF_Simd32x3.h"
 #include "TF_MathUtils.h"
 
 
@@ -21,14 +21,14 @@ UTEST(TF_Simd3, tfSimd3iCmpGt)
   } tests[] = {
       // ... existing test cases ...
       // Edge cases:
-      {tfSimdInt3Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
-      {tfSimdInt3Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
+      {tfSimdInt3x32Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3x32Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3x32Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
+      {tfSimdInt3x32Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3x32Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3x32Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
       // Mixed values:
-      {tfSimdInt3Load(0, -1, 1), tfSimdInt3Load(1, 0, -1), tfSimdInt3Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_TRUE)},
+      {tfSimdInt3x32Load(0, -1, 1), tfSimdInt3x32Load(1, 0, -1), tfSimdInt3x32Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_TRUE)},
       // All elements equal:
-      {tfSimdInt3Load(42, 42, 42), tfSimdInt3Load(42, 42, 42), tfSimdInt3Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
+      {tfSimdInt3x32Load(42, 42, 42), tfSimdInt3x32Load(42, 42, 42), tfSimdInt3x32Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
       // Different element types:
-      {tfSimdInt3Load(0, 1, 2), tfSimdInt3Load(3, 2, 1), tfSimdInt3Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_TRUE)},
+      {tfSimdInt3x32Load(0, 1, 2), tfSimdInt3x32Load(3, 2, 1), tfSimdInt3x32Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_TRUE)},
   };
   for(size_t i = 0; i < TF_ARRAY_COUNT(tests); i++) {
     EXPECT_TRUE(tfSimd3iCmpAllEq(tfSimd3iCmpGt(tests[i].a, tests[i].b), tests[i].test));
@@ -43,14 +43,14 @@ UTEST(TF_Simd3, tfSimd3iCmpLt)
     TSimdInt32x3 test;
   } tests[] = {
       // Less than
-      {tfSimdInt3Load(12, 13, 14), tfSimdInt3Load(16, 17, 18), tfSimdInt3Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
+      {tfSimdInt3x32Load(12, 13, 14), tfSimdInt3x32Load(16, 17, 18), tfSimdInt3x32Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
       // Mixed less than and equal
-      {tfSimdInt3Load(125, -12, 153), tfSimdInt3Load(125, 13, 153), tfSimdInt3Load(TF_SIMD_FALSE, TF_SIMD_TRUE, TF_SIMD_FALSE)},
+      {tfSimdInt3x32Load(125, -12, 153), tfSimdInt3x32Load(125, 13, 153), tfSimdInt3x32Load(TF_SIMD_FALSE, TF_SIMD_TRUE, TF_SIMD_FALSE)},
       // All elements greater than or equal
-      {tfSimdInt3Load(1, 2, 3), tfSimdInt3Load(-1, 0, 1), tfSimdInt3Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
+      {tfSimdInt3x32Load(1, 2, 3), tfSimdInt3x32Load(-1, 0, 1), tfSimdInt3x32Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
       // Edge cases:
-      {tfSimdInt3Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
-      {tfSimdInt3Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
+      {tfSimdInt3x32Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3x32Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3x32Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
+      {tfSimdInt3x32Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3x32Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3x32Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
   };
   for(size_t i = 0; i < TF_ARRAY_COUNT(tests); i++) {
     EXPECT_TRUE(tfSimd3iCmpAllEq(tfSimd3iCmpLt(tests[i].a, tests[i].b), tests[i].test));
@@ -67,14 +67,14 @@ UTEST(TF_Simd3, tfSimd3iCmpEq)
     TSimdInt32x3 test;
   } tests[] = {
        // Equal elements
-      {tfSimdInt3Load(12, 13, 14), tfSimdInt3Load(12, 13, 14), tfSimdInt3Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
+      {tfSimdInt3x32Load(12, 13, 14), tfSimdInt3x32Load(12, 13, 14), tfSimdInt3x32Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
       // Mixed equal and unequal elements
-      {tfSimdInt3Load(125, -12, 153), tfSimdInt3Load(125, -12, 14), tfSimdInt3Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_FALSE)},
+      {tfSimdInt3x32Load(125, -12, 153), tfSimdInt3x32Load(125, -12, 14), tfSimdInt3x32Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_FALSE)},
       // All elements unequal
-      {tfSimdInt3Load(1, 2, 3), tfSimdInt3Load(5, 6, 7), tfSimdInt3Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
+      {tfSimdInt3x32Load(1, 2, 3), tfSimdInt3x32Load(5, 6, 7), tfSimdInt3x32Load(TF_SIMD_FALSE, TF_SIMD_FALSE, TF_SIMD_FALSE)},
       // Edge cases:
-      {tfSimdInt3Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
-      {tfSimdInt3Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
+      {tfSimdInt3x32Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3x32Load(INT32_MIN, INT32_MIN, INT32_MIN), tfSimdInt3x32Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
+      {tfSimdInt3x32Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3x32Load(INT32_MAX, INT32_MAX, INT32_MAX), tfSimdInt3x32Load(TF_SIMD_TRUE, TF_SIMD_TRUE, TF_SIMD_TRUE)},
   };
   for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++)
   {
@@ -101,7 +101,7 @@ UTEST(TF_Simd3, tfSimdSplat4f)
     EXPECT_NEAR(tfSimd3fSelectIndex1(value1), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex2(value1), 5.1f, DEFAULT_EPSILON);
 
-    TSimdFloat32x3 value2 = tfSimdFloat3Load(5.1f, 1.0f, 2.0f);
+    TSimdFloat32x3 value2 = tfSimdFloat3x32Load(5.1f, 1.0f, 2.0f);
     EXPECT_NEAR(tfSimd3fSelectIndex0(value2), 5.1f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex1(value2), 1.0f, DEFAULT_EPSILON);
     EXPECT_NEAR(tfSimd3fSelectIndex2(value2), 2.0f, DEFAULT_EPSILON);
@@ -112,7 +112,7 @@ UTEST(TF_Simd3, tfSimd3iNot) {
     TSimdInt32x3 test;
     TSimdInt32x3 expect;
   } tests[] = {
-       {tfSimdInt3Load(0xFFFFFFFF, 0x0000FFFF, 0xFFFF0000), tfSimdInt3Load(0, 0xFFFF0000, 0x0000FFFF)},
+       {tfSimdInt3x32Load(0xFFFFFFFF, 0x0000FFFF, 0xFFFF0000), tfSimdInt3x32Load(0, 0xFFFF0000, 0x0000FFFF)},
   };   
   for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++)
   {
@@ -127,10 +127,10 @@ UTEST(TF_Simd3, tfSimd3iSelect) {
     TSimdInt32x3 mask;
     TSimdInt32x3 expect;
   } tests[] = {
-       {tfSimdInt3Load(10, 11, -13), tfSimdInt3Load(123, -149, 0), tfSimdInt3Load(0,0,0), tfSimdInt3Load(10, 11, -13)},
-       {tfSimdInt3Load(10, 11, -13), tfSimdInt3Load(123, -149, 0), tfSimdInt3Load(TF_SIMD_TRUE,0,0), tfSimdInt3Load(123, 11, -13)},
-       {tfSimdInt3Load(10, 11, -13), tfSimdInt3Load(123, -149, 0), tfSimdInt3Load(TF_SIMD_TRUE,0,TF_SIMD_TRUE), tfSimdInt3Load(123, 11, 0)},
-       {tfSimdInt3Load(10, 11, -13), tfSimdInt3Load(123, -149, 0), tfSimdInt3Load(TF_SIMD_TRUE,TF_SIMD_TRUE,TF_SIMD_TRUE), tfSimdInt3Load(123, -149, 0)},
+       {tfSimdInt3x32Load(10, 11, -13), tfSimdInt3x32Load(123, -149, 0), tfSimdInt3x32Load(0,0,0), tfSimdInt3x32Load(10, 11, -13)},
+       {tfSimdInt3x32Load(10, 11, -13), tfSimdInt3x32Load(123, -149, 0), tfSimdInt3x32Load(TF_SIMD_TRUE,0,0), tfSimdInt3x32Load(123, 11, -13)},
+       {tfSimdInt3x32Load(10, 11, -13), tfSimdInt3x32Load(123, -149, 0), tfSimdInt3x32Load(TF_SIMD_TRUE,0,TF_SIMD_TRUE), tfSimdInt3x32Load(123, 11, 0)},
+       {tfSimdInt3x32Load(10, 11, -13), tfSimdInt3x32Load(123, -149, 0), tfSimdInt3x32Load(TF_SIMD_TRUE,TF_SIMD_TRUE,TF_SIMD_TRUE), tfSimdInt3x32Load(123, -149, 0)},
   };   
   for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++)
   {

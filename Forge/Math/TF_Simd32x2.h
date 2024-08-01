@@ -33,8 +33,8 @@ inline TSimdInt32x2 tfSimd2iSelect(TSimdInt32x2 arg0, TSimdInt32x2 arg1, TSimdIn
 inline float tfSimd2fSelectIndex0(TSimdFloat32x2 value);
 inline float tfSimd2fSelectIndex1(TSimdFloat32x2 value);
 
-inline TSimdFloat32x2 tfSimdFloat2Load(float x, float y);
-inline TSimdInt32x2 tfSimd2iLoadImmediate(int32_t x, int32_t y);
+inline TSimdFloat32x2 tfSimdFloat2x32Load(float x, float y);
+inline TSimdInt32x2   tfSimdInt2x32Load(int32_t x, int32_t y);
 
 inline TSimdFloat32x2 tfSimd2fAdd(TSimdFloat32x2 arg1, TSimdFloat32x2 arg2);
 inline TSimdFloat32x2 tfSimd2fSub(TSimdFloat32x2 arg1, TSimdFloat32x2 arg2);
@@ -80,17 +80,14 @@ inline TSimdFloat32x2 tfSimd2fCmpLtEq(TSimdFloat32x2 arg1, TSimdFloat32x2 arg2);
 inline bool tfSimd2iCmpAllEq(TSimdInt32x2 arg1, TSimdInt32x2 arg2);
 inline bool tfSimd2fCmpAllEq(TSimdFloat32x2 arg1, TSimdFloat32x2 arg2);
 
-// ----------------------------------------------------------------
-// --------------------- Implementaion ----------------------------
-// ----------------------------------------------------------------
-
+static inline bool tfSimdFloat32x2CmpAllLt(TSimdFloat32x2 a, TSimdFloat32x2 b);
 
 #if defined(TF_FEATURE_CPU_SSE)
-#include "Internal/TF_Simd2x32_sse.inl"
+#include "Internal/TF_Simd32x2_sse.inl"
 #elif defined(TF_FEATURE_CPU_NEON)
-#include "Internal/TF_Simd2x32_neon.inl"
+#include "Internal/TF_Simd32x2_neon.inl"
 #else
-#include "Internal/TF_Simd2x32_scalar.inl"
+#include "Internal/TF_Simd32x2_scalar.inl"
 #endif
 
 

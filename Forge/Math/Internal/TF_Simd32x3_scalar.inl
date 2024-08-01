@@ -1,7 +1,7 @@
 #if defined(__CLANGD__)
 #define TF_FEATURE_CPU_SCALAR  
 #include "Forge/TF_Config.h"
-#include "../TF_Simd3x32.h"
+#include "../TF_Simd32x3.h"
 #endif
 
 inline TSimdInt32x3 tfSimd3iSelect(TSimdInt32x3 arg0, TSimdInt32x3 arg1, TSimdInt32x3 mask) {
@@ -120,8 +120,8 @@ inline TSimdFloat32x3 tfSimd3fAbs(TSimdFloat32x3 value) {
     };
 }
 
-inline TSimdFloat32x3 tfSimdFloat3Load(float x, float y, float z) { return { x, y, z }; }
-inline TSimdInt32x3 tfSimdInt3Load(int32_t x, int32_t y, int32_t z) { return { x, y, z }; }
+inline TSimdFloat32x3 tfSimdFloat3x32Load(float x, float y, float z) { return { x, y, z }; }
+inline TSimdInt32x3 tfSimdInt3x32Load(int32_t x, int32_t y, int32_t z) { return { x, y, z }; }
 
 inline TSimdFloat32x2 tfSimd3fToSimd2f(TSimdFloat32x3 value) { return { value.v[0], value.v[1] }; }
 
@@ -177,3 +177,25 @@ inline bool tfSimd3iCmpAllEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
     }
     return true;
 }
+
+static inline bool tfSimdFloat32x3CmpAllLt(TSimdFloat32x3 a, TSimdFloat32x3 b) {
+    for (int i = 0; i < 3; i++) {
+        if (a.v[i] >= b.v[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex0ByValue(TSimdFloat32x3 input, float value) {
+    return {value, input.v[1], input.v[2]};
+}
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex1ByValue(TSimdFloat32x3 input, float value){
+    return {input.v[0], value, input.v[2]};
+};
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex2ByValue(TSimdFloat32x3 input, float value){
+    return {input.v[0], input.v[1], value};
+};
+
+
+

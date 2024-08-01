@@ -1,4 +1,6 @@
 
+#include "Forge/Math/TF_Simd32x4.h"
+
 #define DEFAULT_EPSILON 1e-3f
 #define EXPECT_NEAR_VECTOR4(a, b, epsilon) do { \
   Vector4 __a = a; \
@@ -18,4 +20,34 @@
 } while(false);
 
 
+static inline void debugPrintSimd4F(TSimdFloat4 input) {
+  DLOGF(LogLevel::eDEBUG, "%.3f, %.3f, %.3f, %.3f",
+          tfSimd4fSelectIndex0(input.mRow),
+          tfSimd4fSelectIndex1(input.mRow),
+          tfSimd4fSelectIndex2(input.mRow),
+          tfSimd4fSelectIndex3(input.mRow));
+}
+static inline void debugPrintSimd4x4F(TSimdFloat4x4 input) {
+    DLOGF(LogLevel::eDEBUG,"%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
+          tfSimd4fSelectIndex0(input.mCol0),
+          tfSimd4fSelectIndex0(input.mCol1),
+          tfSimd4fSelectIndex0(input.mCol2),
+          tfSimd4fSelectIndex0(input.mCol3),
+
+          tfSimd4fSelectIndex1(input.mCol0),
+          tfSimd4fSelectIndex1(input.mCol1),
+          tfSimd4fSelectIndex1(input.mCol2),
+          tfSimd4fSelectIndex1(input.mCol3),
+          
+          tfSimd4fSelectIndex2(input.mCol0),
+          tfSimd4fSelectIndex2(input.mCol1),
+          tfSimd4fSelectIndex2(input.mCol2),
+          tfSimd4fSelectIndex2(input.mCol3),
+          
+          tfSimd4fSelectIndex3(input.mCol0),
+          tfSimd4fSelectIndex3(input.mCol1),
+          tfSimd4fSelectIndex3(input.mCol2),
+          tfSimd4fSelectIndex3(input.mCol3)
+    );
+}
 

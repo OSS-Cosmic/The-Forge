@@ -1,7 +1,7 @@
 #if defined(__CLANGD__)
 #define TF_FEATURE_CPU_SSE  
 #include "Forge/TF_Config.h"
-#include "../TF_Simd3x32.h"
+#include "../TF_Simd32x3.h"
 #endif
 
 inline TSimdInt32x3   tfSimd3iSelect(TSimdInt32x3 arg0, TSimdInt32x3 arg1, TSimdInt32x3 mask) { return _mm_blendv_epi8(arg0, arg1, mask); }
@@ -38,14 +38,21 @@ inline TSimdFloat32x3 tfSimd3fClamp(TSimdFloat32x3 value, TSimdFloat32x3 min, TS
 }
 
 inline TSimdInt32x3 tfSimd3fToSimd3i(TSimdFloat32x3 value) { return _mm_castps_si128(value); }
-
 inline TSimdFloat32x3 tfSimd3iToSimd3f(TSimdInt32x3 value) { return _mm_castsi128_ps(value); }
 
 inline float tfSimd3fSelectIndex0(TSimdFloat32x3 value) { return _mm_cvtss_f32(value); }
-
 inline float tfSimd3fSelectIndex1(TSimdFloat32x3 value) { return tfSimd3fSelectIndex0(tfSimd3fSplatIndex1(value)); }
-
 inline float tfSimd3fSelectIndex2(TSimdFloat32x3 value) { return tfSimd3fSelectIndex0(tfSimd3fSplatIndex2(value)); }
+
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex0ByValue(TSimdFloat32x3 input, float value) {
+    return _mm_blend_ps(input, tfSimd3fSplat(value), 0b0001);
+}
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex1ByValue(TSimdFloat32x3 input, float value) {
+    return _mm_blend_ps(input, tfSimd3fSplat(value), 0b0010);
+}
+static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex2ByValue(TSimdFloat32x3 input, float value) {
+    return _mm_blend_ps(input, tfSimd3fSplat(value), 0b0100);
+}
 
 inline TSimdFloat32x3 tfSimd3fAdd(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) { return _mm_add_ps(arg1, arg2); }
 inline TSimdFloat32x3 tfSimd3fSub(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) { return _mm_sub_ps(arg1, arg2); }
@@ -64,9 +71,8 @@ inline TSimdFloat32x3 tfSimd3fAbs(TSimdFloat32x3 value) {
     return _mm_and_ps(value, signMask);
 }
 
-inline TSimdFloat32x3 tfSimdFloat3Load(float x, float y, float z) { return _mm_set_ps(0.0f, z, y, x); }
-
-inline TSimdInt32x3 tfSimdInt3Load(int32_t x, int32_t y, int32_t z) { return _mm_set_epi32(0.0f, x, y, z); }
+inline TSimdFloat32x3 tfSimdFloat3x32Load(float x, float y, float z) { return _mm_set_ps(0.0f, z, y, x); }
+inline TSimdInt32x3 tfSimdInt3x32Load(int32_t x, int32_t y, int32_t z) { return _mm_set_epi32(0.0f, x, y, z); }
 
 inline TSimdFloat32x2 tfSimd3fToSimd2f(TSimdFloat32x3 value) { return value; }
 
@@ -78,7 +84,7 @@ inline TSimdFloat32x3 tfSimd3fSplatIndex0(TSimdFloat32x3 value) { return _mm_shu
 inline TSimdFloat32x3 tfSimd3fSplatIndex1(TSimdFloat32x3 value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(1, 1, 1, 1)); }
 inline TSimdFloat32x3 tfSimd3fSplatIndex2(TSimdFloat32x3 value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(2, 2, 2, 2)); }
 
-inline TSimdInt32x3 tfSimd3iSplat(int32_t value) { return _mm_set1_epi32(value); }
+inline TSimdInt32x3   tfSimd3iSplat(int32_t value) { return _mm_set1_epi32(value); }
 inline TSimdFloat32x3 tfSimd3fSplat(float value) { return _mm_set1_ps(value); }
 
 inline TSimdInt32x3 tfSimd3iCmpEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) { return _mm_cmpeq_epi32(arg1, arg2); }
@@ -97,8 +103,12 @@ inline bool tfSimd3fCmpAllEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
     TSimdFloat32x3 compare = tfSimd3fCmpEq(arg1, arg2);
     return (_mm_movemask_ps(compare) & 0b0111) == 0b0111;
 }
-
 inline bool tfSimd3iCmpAllEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
     const TSimdInt32x3 compare = tfSimd3iCmpEq(arg1, arg2);
     return (_mm_movemask_epi8(compare) & 0b0111) == 0b0111;
 }
+static inline bool tfSimdFloat32x3CmpAllLt(TSimdFloat32x3 a, TSimdFloat32x3 b) {
+    TSimdFloat32x3 compare = tfSimd3fCmpLt(a, b);
+    return (_mm_movemask_ps(compare) & 0b0111) == 0b0111;
+}
+

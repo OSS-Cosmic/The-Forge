@@ -1,3 +1,6 @@
+#pragma once
+#ifndef TF_MATH_INTERNAL_SCALAR_TYPES_H
+#define TF_MATH_INTERNAL_SCALAR_TYPES_H
 
 
 struct float4
@@ -54,3 +57,6 @@ struct half3
 struct half4
 {
 };
+
+#endif
+
