@@ -4,123 +4,291 @@
 #include "../TF_Simd32x4.h"
 #endif
 
-static inline TSimdFloat32x4 tfSimd4fReplaceIndex0ByValue(TSimdFloat32x4 input, float value) {
-    return _mm_blend_ps(input, tfSimd4fSplat(value), 0b0001);
-}
-static inline TSimdFloat32x4 tfSimd4fReplaceIndex1ByValue(TSimdFloat32x4 input, float value) {
-    return _mm_blend_ps(input, tfSimd4fSplat(value), 0b0010);
-}
-static inline TSimdFloat32x4 tfSimd4fReplaceIndex2ByValue(TSimdFloat32x4 input, float value) {
-    return _mm_blend_ps(input, tfSimd4fSplat(value), 0b0100);
-}
-static inline TSimdFloat32x4 tfSimd4fReplaceIndex3ByValue(TSimdFloat32x4 input, float value) {
-    return _mm_blend_ps(input, tfSimd4fSplat(value), 0b1000);
-}
+// Tsimd_f32x4_t
+static inline Tsimd_f32x4_t tfSimdLoad_f32x4(float x, float y, float z, float w) { return _mm_set_ps(w, z, y, x); }
+static inline Tsimd_f32x4_t tfSimdZero_f32x4() { return _mm_setzero_ps(); }
+static inline Tsimd_f32x4_t tfSimdSplat_f32x4(float value) { return _mm_set1_ps(value); }
 
-inline TSimdInt32x4   tfSimd4iSelect(TSimdInt32x4 arg0, TSimdInt32x4 arg1, TSimdInt32x4 mask) { return _mm_blendv_epi8(arg0, arg1, mask); }
-inline TSimdFloat32x4 tfSimd4fSelect(TSimdFloat32x4 arg0, TSimdFloat32x4 arg1, TSimdFloat32x4 mask) {
-    return _mm_blendv_ps(arg0, arg1, mask);
-}
+static inline Tsimd_f32x4_t tfSimdSplat0_f32x4(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(0, 0, 0, 0)); }
+static inline Tsimd_f32x4_t tfSimdSplat1_f32x4(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(1, 1, 1, 1)); }
+static inline Tsimd_f32x4_t tfSimdSplat2_f32x4(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(2, 2, 2, 2)); };
+static inline Tsimd_f32x4_t tfSimdSplat3_f32x4(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(3, 3, 3, 3)); }
 
-inline TSimdFloat32x4 tfSimd4fZero() { return _mm_setzero_ps(); }
-inline TSimdInt32x4   tfSimd4iZero() { return _mm_setzero_si128(); }
 
-inline TSimdInt32x4 tfSimd4iNot(TSimdInt32x4 value) { return _mm_andnot_si128(value, _mm_set1_epi32(TF_SIMDI_MAX)); }
-inline TSimdInt32x4 tfSimd4iAnd(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return _mm_and_si128(arg1, arg2); }
-inline TSimdInt32x4 tfSimd4iAndNot(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return _mm_andnot_si128(arg1, arg2); }
-inline TSimdInt32x4 tfSimd4iOr(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return _mm_or_si128(arg1, arg2); }
-inline TSimdInt32x4 tfSimd4iXor(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return _mm_xor_si128(arg1, arg2); }
-
-inline TSimdFloat32x4 tfSimd4fNot(TSimdFloat32x4 value) { return _mm_andnot_ps(value, _mm_set1_ps((float)(TF_SIMDF_MAX))); }
-inline TSimdFloat32x4 tfSimd4fAnd(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_and_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fAndNot(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_andnot_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fOr(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_or_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fXor(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_xor_ps(arg1, arg2); }
-
-inline TSimdFloat32x4 tfSimd4fFloor(TSimdFloat32x4 value) { return _mm_floor_ps(value); }
-inline TSimdFloat32x4 tfSimd4fCeil(TSimdFloat32x4 value) { return _mm_ceil_ps(value); }
-inline TSimdFloat32x4 tfSimd4fRound(TSimdFloat32x4 value) { return _mm_round_ps(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC); }
-inline TSimdFloat32x4 tfSimd4fTruncate(TSimdFloat32x4 value) { return tfSimd4iToSimd4f(tfSimd4fToSimd4i(value)); }
-inline TSimdFloat32x4 tfSimd4fMin(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_min_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fMax(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_max_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fClamp(TSimdFloat32x4 value, TSimdFloat32x4 min, TSimdFloat32x4 max) {
-    return tfSimd4fMax(min, tfSimd4fMin(value, max));
+static inline Tsimd_f32x4_t tfSimdDot_f32x4(Tsimd_f32x4_t a,Tsimd_f32x4_t b) {
+    Tsimd_f32x4_t x2 = _mm_mul_ps(a, b);
+    Tsimd_f32x4_t tmp = _mm_hadd_ps(x2, x2);
+    return _mm_hadd_ps(tmp, tmp);
 }
 
-inline TSimdInt32x4 tfSimd4fToSimd4i(TSimdFloat32x4 value) { return _mm_castps_si128(value); }
-inline TSimdFloat32x4 tfSimd4iToSimd4f(TSimdInt32x4 value) { return _mm_castsi128_ps(value); }
-
-inline float tfSimd4fSelectIndex0(TSimdFloat32x4 value) { return _mm_cvtss_f32(value); }
-inline float tfSimd4fSelectIndex1(TSimdFloat32x4 value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex1(value)); }
-inline float tfSimd4fSelectIndex2(TSimdFloat32x4 value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex2(value)); }
-inline float tfSimd4fSelectIndex3(TSimdFloat32x4 value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex3(value)); }
-
-inline TSimdFloat32x4 tfSimd4fAdd(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_add_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fSub(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_sub_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fMul(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_mul_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fMadd(TSimdFloat32x4 mul1, TSimdFloat32x4 mul2, TSimdFloat32x4 add) {
-#if 0
-    return _mm_fmadd_ps(mul1, mul2, add); // Requires FMA CPUID
-#else
-    return tfSimd4fAdd(tfSimd4fMul(mul1, mul2), add);
-#endif
+static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a,Tsimd_f32x4_t b) {
+    return _mm_cvtss_f32(tfSimdDot_f32x4(a,b));
 }
 
-inline TSimdFloat32x4 tfSimdFloat4x32Div(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_div_ps(arg1, arg2); }
-
-inline TSimdFloat32x4 tfSimd4fAbs(TSimdFloat32x4 value) {
-    const TSimdFloat32x4 signMask = tfSimd4iToSimd4f(tfSimd4iSplat(0x7FFFFFFF));
-    return _mm_and_ps(value, signMask);
+static inline float tfSimdSelect_f32x4(Tsimd_f32x4_t value, int index) {
+    ASSERT(index < 4);
+    switch (index) {
+    case 0: return tfSimdSelect0_f32x4(value);
+    case 1: return tfSimdSelect1_f32x4(value);
+    case 2: return tfSimdSelect2_f32x4(value);
+    case 3: return tfSimdSelect3_f32x4(value);
+    }
+    return {};
 }
-inline TSimdFloat32x4 tfSimdFloat4x32Load(float x, float y, float z, float w) { return _mm_set_ps(w, z, y, x); }
-inline TSimdInt32x4 tfSimdInt4x32Load(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
+static inline float tfSimdSelect0_f32x4(Tsimd_f32x4_t value) { return _mm_cvtss_f32(value); }
+static inline float tfSimdSelect1_f32x4(Tsimd_f32x4_t value) { return _mm_cvtss_f32(tfSimdSplat1_f32x4(value)); }
+static inline float tfSimdSelect2_f32x4(Tsimd_f32x4_t value) { return _mm_cvtss_f32(tfSimdSplat2_f32x4(value)); }
+static inline float tfSimdSelect3_f32x4(Tsimd_f32x4_t value) { return _mm_cvtss_f32(tfSimdSplat3_f32x4(value)); }
 
-inline TSimdFloat32x2 tfSimd4fToSimd2f(TSimdFloat32x4 value) { return value; }
-inline TSimdFloat32x3 tfSimd4fToSimd3f(TSimdFloat32x4 value) { return value; }
-
-inline TSimdFloat32x4 tfSimd4fSplatIndex0(TSimdFloat32x4 value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(0, 0, 0, 0)); }
-inline TSimdFloat32x4 tfSimd4fSplatIndex1(TSimdFloat32x4 value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(1, 1, 1, 1)); }
-inline TSimdFloat32x4 tfSimd4fSplatIndex2(TSimdFloat32x4 value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(2, 2, 2, 2)); }
-inline TSimdFloat32x4 tfSimd4fSplatIndex3(TSimdFloat32x4 value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(3, 3, 3, 3)); }
-
-inline TSimdInt32x4 tfSimd4iSplat(int32_t value) { return _mm_set1_epi32(value); }
-inline TSimdFloat32x4 tfSimd4fSplat(float value) { return _mm_set1_ps(value); }
-
-inline TSimdFloat32x4 tfSimd4fCmpEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_cmpeq_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fCmpNeq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_cmpneq_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fCmpGt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_cmpgt_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fCmpGtEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_cmpge_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fCmpLt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_cmplt_ps(arg1, arg2); }
-inline TSimdFloat32x4 tfSimd4fCmpLtEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) { return _mm_cmple_ps(arg1, arg2); }
-
-inline TSimdInt32x4 tfSimd4iCmpEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return _mm_cmpeq_epi32(arg1, arg2); }
-inline TSimdInt32x4 tfSimd4iCmpNeq(TSimdInt32x4 arg1, TSimdInt32x4 arg2) {
-    return _mm_xor_si128(_mm_cmpeq_epi32(arg1, arg2), _mm_set1_epi32((int32_t)0xFFFFFFFF));
+static inline Tsimd_f32x4_t tfSimdAdd_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_add_ps(a, b); }
+static inline Tsimd_f32x4_t tfSimdMul_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_mul_ps(a, b); }
+static inline Tsimd_f32x4_t tfSimdDiv_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_div_ps(a, b); }
+static inline Tsimd_f32x4_t tfSimdAbs_f32x4(Tsimd_f32x4_t a) { 
+    const __m128 signMask = tfSimd_i32x4_To_f32x4(tfSimdSplat_i32x4(0x7FFFFFFF));
+    return tfSimdAnd_f32x4(a, signMask);
 }
-inline TSimdInt32x4 tfSimd4iCmpGt(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return _mm_cmpgt_epi32(arg1, arg2); }
-inline TSimdInt32x4 tfSimd4iCmpGtEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2) {
+static inline Tsimd_f32x4_t tfSimdMadd_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b, Tsimd_f32x4_t c) {
+    return tfSimdAdd_f32x4(tfSimdMul_f32x4(a, b), c);
+}
+
+static inline Tsimd_f32x4_t tfSimdNot_f32x4(Tsimd_f32x4_t value) {
+    return _mm_andnot_ps(value, tfSimd_i32x4_To_f32x4(tfSimdSplat_i32x4((int32_t)(0xFFFFFFFF))));
+}
+static inline Tsimd_f32x4_t tfSimdAnd_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_and_ps(arg1, arg2); }
+static inline Tsimd_f32x4_t tfSimdAndNot_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_andnot_ps(arg1, arg2); }
+static inline Tsimd_f32x4_t tfSimdOr_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_or_ps(arg1, arg2); }
+static inline Tsimd_f32x4_t tfSimdXor_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_xor_ps(arg1, arg2); }
+
+static inline Tsimd_f32x4_t tfSimdCmpEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmpeq_ps(arg1, arg2); }
+static inline Tsimd_f32x4_t tfSimdCmpNeq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmpneq_ps(arg1, arg2); }
+static inline Tsimd_f32x4_t tfSimdCmpGt_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmpgt_ps(arg1, arg2); }
+static inline Tsimd_f32x4_t tfSimdCmpGtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmpge_ps(arg1, arg2); }
+static inline Tsimd_f32x4_t tfSimdCmpLt_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmplt_ps(arg1, arg2); }
+static inline Tsimd_f32x4_t tfSimdCmpLtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmple_ps(arg1, arg2); }
+
+static inline bool tfSimdCmpAllEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+    return (_mm_movemask_ps(tfSimdCmpEq_f32x4(arg1, arg2)) & 0xf) == 0xf;
+}
+static inline bool tfSimdCmpAllNeq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+    return (_mm_movemask_ps(tfSimdCmpNeq_f32x4(arg1, arg2)) & 0xf) == 0xf;
+}
+static inline bool tfSimdCmpAllGt_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+    return (_mm_movemask_ps(tfSimdCmpGt_f32x4(arg1, arg2)) & 0xf) == 0xf;
+}
+static inline bool tfSimdCmpAllGtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+    return (_mm_movemask_ps(tfSimdCmpGtEq_f32x4(arg1, arg2)) & 0xf) == 0xf;
+}
+static inline bool tfSimdCmpAllLt_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+    return (_mm_movemask_ps(tfSimdCmpLt_f32x4(arg1, arg2)) & 0xf) == 0xf;
+}
+static inline bool tfSimdCmpAllLtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+    return (_mm_movemask_ps(tfSimdCmpLtEq_f32x4(arg1, arg2)) & 0xf) == 0xf;
+}
+
+// Tsimd_i32x4_t
+static inline Tsimd_i32x4_t tfSimdLoad_i32x4(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
+static inline Tsimd_i32x4_t tfSimdSplat_i32x4(int32_t value) { return _mm_set1_epi32(value); }
+static inline Tsimd_i32x4_t tfSimdSplat0_i32x4(Tsimd_i32x4_t value) { return _mm_shuffle_epi32(value, _MM_SHUFFLE(0, 0, 0, 0)); }
+static inline Tsimd_i32x4_t tfSimdSplat1_i32x4(Tsimd_i32x4_t value) { return _mm_shuffle_epi32(value, _MM_SHUFFLE(1, 1, 1, 1)); }
+static inline Tsimd_i32x4_t tfSimdSplat2_i32x4(Tsimd_i32x4_t value) { return _mm_shuffle_epi32(value, _MM_SHUFFLE(2, 2, 2, 2)); }
+static inline Tsimd_i32x4_t tfSimdSplat3_i32x4(Tsimd_i32x4_t value) { return _mm_shuffle_epi32(value, _MM_SHUFFLE(3, 3, 3, 3)); }
+
+static inline int32_t tfSimdSelect_i32x4(Tsimd_i32x4_t value, int index) {
+    ASSERT(index < 4);
+    switch(index) {
+        case 0: return tfSimdSelect0_i32x4(value);
+        case 1: return tfSimdSelect1_i32x4(value);
+        case 2: return tfSimdSelect2_i32x4(value);
+        case 3: return tfSimdSelect3_i32x4(value);
+    }
+    return {};
+
+}
+static inline int32_t tfSimdSelect0_i32x4(Tsimd_i32x4_t value) { return _mm_cvtsi128_si32(value); }
+static inline int32_t tfSimdSelect1_i32x4(Tsimd_i32x4_t value) { return _mm_cvtsi128_si32(tfSimdSplat1_i32x4(value)); };
+static inline int32_t tfSimdSelect2_i32x4(Tsimd_i32x4_t value) { return _mm_cvtsi128_si32(tfSimdSplat2_i32x4(value)); };
+static inline int32_t tfSimdSelect3_i32x4(Tsimd_i32x4_t value) { return _mm_cvtsi128_si32(tfSimdSplat3_i32x4(value)); };
+
+static inline Tsimd_i32x4_t tfSimd_f32x4_To_i32x4(Tsimd_f32x4_t a) { return _mm_castps_si128(a); }
+static inline Tsimd_f32x4_t tfSimd_i32x4_To_f32x4(Tsimd_i32x4_t a) { return _mm_castsi128_ps(a); }
+
+static inline Tsimd_f32x4_t tfSimdAdd_i32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_add_epi32(a, b); }
+static inline Tsimd_f32x4_t tfSimdMul_i32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_mul_epi32(a, b); }
+static inline Tsimd_f32x4_t tfSimdAbs_i32x4(Tsimd_f32x4_t a) { return _mm_abs_epi32(a); }
+static inline Tsimd_f32x4_t tfSimdMadd_i32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b, Tsimd_f32x4_t c) {
+    return tfSimdAdd_i32x4(tfSimdMul_i32x4(a, b), c);
+}
+static inline Tsimd_i32x4_t tfSimdNot_i32x4(Tsimd_i32x4_t value) { return _mm_andnot_si128(value, tfSimdSplat_i32x4(0xFFFFFFFF)); }
+static inline Tsimd_i32x4_t tfSimdAnd_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_and_si128(arg1, arg2); }
+static inline Tsimd_i32x4_t tfSimdAndNot_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_andnot_si128(arg1, arg2); }
+static inline Tsimd_i32x4_t tfSimdOr_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_or_si128(arg1, arg2); }
+static inline Tsimd_i32x4_t tfSimdXor_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_xor_si128(arg1, arg2); }
+
+static inline Tsimd_i32x4_t tfSimdCmpEq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_cmpeq_epi32(arg1, arg2); }
+static inline Tsimd_i32x4_t tfSimdCmpNeq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+    return tfSimdNot_i32x4(tfSimdCmpEq_i32x4(arg1, arg2));
+}
+static inline Tsimd_i32x4_t tfSimdCmpGt_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_cmpgt_epi32(arg1, arg2); }
+
+static inline Tsimd_i32x4_t tfSimdCmpGtEq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
     return _mm_or_si128(_mm_cmpgt_epi32(arg1, arg2), _mm_cmpeq_epi32(arg1, arg2));
 }
-inline TSimdInt32x4 tfSimd4iCmpLt(TSimdInt32x4 arg1, TSimdInt32x4 arg2) { return _mm_cmplt_epi32(arg1, arg2); }
-inline TSimdInt32x4 tfSimd4iCmpLtEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2) {
+static inline Tsimd_i32x4_t tfSimdCmpLt_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_cmplt_epi32(arg1, arg2); }
+static inline Tsimd_i32x4_t tfSimdCmpLtEq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { 
     return _mm_or_si128(_mm_cmplt_epi32(arg1, arg2), _mm_cmpeq_epi32(arg1, arg2));
 }
-inline bool tfSimd4fCmpAllLt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
-    TSimdFloat32x4 compare = tfSimd4fCmpLt(arg1, arg2);
-    return (_mm_movemask_ps(compare) & 0xf) == 0xf;
+
+static inline bool tfSimdCmpAllEq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+    return (_mm_movemask_epi8(tfSimdCmpEq_i32x4(arg1, arg2)) & 0xFFFF) == 0xFFFF;
+}
+static inline bool tfSimdCmpAllNeq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+    return (_mm_movemask_epi8(tfSimdCmpNeq_i32x4(arg1, arg2)) & 0xFFFF) == 0xFFFF;
+}
+static inline bool tfSimdCmpAllGt_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+    return (_mm_movemask_epi8(tfSimdCmpGt_i32x4(arg1, arg2))& 0xFFFF) == 0xFFFF;
+}
+static inline bool tfSimdCmpAllGtEq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+    return (_mm_movemask_epi8(tfSimdCmpGtEq_i32x4(arg1, arg2))& 0xFFFF) == 0xFFFF;
+}
+static inline bool tfSimdCmpAllLt_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+    return (_mm_movemask_epi8(tfSimdCmpLt_i32x4(arg1, arg2)) & 0xFFFF) == 0xFFFF; 
+}
+static inline bool tfSimdCmpAllLtEq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+    return (_mm_movemask_epi8(tfSimdCmpLtEq_i32x4(arg1, arg2))& 0xFFFF) == 0xFFFF;  
 }
 
-inline bool tfSimd4fCmpAllGt(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
-    TSimdFloat32x4 compare = tfSimd4fCmpGt(arg1, arg2);
-    return (_mm_movemask_ps(compare) & 0xf) == 0xf;
-}
-
-inline bool tfSimd4fCmpAllEq(TSimdFloat32x4 arg1, TSimdFloat32x4 arg2) {
-    TSimdFloat32x4 compare = tfSimd4fCmpEq(arg1, arg2);
-    return (_mm_movemask_ps(compare) & 0xf) == 0xf;
-}
-
-inline bool tfSimd4iCmpAllEq(TSimdInt32x4 arg1, TSimdInt32x4 arg2) {
-    const TSimdInt32x4 compare = tfSimd4iCmpEq(arg1, arg2);
-    return (_mm_movemask_epi8(compare) & 0xf) == 0xf;
-}
+// DELETE everything below
+//static inline Tsimd_f32x4_t tfS32x4FReplaceIndex0(Tsimd_f32x4_t input, Tsimd_f32x4_t value) {
+//    return _mm_blend_ps(input, value, 0b0001);
+//}
+//static inline Tsimd_f32x4_t tfS32x4FReplaceIndex1(Tsimd_f32x4_t input, Tsimd_f32x4_t value){
+//    return _mm_blend_ps(input, value, 0b0010);
+//}
+//static inline Tsimd_f32x4_t tfS32x4FReplaceIndex2(Tsimd_f32x4_t input, Tsimd_f32x4_t value){
+//    return _mm_blend_ps(input, value, 0b0100);
+//}
+//static inline Tsimd_f32x4_t tfS32x4FReplaceIndex3(Tsimd_f32x4_t input, Tsimd_f32x4_t value){
+//    return _mm_blend_ps(input, value, 0b1000);
+//}
+//
+//
+//static inline Tsimd_f32x4_t tfS32x4FReplaceIndex0ByValue(Tsimd_f32x4_t input, float value) {
+//    return _mm_blend_ps(input, tfS32x4FSplat(value), 0b0001);
+//}
+//static inline Tsimd_f32x4_t tfSimdFloat4ReplaceIndex1ByValue(Tsimd_f32x4_t input, float value) {
+//    return _mm_blend_ps(input, tfS32x4FSplat(value), 0b0010);
+//}
+//static inline Tsimd_f32x4_t tfSimd4fReplaceIndex2ByValue(Tsimd_f32x4_t input, float value) {
+//    return _mm_blend_ps(input, tfS32x4FSplat(value), 0b0100);
+//}
+//static inline Tsimd_f32x4_t tfSimd4fReplaceIndex3ByValue(Tsimd_f32x4_t input, float value) {
+//    return _mm_blend_ps(input, tfS32x4FSplat(value), 0b1000);
+//}
+//
+//inline Tsimd_i32x4_t   tfSimd4iSelect(Tsimd_i32x4_t arg0, Tsimd_i32x4_t arg1, Tsimd_i32x4_t mask) { return _mm_blendv_epi8(arg0, arg1, mask); }
+//inline Tsimd_f32x4_t tfSimd4fSelect(Tsimd_f32x4_t arg0, Tsimd_f32x4_t arg1, Tsimd_f32x4_t mask) {
+//    return _mm_blendv_ps(arg0, arg1, mask);
+//}
+//
+//inline Tsimd_f32x4_t tfSimd4fZero() { return _mm_setzero_ps(); }
+//inline Tsimd_i32x4_t   tfSimd4iZero() { return _mm_setzero_si128(); }
+//
+//inline Tsimd_i32x4_t tfSimd4iNot(Tsimd_i32x4_t value) { return _mm_andnot_si128(value, _mm_set1_epi32(TF_SIMDI_MAX)); }
+//inline Tsimd_i32x4_t tfSimd4iAnd(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_and_si128(arg1, arg2); }
+//inline Tsimd_i32x4_t tfSimd4iAndNot(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_andnot_si128(arg1, arg2); }
+//inline Tsimd_i32x4_t tfSimd4iOr(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_or_si128(arg1, arg2); }
+//inline Tsimd_i32x4_t tfSimd4iXor(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_xor_si128(arg1, arg2); }
+//
+//inline Tsimd_f32x4_t tfSimd4fNot(Tsimd_f32x4_t value) { return _mm_andnot_ps(value, _mm_set1_ps((float)(TF_SIMDF_MAX))); }
+//inline Tsimd_f32x4_t tfSimd4fAnd(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_and_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fAndNot(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_andnot_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fOr(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_or_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fXor(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_xor_ps(arg1, arg2); }
+//
+//inline Tsimd_f32x4_t tfSimd4fFloor(Tsimd_f32x4_t value) { return _mm_floor_ps(value); }
+//inline Tsimd_f32x4_t tfSimd4fCeil(Tsimd_f32x4_t value) { return _mm_ceil_ps(value); }
+//inline Tsimd_f32x4_t tfSimd4fRound(Tsimd_f32x4_t value) { return _mm_round_ps(value, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC); }
+//inline Tsimd_f32x4_t tfSimd4fTruncate(Tsimd_f32x4_t value) { return tfSimd4iToSimd4f(tfSimd4fToSimd4i(value)); }
+//inline Tsimd_f32x4_t tfSimd4fMin(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_min_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fMax(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_max_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fClamp(Tsimd_f32x4_t value, Tsimd_f32x4_t min, Tsimd_f32x4_t max) {
+//    return tfSimd4fMax(min, tfSimd4fMin(value, max));
+//}
+//
+//inline Tsimd_i32x4_t tfSimd4fToSimd4i(Tsimd_f32x4_t value) { return _mm_castps_si128(value); }
+//inline Tsimd_f32x4_t tfSimd4iToSimd4f(Tsimd_i32x4_t value) { return _mm_castsi128_ps(value); }
+//
+//inline float tfSimd4fSelectIndex0(Tsimd_f32x4_t value) { return _mm_cvtss_f32(value); }
+//inline float tfSimd4fSelectIndex1(Tsimd_f32x4_t value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex1(value)); }
+//inline float tfSimd4fSelectIndex2(Tsimd_f32x4_t value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex2(value)); }
+//inline float tfSimd4fSelectIndex3(Tsimd_f32x4_t value) { return tfSimd4fSelectIndex0(tfSimd4fSplatIndex3(value)); }
+//
+//inline Tsimd_f32x4_t tfSimd4fAdd(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_add_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fSub(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_sub_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fMul(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_mul_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fMadd(Tsimd_f32x4_t mul1, Tsimd_f32x4_t mul2, Tsimd_f32x4_t add) {
+//#if 0
+//    return _mm_fmadd_ps(mul1, mul2, add); // Requires FMA CPUID
+//#else
+//    return tfSimd4fAdd(tfSimd4fMul(mul1, mul2), add);
+//#endif
+//}
+//
+//inline Tsimd_f32x4_t tfSimdFloat4x32Div(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_div_ps(arg1, arg2); }
+//
+//inline Tsimd_f32x4_t tfSimd4fAbs(Tsimd_f32x4_t value) {
+//    const Tsimd_f32x4_t signMask = tfSimd4iToSimd4f(tfSimd4iSplat(0x7FFFFFFF));
+//    return _mm_and_ps(value, signMask);
+//}
+//inline Tsimd_f32x4_t tfSimdFloat4x32Load(float x, float y, float z, float w) { return _mm_set_ps(w, z, y, x); }
+//inline Tsimd_i32x4_t tfSimdInt4x32Load(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
+//
+//inline Tsimd_f32x2_t tfSimd4fToSimd2f(Tsimd_f32x4_t value) { return value; }
+//inline Tsimd_f32x3_t tfSimd4fToSimd3f(Tsimd_f32x4_t value) { return value; }
+//
+//inline Tsimd_f32x4_t tfSimd4fSplatIndex0(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(0, 0, 0, 0)); }
+//inline Tsimd_f32x4_t tfSimd4fSplatIndex1(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(1, 1, 1, 1)); }
+//inline Tsimd_f32x4_t tfSimd4fSplatIndex2(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(2, 2, 2, 2)); }
+//inline Tsimd_f32x4_t tfSimd4fSplatIndex3(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(3, 3, 3, 3)); }
+//
+//inline Tsimd_i32x4_t tfSimd4iSplat(int32_t value) { return _mm_set1_epi32(value); }
+//inline Tsimd_f32x4_t tfSimd4fSplat(float value) { return _mm_set1_ps(value); }
+//
+//inline Tsimd_f32x4_t tfSimd4fCmpEq(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmpeq_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fCmpNeq(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmpneq_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fCmpGt(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmpgt_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fCmpGtEq(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmpge_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fCmpLt(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmplt_ps(arg1, arg2); }
+//inline Tsimd_f32x4_t tfSimd4fCmpLtEq(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_cmple_ps(arg1, arg2); }
+//
+//inline Tsimd_i32x4_t tfSimd4iCmpEq(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_cmpeq_epi32(arg1, arg2); }
+//inline Tsimd_i32x4_t tfSimd4iCmpNeq(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+//    return _mm_xor_si128(_mm_cmpeq_epi32(arg1, arg2), _mm_set1_epi32((int32_t)0xFFFFFFFF));
+//}
+//inline Tsimd_i32x4_t tfSimd4iCmpGt(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_cmpgt_epi32(arg1, arg2); }
+//inline Tsimd_i32x4_t tfSimd4iCmpGtEq(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+//    return _mm_or_si128(_mm_cmpgt_epi32(arg1, arg2), _mm_cmpeq_epi32(arg1, arg2));
+//}
+//inline Tsimd_i32x4_t tfSimd4iCmpLt(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_cmplt_epi32(arg1, arg2); }
+//inline Tsimd_i32x4_t tfSimd4iCmpLtEq(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+//    return _mm_or_si128(_mm_cmplt_epi32(arg1, arg2), _mm_cmpeq_epi32(arg1, arg2));
+//}
+//inline bool tfSimd4fCmpAllLt(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+//    Tsimd_f32x4_t compare = tfSimd4fCmpLt(arg1, arg2);
+//    return (_mm_movemask_ps(compare) & 0xf) == 0xf;
+//}
+//
+//inline bool tfSimd4fCmpAllGt(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+//    Tsimd_f32x4_t compare = tfSimd4fCmpGt(arg1, arg2);
+//    return (_mm_movemask_ps(compare) & 0xf) == 0xf;
+//}
+//
+//inline bool tfSimd4fCmpAllEq(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) {
+//    Tsimd_f32x4_t compare = tfSimd4fCmpEq(arg1, arg2);
+//    return (_mm_movemask_ps(compare) & 0xf) == 0xf;
+//}
+//
+//inline bool tfSimd4iCmpAllEq(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) {
+//    const Tsimd_i32x4_t compare = tfSimd4iCmpEq(arg1, arg2);
+//    return (_mm_movemask_epi8(compare) & 0xf) == 0xf;
+//}

@@ -34,7 +34,7 @@ UTEST(TF_SimdFloat4x4, tfMatTranpose4x4F)
 
     for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++)
     {
-        TSimdFloat4x4 result = tfMatTranpose4x4F(tests[i].a);
+        TSimdFloat4x4 result = tfTransposeSimd4x4F(tests[i].a);
         debugPrintSimd4x4F(result);
         EXPECT_TRUE(tfIsCloseSimd4x4F(result, tests[i].test, DEFAULT_EPSILON));
     }
@@ -68,7 +68,7 @@ UTEST(TF_SimdFloat4x4, tfMatMul4x4F_4x4F)
 
     for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++)
     {
-        TSimdFloat4x4 result = tfMatMul4x4F_4x4F(tests[i].a, tests[i].b);
+        TSimdFloat4x4 result = tfMulSimd4x4F_4x4F(tests[i].a, tests[i].b);
         debugPrintSimd4x4F(result);
         EXPECT_TRUE(tfIsCloseSimd4x4F(result, tests[i].test, DEFAULT_EPSILON));
     }
@@ -137,7 +137,7 @@ UTEST(TF_SimdFloat4x4, tfVectorMul4x4F)
     };
     for (size_t i = 0; i < TF_ARRAY_COUNT(tests); i++)
     {
-        TSimdFloat4 result = tfVectorMul4x4F(tests[i].a, tests[i].b);
+        TSimdFloat4 result = tfVectorMulSimd4x4F(tests[i].a, tests[i].b);
         debugPrintSimd4F(result);
         EXPECT_TRUE(tfIsCloseSimd4F(result, tests[i].test, DEFAULT_EPSILON));
     }

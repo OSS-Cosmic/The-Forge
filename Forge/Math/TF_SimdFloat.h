@@ -28,28 +28,13 @@ static inline float tfGetYSimd2F(TSimdFloat2 a);
 
 static inline bool tfIsCloseSimd2F(TSimdFloat2 a, TSimdFloat2 b, float epsilon);
 
-// -----------------------------------------------------------
-// TSimdFloat3
-// -----------------------------------------------------------
-
-
-// -----------------------------------------------------------
-// TSimdFloat4
-// -----------------------------------------------------------
 #include "TF_SimdFloat3.h"
 #include "TF_SimdFloat4.h"
+#include "TF_SimdFloat3x3.h"
 
-// -----------------------------------------------------------
-//  TSimdFloat3x3
-// -----------------------------------------------------------
-static inline TSimdFloat3x3 tfLoadIdentitySimd3x4F();
-static inline void tfSetElemSimd3x3F(TSimdFloat3x3* input, int col, int row, float value);
+static inline TSimdFloat4x3 tfLoadIdentitySimd4x3F();
 
-// -----------------------------------------------------------
-//  TSimdFloat3x4
-// -----------------------------------------------------------
-
-static inline TSimdFloat4x3  tfLoadSimd3x4F(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21,
+static inline TSimdFloat4x3  tfLoadSimd4x3F(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21,
                                            float m22, float m30, float m31, float m32);
 
 // -----------------------------------------------------------
@@ -60,11 +45,8 @@ static inline TSimdFloat4x3  tfLoadSimd3x4F(float m00, float m01, float m02, flo
 static inline TSimdFloat4x2 tfLoadSimd4x2F(float m00, float m01, float m10, float m11, float m20, float m21, float m30, float m31);
 static inline TSimdFloat4x1 tfLoadSimd4x1F(float m00, float m10, float m20, float m30);
 
-static inline TSimdFloat3x3 tfLoadSimd3x3F(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21,
-                                           float m22);
 static inline TSimdFloat3x2 tfLoadSimd2x3F(float m00, float m01, float m10, float m11, float m20, float m21);
 static inline TSimdFloat3x1 tfLoadSimd1x3F(float m00, float m10, float m20);
-
 
 static inline void tfSetElemSimd2x3F(TSimdFloat3x2* input, int col, int row, float value);
 static inline void tfSetElemSimd1x3F(TSimdFloat3x1* input, int col, int row, float value);
@@ -72,34 +54,18 @@ static inline void tfSetElemSimd1x3F(TSimdFloat3x1* input, int col, int row, flo
 static inline TSimdFloat2x2 tfLoadSimd2x2F(float m00, float m01, float m10, float m11);
 static inline TSimdFloat2x1 tfLoadSimd2x1F(float m00, float m10);
 
-static inline TSimdFloat4x4 tfTransposeSimd4x4F(TSimdFloat4x4 input);
-
 static inline bool tfIsCloseSimd3x4F(TSimdFloat4x3 a, TSimdFloat4x3 b, float epsilon);
 static inline bool tfIsCloseSimd2x4F(TSimdFloat4x2 a, TSimdFloat4x2 b, float epsilon);
 static inline bool tfIsCloseSimd1x4F(TSimdFloat4x1 a, TSimdFloat4x1 b, float epsilon);
-
-static inline bool tfIsCloseSimd4F(TSimdFloat4 a, TSimdFloat4 b, float epsilon);
 
 static inline void tfSetElemSimd3x4F(TSimdFloat4x3* input, int col, int row, float value);
 static inline void tfSetElemSimd2x4F(TSimdFloat4x2* input, int col, int row, float value);
 static inline void tfSetElemSimd1x4F(TSimdFloat4x1* input, int col, int row, float value);
 
-static inline TSimdFloat4 tfGetRowSimd4x4F(TSimdFloat4x4 input, int row);
 static inline TSimdFloat3 tfGetRowSimd3x4F(TSimdFloat4x3 input, int row);
 static inline TSimdFloat2 tfGetRowSimd2x4F(TSimdFloat4x2 input, int row);
 static inline float       tfGetRowSimd1x4F(TSimdFloat4x1 input, int row);
 
-static inline float tfVectorDot4F(TSimdFloat4 a0, TSimdFloat4 a1);
-static inline float tfVectorLengthSq4F(TSimdFloat4 a0, TSimdFloat4 a1);
-static inline float tfVectorLength4F(TSimdFloat4 a0, TSimdFloat4 a1);
-
-static inline TSimdFloat4 tfVectorEleDiv4F(TSimdFloat4 a0, TSimdFloat4 a1);
-static inline TSimdFloat4 tfVectorEleAdd4F(TSimdFloat4 a0, TSimdFloat4 a1);
-static inline TSimdFloat4 tfVectorEleSub4F(TSimdFloat4 a0, TSimdFloat4 a1);
-static inline TSimdFloat4 tfVectorEleMul4F(TSimdFloat4 a0, TSimdFloat4 a1);
-
-static inline bool tfIsCloseSimd4x4F(TSimdFloat4x4 a, TSimdFloat4x4 b, float epsilon);
-static inline void tfSetElemSimd4x4F(TSimdFloat4x4* input, int col, int row, float value);
 
 
 // conviences if cpp is avaliable

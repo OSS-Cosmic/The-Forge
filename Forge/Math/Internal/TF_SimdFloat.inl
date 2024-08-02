@@ -17,19 +17,19 @@
 
 
 static inline TSimdFloat4 tfVectorMul3x4F(const TSimdFloat4x3 a0, const TSimdFloat3 a1) {
-    TSimdFloat32x4 xxxx = tfSimdFloat3To4Splat0(a1.mRow);
-    TSimdFloat32x4 yyyy = tfSimdFloat3To4Splat1(a1.mRow);
-    TSimdFloat32x4 zzzz = tfSimdFloat3To4Splat2(a1.mRow);
-    TSimdFloat32x4 res = tfSimd4fMul(a0.mCol0, xxxx);
+    Tsimd_f32x4_t xxxx = tfS32x3FTo32x4FSplat0(a1.mRow);
+    Tsimd_f32x4_t yyyy = tfS32x3FTo32x4FSplat1(a1.mRow);
+    Tsimd_f32x4_t zzzz = tfS32x3FTo32x4FSplat2(a1.mRow);
+    Tsimd_f32x4_t res = tfSimd4fMul(a0.mCol0, xxxx);
     res = tfSimd4fMadd(a0.mCol1, yyyy, res);
     res = tfSimd4fMadd(a0.mCol2, zzzz, res);
     return { res };
 }
 
 static inline TSimdFloat4 tfVectorMul2x4F(const TSimdFloat4x2 a0, const TSimdFloat2 a1) {
-    TSimdFloat32x4 xxxx = tfSimdFloat2To4Splat0(a1.mRow);
-    TSimdFloat32x4 yyyy = tfSimdFloat2To4Splat1(a1.mRow);
-    TSimdFloat32x4 res = tfSimd4fMul(a0.mCol0, xxxx);
+    Tsimd_f32x4_t xxxx = tfSimdFloat2To4Splat0(a1.mRow);
+    Tsimd_f32x4_t yyyy = tfSimdFloat2To4Splat1(a1.mRow);
+    Tsimd_f32x4_t res = tfSimd4fMul(a0.mCol0, xxxx);
     res = tfSimd4fMadd(a0.mCol1, yyyy, res);
     return { res };
 }
@@ -38,12 +38,12 @@ static inline TSimdFloat4 tfVectorMul2x4F(const TSimdFloat4x2 a0, const TSimdFlo
  * Multiplication of a 3x3 matrix and a 4 element vector
  **/
 static inline TSimdFloat3 tfVectorMul3x3F(const TSimdFloat3x3 a0, const TSimdFloat3 a1) {
-    TSimdFloat32x3 xxx = tfSimd3fSplatIndex0(a1.mRow);
-    TSimdFloat32x3 yyy = tfSimd3fSplatIndex1(a1.mRow);
-    TSimdFloat32x3 zzz = tfSimd3fSplatIndex2(a1.mRow);
-    TSimdFloat32x3 res = tfSimd3fMul(a0.mCol0, xxx);
-    res = tfSimd3fMadd(a0.mCol1, yyy, res);
-    res = tfSimd3fMadd(a0.mCol2, zzz, res);
+    Tsimd_f32x3_t xxx = tfS32x3FSplatIndex0(a1.mRow);
+    Tsimd_f32x3_t yyy = tfS32x3FSplatIndex1(a1.mRow);
+    Tsimd_f32x3_t zzz = tfS32x3FSplatIndex2(a1.mRow);
+    Tsimd_f32x3_t res = tfS32x3FMul(a0.mCol0, xxx);
+    res = tfS32x3FMadd(a0.mCol1, yyy, res);
+    res = tfS32x3FMadd(a0.mCol2, zzz, res);
     return { res };
 }
 
@@ -52,19 +52,19 @@ static inline TSimdFloat3 tfVectorMul3x3F(const TSimdFloat3x3 a0, const TSimdFlo
 static inline TSimdFloat3 tfGetRowSimd3x4F(TSimdFloat4x3 input, int row) {
   ASSERT(row >= 0 && row < 4);
   switch(row) {
-    case 0: return {tfSimdFloat3x32Load(
+    case 0: return {tfSimd3x32FLoad(
                     tfSimd4fSelectIndex0(input.mCol0),
                     tfSimd4fSelectIndex0(input.mCol1),
                     tfSimd4fSelectIndex0(input.mCol2))};
-    case 1: return {tfSimdFloat3x32Load(
+    case 1: return {tfSimd3x32FLoad(
                     tfSimd4fSelectIndex1(input.mCol0),
                     tfSimd4fSelectIndex1(input.mCol1),
                     tfSimd4fSelectIndex1(input.mCol2))};
-    case 2: return {tfSimdFloat3x32Load(
+    case 2: return {tfSimd3x32FLoad(
                     tfSimd4fSelectIndex2(input.mCol0),
                     tfSimd4fSelectIndex2(input.mCol1),
                     tfSimd4fSelectIndex2(input.mCol2))};
-    case 3: return {tfSimdFloat3x32Load(
+    case 3: return {tfSimd3x32FLoad(
                     tfSimd4fSelectIndex3(input.mCol0),
                     tfSimd4fSelectIndex3(input.mCol1),
                     tfSimd4fSelectIndex3(input.mCol2))};
@@ -73,34 +73,6 @@ static inline TSimdFloat3 tfGetRowSimd3x4F(TSimdFloat4x3 input, int row) {
 
 }
 
-static inline TSimdFloat4 tfGetRowSimd4x4F(TSimdFloat4x4 input, int row) {
-  ASSERT(row >= 0 && row < 4);
-  switch(row) {
-    case 0: return {tfSimdFloat4x32Load(
-                    tfSimd4fSelectIndex0(input.mCol0),
-                    tfSimd4fSelectIndex0(input.mCol1),
-                    tfSimd4fSelectIndex0(input.mCol2),
-                    tfSimd4fSelectIndex0(input.mCol3)
-                    )};
-    case 1: return {tfSimdFloat4x32Load(
-                    tfSimd4fSelectIndex1(input.mCol0),
-                    tfSimd4fSelectIndex1(input.mCol1),
-                    tfSimd4fSelectIndex1(input.mCol2),
-                    tfSimd4fSelectIndex1(input.mCol3))};
-    case 2: return {tfSimdFloat4x32Load(
-                    tfSimd4fSelectIndex2(input.mCol0),
-                    tfSimd4fSelectIndex2(input.mCol1),
-                    tfSimd4fSelectIndex2(input.mCol2),
-                    tfSimd4fSelectIndex2(input.mCol3))};
-    case 3: return {tfSimdFloat4x32Load(
-                    tfSimd4fSelectIndex3(input.mCol0),
-                    tfSimd4fSelectIndex3(input.mCol1),
-                    tfSimd4fSelectIndex3(input.mCol2),
-                    tfSimd4fSelectIndex3(input.mCol3))};
-  }
-  return {};
-
-}
 
 
 static inline TSimdFloat2 tfGetRowSimd2x4F(TSimdFloat4x2 input, int row) {
@@ -134,35 +106,13 @@ static inline float tfGetRowSimd1x4F(TSimdFloat4x1 input, int row) {
 
 }
 
-static inline void tfSetElemSimd4x4F(TSimdFloat4x4* input, int col, int row, float value){
-  ASSERT(col >= 0 && col < 4);
-  ASSERT(row >= 0 && row < 4);
-  switch (row)
-  {
-    case 0: input->mCol[col] = tfSimd4fReplaceIndex0ByValue(input->mCol[col], value); break;
-    case 1: input->mCol[col] = tfSimd4fReplaceIndex1ByValue(input->mCol[col], value); break;
-    case 2: input->mCol[col] = tfSimd4fReplaceIndex2ByValue(input->mCol[col], value); break;
-    case 3: input->mCol[col] = tfSimd4fReplaceIndex3ByValue(input->mCol[col], value); break;
-  }
-}
-static inline void tfSetElemSimd3x4F(TSimdFloat4x3* input, int col, int row, float value){
-  ASSERT(col >= 0 && col < 3);
-  ASSERT(row >= 0 && row < 4);
-  switch (row)
-  {
-    case 0: input->mCol[col] = tfSimd4fReplaceIndex0ByValue(input->mCol[col], value); break;
-    case 1: input->mCol[col] = tfSimd4fReplaceIndex1ByValue(input->mCol[col], value); break;
-    case 2: input->mCol[col] = tfSimd4fReplaceIndex2ByValue(input->mCol[col], value); break;
-    case 3: input->mCol[col] = tfSimd4fReplaceIndex3ByValue(input->mCol[col], value); break;
-  }
-}
 static inline void tfSetElemSimd2x4F(TSimdFloat4x2* input, int col, int row, float value){
   ASSERT(col >= 0 && col < 2);
   ASSERT(row >= 0 && row < 4);
   switch (row)
   {
-    case 0: input->mCol[col] = tfSimd4fReplaceIndex0ByValue(input->mCol[col], value); break;
-    case 1: input->mCol[col] = tfSimd4fReplaceIndex1ByValue(input->mCol[col], value); break;
+    case 0: input->mCol[col] = tfSimdFloat4ReplaceIndex0ByValue(input->mCol[col], value); break;
+    case 1: input->mCol[col] = tfSimdFloat4ReplaceIndex1ByValue(input->mCol[col], value); break;
     case 2: input->mCol[col] = tfSimd4fReplaceIndex2ByValue(input->mCol[col], value); break;
     case 3: input->mCol[col] = tfSimd4fReplaceIndex3ByValue(input->mCol[col], value); break;
   }
@@ -172,8 +122,8 @@ static inline void tfSetElemSimd1x4F(TSimdFloat4x1* input, int col, int row, flo
   ASSERT(row >= 0 && row < 4);
   switch (row)
   {
-    case 0: input->mCol[col] = tfSimd4fReplaceIndex0ByValue(input->mCol[col], value); break;
-    case 1: input->mCol[col] = tfSimd4fReplaceIndex1ByValue(input->mCol[col], value); break;
+    case 0: input->mCol[col] = tfSimdFloat4ReplaceIndex0ByValue(input->mCol[col], value); break;
+    case 1: input->mCol[col] = tfSimdFloat4ReplaceIndex1ByValue(input->mCol[col], value); break;
     case 2: input->mCol[col] = tfSimd4fReplaceIndex2ByValue(input->mCol[col], value); break;
     case 3: input->mCol[col] = tfSimd4fReplaceIndex3ByValue(input->mCol[col], value); break;
   }
@@ -261,9 +211,9 @@ static inline TSimdFloat3x3 tfLoadSimd3x3F(
   float m20, float m21, float m22
 ) {
     TSimdFloat3x3 res;
-    res.mCol0 = tfSimdFloat3x32Load(m00, m10, m20);
-    res.mCol1 = tfSimdFloat3x32Load(m01, m11, m21);
-    res.mCol2 = tfSimdFloat3x32Load(m02, m12, m22);
+    res.mCol0 = tfSimd3x32FLoad(m00, m10, m20);
+    res.mCol1 = tfSimd3x32FLoad(m01, m11, m21);
+    res.mCol2 = tfSimd3x32FLoad(m02, m12, m22);
     return res;
 }
 static inline TSimdFloat3x2 tfLoadSimd2x3F(
@@ -272,8 +222,8 @@ static inline TSimdFloat3x2 tfLoadSimd2x3F(
   float m20, float m21
 ) {
     TSimdFloat3x2 res;
-    res.mCol0 = tfSimdFloat3x32Load(m00, m10, m20);
-    res.mCol1 = tfSimdFloat3x32Load(m01, m11, m21);
+    res.mCol0 = tfSimd3x32FLoad(m00, m10, m20);
+    res.mCol1 = tfSimd3x32FLoad(m01, m11, m21);
     return res;
 }
 static inline TSimdFloat3x1 tfLoadSimd1x3F(
@@ -282,7 +232,7 @@ static inline TSimdFloat3x1 tfLoadSimd1x3F(
   float m20 
 ) {
     TSimdFloat3x1 res;
-    res.mCol0 = tfSimdFloat3x32Load(m00, m10, m20);
+    res.mCol0 = tfSimd3x32FLoad(m00, m10, m20);
     return res;
 }
 
@@ -291,9 +241,9 @@ static inline void tfSetElemSimd3x3F(TSimdFloat3x3* input, int col, int row, flo
   ASSERT(row >= 0 && row < 3);
   switch (row)
   {
-    case 0: input->mCol[col] = tfSimdFloat3x32ReplaceIndex0ByValue(input->mCol[col], value); break;
-    case 1: input->mCol[col] = tfSimdFloat3x32ReplaceIndex1ByValue(input->mCol[col], value); break;
-    case 2: input->mCol[col] = tfSimdFloat3x32ReplaceIndex2ByValue(input->mCol[col], value); break;
+    case 0: input->mCol[col] = tfSimd3x32FReplaceIndex0ByValue(input->mCol[col], value); break;
+    case 1: input->mCol[col] = tfSimd3x32FReplaceIndex1ByValue(input->mCol[col], value); break;
+    case 2: input->mCol[col] = tfSimd3x32FReplaceIndex2ByValue(input->mCol[col], value); break;
   }
 }
 
@@ -303,9 +253,9 @@ static inline void tfSetElemSimd2x3F(TSimdFloat3x2* input, int col, int row, flo
   ASSERT(row >= 0 && row < 3);
   switch (row)
   {
-    case 0: input->mCol[col] = tfSimdFloat3x32ReplaceIndex0ByValue(input->mCol[col], value); break;
-    case 1: input->mCol[col] = tfSimdFloat3x32ReplaceIndex1ByValue(input->mCol[col], value); break;
-    case 2: input->mCol[col] = tfSimdFloat3x32ReplaceIndex2ByValue(input->mCol[col], value); break;
+    case 0: input->mCol[col] = tfSimd3x32FReplaceIndex0ByValue(input->mCol[col], value); break;
+    case 1: input->mCol[col] = tfSimd3x32FReplaceIndex1ByValue(input->mCol[col], value); break;
+    case 2: input->mCol[col] = tfSimd3x32FReplaceIndex2ByValue(input->mCol[col], value); break;
   }
 }
 
@@ -314,9 +264,9 @@ static inline void tfSetElemSimd1x3F(TSimdFloat3x1* input, int col, int row, flo
   ASSERT(row >= 0 && row < 3);
   switch (row)
   {
-    case 0: input->mCol[col] = tfSimdFloat3x32ReplaceIndex0ByValue(input->mCol[col], value); break;
-    case 1: input->mCol[col] = tfSimdFloat3x32ReplaceIndex1ByValue(input->mCol[col], value); break;
-    case 2: input->mCol[col] = tfSimdFloat3x32ReplaceIndex2ByValue(input->mCol[col], value); break;
+    case 0: input->mCol[col] = tfSimd3x32FReplaceIndex0ByValue(input->mCol[col], value); break;
+    case 1: input->mCol[col] = tfSimd3x32FReplaceIndex1ByValue(input->mCol[col], value); break;
+    case 2: input->mCol[col] = tfSimd3x32FReplaceIndex2ByValue(input->mCol[col], value); break;
   }
 }
 
@@ -324,27 +274,27 @@ static inline float tfGetElemSimd3F(TSimdFloat3 a, int elem) {
     ASSERT(elem >= 0 && elem < 3);
     switch (elem) {
     case 0:
-        return tfSimd3fSelectIndex0(a.mRow);
+        return tfS32x3FSelectIndex0(a.mRow);
     case 1:
-        return tfSimd3fSelectIndex1(a.mRow);
+        return tfS32x3FSelectIndex1(a.mRow);
     case 2:
-        return tfSimd3fSelectIndex2(a.mRow);
+        return tfS32x3FSelectIndex2(a.mRow);
     }
     return 0;
 }
-static inline float tfGetXSimd3F(TSimdFloat3 a) { return tfSimd3fSelectIndex0(a.mRow); }
-static inline float tfGetYSimd3F(TSimdFloat3 a) { return tfSimd3fSelectIndex1(a.mRow); }
-static inline float tfGetZSimd3F(TSimdFloat3 a) { return tfSimd3fSelectIndex2(a.mRow); }
+static inline float tfGetXSimd3F(TSimdFloat3 a) { return tfS32x3FSelectIndex0(a.mRow); }
+static inline float tfGetYSimd3F(TSimdFloat3 a) { return tfS32x3FSelectIndex1(a.mRow); }
+static inline float tfGetZSimd3F(TSimdFloat3 a) { return tfS32x3FSelectIndex2(a.mRow); }
 
 static inline bool tfIsCloseSimd3F(TSimdFloat3 a, TSimdFloat3 b, float epsilon) {
-    return tfSimdFloat32x3CmpAllLt(tfSimd3fAbs(tfSimd3fSub(a.mRow, b.mRow)), tfSimd3fSplat(epsilon));
+    return tfSimdFloat32x3CmpAllLt(tfS32x3FAbs(tfS32x3FSub(a.mRow, b.mRow)), tfS32x3FSplat(epsilon));
 }
 
 static inline float tfVectorDot3F(TSimdFloat3 a0, TSimdFloat3 a1) {
-    TSimdFloat32x3 x2 = tfSimd3fMul(a0.mRow, a1.mRow);
-    TSimdFloat32x3 xy = tfSimd3fAdd(tfSimd3fSplatIndex1(x2), x2);
-    TSimdFloat32x3 xyz = tfSimd3fAdd(tfSimd3fSplatIndex2(x2), xy);
-    return tfSimd3fSelectIndex0(xyz);
+    Tsimd_f32x3_t x2 = tfS32x3FMul(a0.mRow, a1.mRow);
+    Tsimd_f32x3_t xy = tfS32x3FAdd(tfS32x3FSplatIndex1(x2), x2);
+    Tsimd_f32x3_t xyz = tfS32x3FAdd(tfS32x3FSplatIndex2(x2), xy);
+    return tfS32x3FSelectIndex0(xyz);
 }
 
 
@@ -385,10 +335,10 @@ static inline TSimdFloat2 tfLoadSimd2F(float x, float y) {
 }
 
 static inline TSimdFloat2 tfVectorMul2x2F(const TSimdFloat2x2 a0, const TSimdFloat2 a1) {
-    TSimdFloat32x2 xx = tfSimd2fSplatIndex0(a1.mRow);
-    TSimdFloat32x2 yy = tfSimd2fSplatIndex1(a1.mRow);
-    TSimdFloat32x2 res = tfSimd2fMul(a0.mCol0, xx);
-    res = tfSimd2fMadd(a0.mCol1, yy, res);
+    Tsimd_f32x2_t xx = tfS32x2FSplatIndex0(a1.mRow);
+    Tsimd_f32x2_t yy = tfS32x2FSplatIndex1(a1.mRow);
+    Tsimd_f32x2_t res = tfS32x2FMul(a0.mCol0, xx);
+    res = tfS32x2FMadd(a0.mCol1, yy, res);
     return { res };
 }
 
@@ -396,24 +346,24 @@ static inline float tfGetElemSimd2F(TSimdFloat2 a, int elem) {
     ASSERT(elem >= 0 && elem < 2);
     switch (elem) {
     case 0:
-        return tfSimd2fSelectIndex0(a.mRow);
+        return tfS32x2FSelectIndex0(a.mRow);
     case 1:
-        return tfSimd2fSelectIndex1(a.mRow);
+        return tfS32x2FSelectIndex1(a.mRow);
     }
     return 0;
 }
-static inline float tfGetXSimd2F(TSimdFloat2 a) { return tfSimd2fSelectIndex0(a.mRow); }
-static inline float tfGetYSimd2F(TSimdFloat2 a) { return tfSimd2fSelectIndex1(a.mRow); }
+static inline float tfGetXSimd2F(TSimdFloat2 a) { return tfS32x2FSelectIndex0(a.mRow); }
+static inline float tfGetYSimd2F(TSimdFloat2 a) { return tfS32x2FSelectIndex1(a.mRow); }
 
-static inline TSimdFloat3 tfVectorEleDiv3F(TSimdFloat3 a0, TSimdFloat3 a1) { return { tfSimd3fDiv(a0.mRow, a1.mRow) }; }
-static inline TSimdFloat2 tfVectorEleDiv2F(TSimdFloat2 a0, TSimdFloat2 a1) { return { tfSimd2fDiv(a0.mRow, a1.mRow) }; }
+static inline TSimdFloat3 tfVectorEleDiv3F(TSimdFloat3 a0, TSimdFloat3 a1) { return { tfS32x3FDiv(a0.mRow, a1.mRow) }; }
+static inline TSimdFloat2 tfVectorEleDiv2F(TSimdFloat2 a0, TSimdFloat2 a1) { return { tfS32x2FDiv(a0.mRow, a1.mRow) }; }
 
-static inline TSimdFloat3 tfVectorEleSub3F(TSimdFloat3 a0, TSimdFloat3 a1) { return { tfSimd3fSub(a0.mRow, a1.mRow) }; }
-static inline TSimdFloat2 tfVectorEleSub2F(TSimdFloat2 a0, TSimdFloat2 a1) { return { tfSimd2fSub(a0.mRow, a1.mRow) }; }
+static inline TSimdFloat3 tfVectorEleSub3F(TSimdFloat3 a0, TSimdFloat3 a1) { return { tfS32x3FSub(a0.mRow, a1.mRow) }; }
+static inline TSimdFloat2 tfVectorEleSub2F(TSimdFloat2 a0, TSimdFloat2 a1) { return { tfS32x2FSub(a0.mRow, a1.mRow) }; }
 
-static inline TSimdFloat3 tfVectorEleAdd3F(TSimdFloat3 a0, TSimdFloat3 a1) { return { tfSimd3fAdd(a0.mRow, a1.mRow) }; }
-static inline TSimdFloat2 tfVectorEleAdd2F(TSimdFloat2 a0, TSimdFloat2 a1) { return { tfSimd2fAdd(a0.mRow, a1.mRow) }; }
+static inline TSimdFloat3 tfVectorEleAdd3F(TSimdFloat3 a0, TSimdFloat3 a1) { return { tfS32x3FAdd(a0.mRow, a1.mRow) }; }
+static inline TSimdFloat2 tfVectorEleAdd2F(TSimdFloat2 a0, TSimdFloat2 a1) { return { tfS32x2FAdd(a0.mRow, a1.mRow) }; }
 
-static inline TSimdFloat3 tfVectorEleMul3F(TSimdFloat3 a0, TSimdFloat3 a1) { return { tfSimd3fMul(a0.mRow, a1.mRow) }; }
-static inline TSimdFloat2 tfVectorEleMul2F(TSimdFloat2 a0, TSimdFloat2 a1) { return { tfSimd2fMul(a0.mRow, a1.mRow) }; }
+static inline TSimdFloat3 tfVectorEleMul3F(TSimdFloat3 a0, TSimdFloat3 a1) { return { tfS32x3FMul(a0.mRow, a1.mRow) }; }
+static inline TSimdFloat2 tfVectorEleMul2F(TSimdFloat2 a0, TSimdFloat2 a1) { return { tfS32x2FMul(a0.mRow, a1.mRow) }; }
 

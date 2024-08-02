@@ -19,35 +19,47 @@
   EXPECT_EQ(__a.getW(), __b.getW()); \
 } while(false);
 
+#define LOG_FORMAT_SIMD_32x4f(input) \
+    "%.3f, %.3f, %.3f, %.3f", tfSimdSelect0_f32x4(input), tfSimdSelect1_f32x4(input), tfSimdSelect2_f32x4(input), tfSimdSelect3_f32x4(input)
+#define LOG_FORMAT_SIMD_32x4i(input) \
+    "%d, %d, %d, %d", tfSimdSelect0_i32x4(input), tfSimdSelect1_i32x4(input), tfSimdSelect2_i32x4(input), tfSimdSelect3_i32x4(input)
 
-static inline void debugPrintSimd4F(TSimdFloat4 input) {
-  DLOGF(LogLevel::eDEBUG, "%.3f, %.3f, %.3f, %.3f",
-          tfSimd4fSelectIndex0(input.mRow),
-          tfSimd4fSelectIndex1(input.mRow),
-          tfSimd4fSelectIndex2(input.mRow),
-          tfSimd4fSelectIndex3(input.mRow));
+#define LOG_SIMD_32x4x4f(input, LOG, ...)                                                                                            \
+    LOG(__VA_ARGS__, "%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", tfSimdSelectIndex0_f32x4(input.mCol0), \
+        tfSimdSelectIndex1_f32x4(input.mCol1), tfSimdSelectIndex2_f32x4(input.mCol2), tfSimdSelectIndex3_f32x4(input.mCol3),            \
+        tfSimdSelectIndex0_f32x4(input.mCol0), tfSimdSelectIndex1_f32x4(input.mCol1), tfSimdSelectIndex2_f32x4(input.mCol2),            \
+        tfSimdSelectIndex3_f32x4(input.mCol3), tfSimdSelectIndex0_f32x4(input.mCol0), tfSimdSelectIndex1_f32x4(input.mCol1),            \
+        tfSimdSelectIndex2_f32x4(input.mCol2), tfSimdSelectIndex3_f32x4(input.mCol3), tfSimdSelectIndex0_f32x4(input.mCol0),            \
+        tfSimdSelectIndex1_f32x4(input.mCol1), tfSimdSelectIndex2_f32x4(input.mCol2), tfSimdSelectIndex3_f32x4(input.mCol3))
+
+static inline void debugPrintSimd4F(Tsimd_f32x4_t input) {
+ // DLOGF(LogLevel::eDEBUG, "%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
+ //         tfSimdSelectIndex0_f32x4(input),
+ //         tfSimdSelectIndex1_f32x4(input),
+ //         tfSimdSelectIndex2_f32x4(input),
+ //         tfSimdSelectIndex3_f32x4(input));
 }
-static inline void debugPrintSimd4x4F(TSimdFloat4x4 input) {
-    DLOGF(LogLevel::eDEBUG,"%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
-          tfSimd4fSelectIndex0(input.mCol0),
-          tfSimd4fSelectIndex0(input.mCol1),
-          tfSimd4fSelectIndex0(input.mCol2),
-          tfSimd4fSelectIndex0(input.mCol3),
+static inline void debugPrintSimd4x4F(struct Tsimd_f32x4x4_s  input) {
+   // DLOGF(LogLevel::eDEBUG,"%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
+   //       tfSimdSelectIndex0_f32x4(input.mCol0),
+   //       tfSimdSelectIndex1_f32x4(input.mCol1),
+   //       tfSimdSelectIndex2_f32x4(input.mCol2),
+   //       tfSimdSelectIndex3_f32x4(input.mCol3),
 
-          tfSimd4fSelectIndex1(input.mCol0),
-          tfSimd4fSelectIndex1(input.mCol1),
-          tfSimd4fSelectIndex1(input.mCol2),
-          tfSimd4fSelectIndex1(input.mCol3),
-          
-          tfSimd4fSelectIndex2(input.mCol0),
-          tfSimd4fSelectIndex2(input.mCol1),
-          tfSimd4fSelectIndex2(input.mCol2),
-          tfSimd4fSelectIndex2(input.mCol3),
-          
-          tfSimd4fSelectIndex3(input.mCol0),
-          tfSimd4fSelectIndex3(input.mCol1),
-          tfSimd4fSelectIndex3(input.mCol2),
-          tfSimd4fSelectIndex3(input.mCol3)
-    );
+   //       tfSimdSelectIndex0_f32x4(input.mCol0),
+   //       tfSimdSelectIndex1_f32x4(input.mCol1),
+   //       tfSimdSelectIndex2_f32x4(input.mCol2),
+   //       tfSimdSelectIndex3_f32x4(input.mCol3),
+   //       
+   //       tfSimdSelectIndex0_f32x4(input.mCol0),
+   //       tfSimdSelectIndex1_f32x4(input.mCol1),
+   //       tfSimdSelectIndex2_f32x4(input.mCol2),
+   //       tfSimdSelectIndex3_f32x4(input.mCol3),
+   //       
+   //       tfSimdSelectIndex0_f32x4(input.mCol0),
+   //       tfSimdSelectIndex1_f32x4(input.mCol1),
+   //       tfSimdSelectIndex2_f32x4(input.mCol2),
+   //       tfSimdSelectIndex3_f32x4(input.mCol3)
+   // );
 }
 

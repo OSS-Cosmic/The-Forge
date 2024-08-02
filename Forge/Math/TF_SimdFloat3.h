@@ -4,7 +4,6 @@
 #include "Internal/SimdTypes.h"
 
 
-static inline TSimdFloat3   tfLoadZeroSimd3x3F();
 static inline TSimdFloat3   tfLoadSimd3F(float x, float y, float z);
 
 static inline float tfVectorDot3F(TSimdFloat3 a0, TSimdFloat3 a1);

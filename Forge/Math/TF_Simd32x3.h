@@ -11,83 +11,83 @@
 
 #include "Forge/Math/Internal/SimdTypes.h"
 
-inline TSimdFloat32x3 tfSimd3fSplat(float value);
-inline TSimdInt32x3 tfSimd3iSplat(int32_t value);
+inline Tsimd_f32x3_t tfS32x3FSplat(float value);
+inline Tsimd_i32x3_t tfS32x3iSplat(int32_t value);
 
-inline TSimdFloat32x3 tfSimd3fZero();
-inline TSimdInt32x3 tfSimd3iZero();
+inline Tsimd_f32x3_t tfS32x3FZero();
+inline Tsimd_i32x3_t tfS32x3iZero();
 
-inline TSimdFloat32x2 tfSimd3fToSimd2f(TSimdFloat32x3 value);
-inline TSimdInt32x3 tfSimd3fToSimd3i(TSimdFloat32x3 value);
-inline TSimdFloat32x3 tfSimd3iToSimd3f(TSimdInt32x3 value);
+inline Tsimd_f32x2_t tfS32x3FToSimd2f(Tsimd_f32x3_t value);
+inline Tsimd_i32x3_t tfS32x3FToSimd3i(Tsimd_f32x3_t value);
+inline Tsimd_f32x3_t tfS32x3iToSimd3f(Tsimd_i32x3_t value);
 
-inline TSimdFloat32x3 tfSimd3fSplatIndex0(TSimdFloat32x3 value);
-inline TSimdFloat32x3 tfSimd3fSplatIndex1(TSimdFloat32x3 value);
-inline TSimdFloat32x3 tfSimd3fSplatIndex2(TSimdFloat32x3 value);
+inline Tsimd_f32x3_t tfS32x3FSplatIndex0(Tsimd_f32x3_t value);
+inline Tsimd_f32x3_t tfS32x3FSplatIndex1(Tsimd_f32x3_t value);
+inline Tsimd_f32x3_t tfS32x3FSplatIndex2(Tsimd_f32x3_t value);
 
-static inline TSimdFloat32x4 tfSimdFloat3To4Splat0(TSimdFloat32x3 value);
-static inline TSimdFloat32x4 tfSimdFloat3To4Splat1(TSimdFloat32x3 value);
-static inline TSimdFloat32x4 tfSimdFloat3To4Splat2(TSimdFloat32x3 value);
+static inline Tsimd_f32x4_t tfS32x3FTo32x4FSplat0(Tsimd_f32x3_t value);
+static inline Tsimd_f32x4_t tfS32x3FTo32x4FSplat1(Tsimd_f32x3_t value);
+static inline Tsimd_f32x4_t tfS32x3FTo32x4FSplat2(Tsimd_f32x3_t value);
 
-inline TSimdFloat32x3 tfSimd3fSelect(TSimdFloat32x3 arg0, TSimdFloat32x3 arg1, TSimdFloat32x3 mask);
-inline TSimdInt32x3 tfSimd3iSelect(TSimdInt32x3 arg0, TSimdInt32x3 arg1, TSimdInt32x3 mask);
+inline Tsimd_f32x3_t tfS32x3FSelect(Tsimd_f32x3_t arg0, Tsimd_f32x3_t arg1, Tsimd_f32x3_t mask);
+inline Tsimd_i32x3_t tfS32x3iSelect(Tsimd_i32x3_t arg0, Tsimd_i32x3_t arg1, Tsimd_i32x3_t mask);
 
-inline float tfSimd3fSelectIndex0(TSimdFloat32x3 value);
-inline float tfSimd3fSelectIndex1(TSimdFloat32x3 value);
-inline float tfSimd3fSelectIndex2(TSimdFloat32x3 value);
+inline float tfS32x3FSelectIndex0(Tsimd_f32x3_t value);
+inline float tfS32x3FSelectIndex1(Tsimd_f32x3_t value);
+inline float tfS32x3FSelectIndex2(Tsimd_f32x3_t value);
 
-static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex0ByValue(TSimdFloat32x3 input, float value);
-static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex1ByValue(TSimdFloat32x3 input, float value);
-static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex2ByValue(TSimdFloat32x3 input, float value);
+static inline Tsimd_f32x3_t tfSimd3x32FReplaceIndex0ByValue(Tsimd_f32x3_t input, float value);
+static inline Tsimd_f32x3_t tfSimd3x32FReplaceIndex1ByValue(Tsimd_f32x3_t input, float value);
+static inline Tsimd_f32x3_t tfSimd3x32FReplaceIndex2ByValue(Tsimd_f32x3_t input, float value);
 
-inline TSimdFloat32x3 tfSimdFloat3x32Load(float x, float y, float z);
-inline TSimdInt32x3 tfSimdInt3x32Load(int32_t x, int32_t y, int32_t z);
+inline Tsimd_f32x3_t tfSimd3x32FLoad(float x, float y, float z);
+inline Tsimd_i32x3_t tfSimd3x32ILoad(int32_t x, int32_t y, int32_t z);
 
-inline TSimdFloat32x3 tfSimd3fAdd(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fSub(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fMul(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fMadd(TSimdFloat32x3 mul1, TSimdFloat32x3 mul2, TSimdFloat32x3 add);
-inline TSimdFloat32x3 tfSimd3fDiv(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fAbs(TSimdFloat32x3 value);
+inline Tsimd_f32x3_t tfS32x3FAdd(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FSub(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FMul(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FMadd(Tsimd_f32x3_t mul1, Tsimd_f32x3_t mul2, Tsimd_f32x3_t add);
+inline Tsimd_f32x3_t tfS32x3FDiv(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FAbs(Tsimd_f32x3_t value);
 
-inline TSimdFloat32x3 tfSimd3fNot(TSimdFloat32x3 value);
-inline TSimdFloat32x3 tfSimd3fAnd(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fAndNot(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fOr(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fXor(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
+inline Tsimd_f32x3_t tfS32x3FNot(Tsimd_f32x3_t value);
+inline Tsimd_f32x3_t tfS32x3FAnd(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FAndNot(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FOr(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FXor(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
 
-inline TSimdInt32x3 tfSimd3iNot(TSimdInt32x3 value);
-inline TSimdInt32x3 tfSimd3iAnd(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline TSimdInt32x3 tfSimd3iAndNot(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline TSimdInt32x3 tfSimd3iOr(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline TSimdInt32x3 tfSimd3iXor(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
+inline Tsimd_i32x3_t tfS32x3iNot(Tsimd_i32x3_t value);
+inline Tsimd_i32x3_t tfS32x3iAnd(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline Tsimd_i32x3_t tfS32x3iAndNot(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline Tsimd_i32x3_t tfS32x3iOr(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline Tsimd_i32x3_t tfS32x3iXor(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
 
-inline TSimdFloat32x3 tfSimd3fFloor(TSimdFloat32x3 value);
-inline TSimdFloat32x3 tfSimd3fCeil(TSimdFloat32x3 value);
-inline TSimdFloat32x3 tfSimd3fRound(TSimdFloat32x3 value); // Ties to even (banker's rounding)
-inline TSimdFloat32x3 tfSimd3fTruncate(TSimdFloat32x3 value);
-inline TSimdFloat32x3 tfSimd3fMin(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fMax(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fClamp(TSimdFloat32x3 value, TSimdFloat32x3 min, TSimdFloat32x3 max);
+inline Tsimd_f32x3_t tfS32x3FFloor(Tsimd_f32x3_t value);
+inline Tsimd_f32x3_t tfS32x3FCeil(Tsimd_f32x3_t value);
+inline Tsimd_f32x3_t tfS32x3FRound(Tsimd_f32x3_t value); // Ties to even (banker's rounding)
+inline Tsimd_f32x3_t tfS32x3FTruncate(Tsimd_f32x3_t value);
+inline Tsimd_f32x3_t tfS32x3FMin(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FMax(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FClamp(Tsimd_f32x3_t value, Tsimd_f32x3_t min, Tsimd_f32x3_t max);
 
-inline TSimdInt32x3 tfSimd3iCmpEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline TSimdInt32x3 tfSimd3iCmpNeq(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline TSimdInt32x3 tfSimd3iCmpGt(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline TSimdInt32x3 tfSimd3iCmpGtEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline TSimdInt32x3 tfSimd3iCmpLt(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline TSimdInt32x3 tfSimd3iCmpLtEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
+inline Tsimd_i32x3_t tfS32x3iCmpEq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline Tsimd_i32x3_t tfS32x3iCmpNeq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline Tsimd_i32x3_t tfS32x3iCmpGt(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline Tsimd_i32x3_t tfS32x3iCmpGtEq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline Tsimd_i32x3_t tfS32x3iCmpLt(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline Tsimd_i32x3_t tfS32x3iCmpLtEq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
 
-inline TSimdFloat32x3 tfSimd3fCmpEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fCmpNeq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fCmpGt(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fCmpGtEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fCmpLt(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
-inline TSimdFloat32x3 tfSimd3fCmpLtEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
+inline Tsimd_f32x3_t tfS32x3FCmpEq(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FCmpNeq(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FCmpGt(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FCmpGtEq(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FCmpLt(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
+inline Tsimd_f32x3_t tfS32x3FCmpLtEq(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
 
-inline bool tfSimd3iCmpAllEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2);
-inline bool tfSimd3fCmpAllEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2);
+inline bool tfS32x3iCmpAllEq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2);
+inline bool tfS32x3FCmpAllEq(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2);
 
-static inline bool tfSimdFloat32x3CmpAllLt(TSimdFloat32x3 a, TSimdFloat32x3 b);
+static inline bool tfSimdFloat32x3CmpAllLt(Tsimd_f32x3_t a, Tsimd_f32x3_t b);
 
 #if defined(TF_FEATURE_CPU_SSE)
 #include "Internal/TF_Simd32x3_sse.inl"

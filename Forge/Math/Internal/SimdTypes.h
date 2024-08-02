@@ -17,14 +17,14 @@
     #define TF_SIMDI_MAX 0xFFFFFFFF
     #define TF_SIMDF_MAX 0xFFFFFFFF
 
-    typedef __m128 TSimdFloat32x4;
-    typedef __m128i TSimdInt32x4;
+    typedef __m128 Tsimd_f32x4_t;
+    typedef __m128i Tsimd_i32x4_t;
 
-    typedef __m128 TSimdFloat32x3;
-    typedef __m128i TSimdInt32x3;
+    typedef __m128 Tsimd_f32x3_t;
+    typedef __m128i Tsimd_i32x3_t;
 
-    typedef __m128 TSimdFloat32x2;
-    typedef __m128i TSimdInt32x2;
+    typedef __m128 Tsimd_f32x2_t;
+    typedef __m128i Tsimd_i32x2_t;
 #elif defined(TF_FEATURE_CPU_NEON)
     #include <arm_neon.h>
     
@@ -33,14 +33,14 @@
     
     #define TF_SIMDI_MAX 0xFFFFFFFF
     
-    typedef float32x4_t TSimdFloat32x4;
-    typedef int32x4_t TSimdInt32x4;
+    typedef float32x4_t Tsimd_f32x4_t;
+    typedef int32x4_t Tsimd_i32x4_t;
 
-    typedef float32x4_t TSimdFloat32x3;
-    typedef int32x4_t TSimdInt32x3;
+    typedef float32x4_t Tsimd_f32x3_t;
+    typedef int32x4_t Tsimd_i32x3_t;
 
-    typedef float32x2_t TSimdFloat32x2;
-    typedef int32x2_t TSimdInt32x2;
+    typedef float32x2_t Tsimd_f32x2_t;
+    typedef int32x2_t Tsimd_i32x2_t;
 #elif defined(TF_FEATURE_CPU_SCALAR)
     #include <cmath>
     
@@ -49,35 +49,44 @@
     
     #define TF_SIMDI_MAX 0xFFFFFFFF
     
-    typedef struct { float   v[4]; } TSimdFloat32x4;
-    typedef struct { int32_t v[4]; } TSimdInt32x4;
+    typedef struct { float   v[4]; } Tsimd_f32x4_t;
+    typedef struct { int32_t v[4]; } Tsimd_i32x4_t;
 
-    typedef struct { float   v[3]; } TSimdFloat32x3;
-    typedef struct { int32_t v[3]; } TSimdInt32x3;
+    typedef struct { float   v[3]; } Tsimd_f32x3_t;
+    typedef struct { int32_t v[3]; } Tsimd_i32x3_t;
     
-    typedef struct { float   v[2]; } TSimdFloat32x2;
-    typedef struct { int32_t v[2]; } TSimdInt32x2;
+    typedef struct { float   v[2]; } Tsimd_f32x2_t;
+    typedef struct { int32_t v[2]; } Tsimd_i32x2_t;
 #endif
 
 // TODO: keep it simple only implement square matricies
 // everything is column major
 
-struct TSimdFloat4 {
-  TSimdFloat32x4 mRow; 
+struct TSimdQuatFloat {
+  Tsimd_f32x4_t mValue; 
 };
 
-struct TSimdQuatFloat {
-  TSimdFloat32x4 mValue; 
+struct Tsimd_f32x4x4_s {
+    union {
+        struct {
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+            Tsimd_f32x4_t mCol2;
+            Tsimd_f32x4_t mCol3;
+        };
+        Tsimd_f32x4_t mCol[4];
+    };
 };
+
 
 struct TSimdFloat4x1 {
     union
     {
         struct
         {
-            TSimdFloat32x4 mCol0;
+            Tsimd_f32x4_t mCol0;
         };
-        TSimdFloat32x4 mCol[1];
+        Tsimd_f32x4_t mCol[1];
     };
 };
 
@@ -87,21 +96,21 @@ struct TSimdFloat4x2
     {
         struct
         {
-            TSimdFloat32x4 mCol0;
-            TSimdFloat32x4 mCol1;
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
         };
-        TSimdFloat32x4 mCol[2];
+        Tsimd_f32x4_t mCol[2];
     };
 };
 
 struct TSimdFloat4x3 {
   union {
     struct {
-      TSimdFloat32x4 mCol0; 
-      TSimdFloat32x4 mCol1; 
-      TSimdFloat32x4 mCol2; 
+      Tsimd_f32x4_t mCol0; 
+      Tsimd_f32x4_t mCol1; 
+      Tsimd_f32x4_t mCol2; 
     };
-    TSimdFloat32x4 mCol[3]; 
+    Tsimd_f32x4_t mCol[3]; 
   };
 };
 
@@ -111,26 +120,26 @@ struct TSimdFloat4x4
     {
         struct
         {
-            TSimdFloat32x4 mCol0;
-            TSimdFloat32x4 mCol1;
-            TSimdFloat32x4 mCol2;
-            TSimdFloat32x4 mCol3;
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+            Tsimd_f32x4_t mCol2;
+            Tsimd_f32x4_t mCol3;
         };
-        TSimdFloat32x4 mCol[4];
+        Tsimd_f32x4_t mCol[4];
     };
 };
 
 struct TSimdFloat3
 {
-  TSimdFloat32x3 mRow; 
+  Tsimd_f32x3_t mRow; 
 };
 
 struct TSimdFloat3x1 {
     union {
         struct {
-            TSimdFloat32x3 mCol0;
+            Tsimd_f32x3_t mCol0;
         };
-        TSimdFloat32x3 mCol[1];
+        Tsimd_f32x3_t mCol[1];
     };
 };
 
@@ -140,10 +149,10 @@ struct TSimdFloat3x2
     {
         struct
         {
-            TSimdFloat32x3 mCol0;
-            TSimdFloat32x3 mCol1;
+            Tsimd_f32x3_t mCol0;
+            Tsimd_f32x3_t mCol1;
         };
-        TSimdFloat32x3 mCol[2];
+        Tsimd_f32x3_t mCol[2];
     };
 };
 
@@ -153,25 +162,25 @@ struct TSimdFloat3x3
     {
         struct
         {
-            TSimdFloat32x3 mCol0;
-            TSimdFloat32x3 mCol1;
-            TSimdFloat32x3 mCol2;
+            Tsimd_f32x3_t mCol0;
+            Tsimd_f32x3_t mCol1;
+            Tsimd_f32x3_t mCol2;
         };
-        TSimdFloat32x3 mCol[3];
+        Tsimd_f32x3_t mCol[3];
     };
 };
 
 struct TSimdFloat2 {
-  TSimdFloat32x2 mRow; 
+  Tsimd_f32x2_t mRow; 
 };
 
 struct TSimdFloat2x1
 {
     union {
         struct {
-          TSimdFloat32x2 mCol0; 
+          Tsimd_f32x2_t mCol0; 
         };
-        TSimdFloat32x2 mCol[1];
+        Tsimd_f32x2_t mCol[1];
     };
 };
 
@@ -179,10 +188,10 @@ struct TSimdFloat2x2
 {
     union {
         struct {
-            TSimdFloat32x2 mCol0;
-            TSimdFloat32x2 mCol1;
+            Tsimd_f32x2_t mCol0;
+            Tsimd_f32x2_t mCol1;
         };
-        TSimdFloat32x2 mCol[2];
+        Tsimd_f32x2_t mCol[2];
     };
 };
 

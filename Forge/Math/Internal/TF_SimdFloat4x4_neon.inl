@@ -4,15 +4,15 @@
 #include "../TF_SimdFloat4x4.h"
 #endif
 
-static inline TSimdFloat4x4 tfMatTranpose4x4F(TSimdFloat4x4 a0) {
+static inline TSimdFloat4x4 tfTransposeSimd4x4F(TSimdFloat4x4 a0) {
     // abcd    aecg    aeim
     // efgh -> bfdh -> bfjn
     // ijkl    imko    cgko
     // mnop    jnlp    dhlp
-    const TSimdFloat32x4  tmp0 = vtrn1q_f32(a0.mCol0, a0.mCol1);
-    const TSimdFloat32x4  tmp1 = vtrn2q_f32(a0.mCol0, a0.mCol1);
-    const TSimdFloat32x4  tmp2 = vtrn1q_f32(a0.mCol2, a0.mCol3);
-    const TSimdFloat32x4  tmp3 = vtrn2q_f32(a0.mCol2, a0.mCol3);
+    const TSimd32Fx4  tmp0 = vtrn1q_f32(a0.mCol0, a0.mCol1);
+    const TSimd32Fx4  tmp1 = vtrn2q_f32(a0.mCol0, a0.mCol1);
+    const TSimd32Fx4  tmp2 = vtrn1q_f32(a0.mCol2, a0.mCol3);
+    const TSimd32Fx4  tmp3 = vtrn2q_f32(a0.mCol2, a0.mCol3);
     TSimdFloat4x4  result;
     result.mCol0 = vtrn1q_f64(tmp0, tmp2);
     result.mCol1 = vtrn1q_f64(tmp1, tmp3);

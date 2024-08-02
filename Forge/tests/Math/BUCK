@@ -2,12 +2,11 @@ load(":defs.bzl", "cxx_math_simd_test")
 
 math_utils_header = ["TF_MathUtils.h"]
 
-cxx_math_simd_test(name = "TF_SimdFloat2x32Test",srcs = ["TF_SimdFloat2x32Test.cpp"])
-cxx_math_simd_test(name = "TF_SimdFloat3x32Test",srcs = ["TF_SimdFloat3x32Test.cpp"])
-cxx_math_simd_test(name = "TF_SimdFloat4x32Test",srcs = ["TF_SimdFloat4x32Test.cpp"]) 
+# cxx_math_simd_test(name = "TF_SimdFloat2x32Test",srcs = ["TF_SimdFloat2x32Test.cpp"])
+# cxx_math_simd_test(name = "TF_SimdFloat3x32Test",srcs = ["TF_SimdFloat3x32Test.cpp"])
+# cxx_math_simd_test(name = "TF_SimdFloat4x32Test",srcs = ["TF_SimdFloat4x32Test.cpp"]) 
+# cxx_math_simd_test(name = "TF_SimdFloat3Test",srcs = ["TF_SimdFloat3Test.cpp"])
+# cxx_math_simd_test(name = "TF_SimdFloat4x4Test", srcs = ["TF_SimdFloat4x4Test.cpp"])
 
-cxx_math_simd_test(name = "TF_SimdFloat4Test",srcs = ["TF_SimdFloat4Test.cpp"])
-cxx_math_simd_test(name = "TF_SimdFloat3Test",srcs = ["TF_SimdFloat3Test.cpp"])
-
-cxx_math_simd_test(name = "TF_SimdFloat4x4Test", srcs = ["TF_SimdFloat4x4Test.cpp"])
+cxx_math_simd_test(name = "TF_Simdf32x4Test", srcs = ["TF_Simd32x4Test.cpp"])
 

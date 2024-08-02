@@ -4,115 +4,115 @@
 #include "../TF_Simd32x3.h"
 #endif
 
-inline TSimdInt32x3 tfSimd3iSelect(TSimdInt32x3 arg0, TSimdInt32x3 arg1, TSimdInt32x3 mask) {
+inline Tsimd_i32x3_t tfS32x3iSelect(Tsimd_i32x3_t arg0, Tsimd_i32x3_t arg1, Tsimd_i32x3_t mask) {
     return { (mask.v[0] == 0) ? arg0.v[0] : arg1.v[0], (mask.v[1] == 0) ? arg0.v[1] : arg1.v[1], (mask.v[2] == 0) ? arg0.v[2] : arg1.v[2] };
 }
-inline TSimdFloat32x3 tfSimd3fSelect(TSimdFloat32x3 arg0, TSimdFloat32x3 arg1, TSimdFloat32x3 mask) {
-    TSimdInt32x3 intMask = tfSimd3fToSimd3i(mask);
+inline Tsimd_f32x3_t tfS32x3FSelect(Tsimd_f32x3_t arg0, Tsimd_f32x3_t arg1, Tsimd_f32x3_t mask) {
+    Tsimd_i32x3_t intMask = tfS32x3FToSimd3i(mask);
     return { (intMask.v[0] == 0) ? arg0.v[0] : arg1.v[0], (intMask.v[1] == 0) ? arg0.v[1] : arg1.v[1],
              (intMask.v[2] == 0) ? arg0.v[2] : arg1.v[2] };
 }
 
-inline TSimdFloat32x3 tfSimd3fZero() { return { 0, 0, 0 }; }
-inline TSimdInt32x3   tfSimd3iZero() { return { 0, 0, 0 }; }
+inline Tsimd_f32x3_t tfS32x3FZero() { return { 0, 0, 0 }; }
+inline Tsimd_i32x3_t   tfS32x3iZero() { return { 0, 0, 0 }; }
 
-inline TSimdInt32x3 tfSimd3iNot(TSimdInt32x3 value) { return { ~value.v[0], ~value.v[1], ~value.v[2] }; }
-inline TSimdInt32x3 tfSimd3iAnd(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iNot(Tsimd_i32x3_t value) { return { ~value.v[0], ~value.v[1], ~value.v[2] }; }
+inline Tsimd_i32x3_t tfS32x3iAnd(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { arg1.v[0] & arg2.v[0], arg1.v[1] & arg2.v[1], arg1.v[2] & arg2.v[2] };
 }
-inline TSimdInt32x3 tfSimd3iAndNot(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iAndNot(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { ~arg1.v[0] & arg2.v[0], ~arg1.v[1] & arg2.v[1], ~arg1.v[2] & arg2.v[2] };
 }
-inline TSimdInt32x3 tfSimd3iOr(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iOr(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { arg1.v[0] | arg2.v[0], arg1.v[1] | arg2.v[1], arg1.v[2] | arg2.v[2] };
 }
-inline TSimdInt32x3 tfSimd3iXor(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iXor(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { arg1.v[0] ^ arg2.v[0], arg1.v[1] ^ arg2.v[1], arg1.v[2] ^ arg2.v[2] };
 }
 
-inline TSimdFloat32x3 tfSimd3fNot(TSimdFloat32x3 value) {
-    TSimdInt32x3 result = { { ~((int32_t)value.v[0]), ~((int32_t)value.v[1]), ~((int32_t)value.v[2]) } };
-    return tfSimd3iToSimd3f(result);
+inline Tsimd_f32x3_t tfS32x3FNot(Tsimd_f32x3_t value) {
+    Tsimd_i32x3_t result = { { ~((int32_t)value.v[0]), ~((int32_t)value.v[1]), ~((int32_t)value.v[2]) } };
+    return tfS32x3iToSimd3f(result);
 }
-inline TSimdFloat32x3 tfSimd3fAnd(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
-    TSimdInt32x3 result = { ((int32_t)arg1.v[0]) & ((int32_t)arg2.v[0]), ((int32_t)arg1.v[1]) & ((int32_t)arg2.v[1]),
+inline Tsimd_f32x3_t tfS32x3FAnd(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
+    Tsimd_i32x3_t result = { ((int32_t)arg1.v[0]) & ((int32_t)arg2.v[0]), ((int32_t)arg1.v[1]) & ((int32_t)arg2.v[1]),
                             ((int32_t)arg1.v[2]) & ((int32_t)arg2.v[2]) };
-    return tfSimd3iToSimd3f(result);
+    return tfS32x3iToSimd3f(result);
 }
-inline TSimdFloat32x3 tfSimd3fAndNot(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
-    TSimdInt32x3 result = { { ~((int32_t)arg1.v[0]) & ((int32_t)arg2.v[0]), ~((int32_t)arg1.v[1]) & ((int32_t)arg2.v[1]),
+inline Tsimd_f32x3_t tfS32x3FAndNot(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
+    Tsimd_i32x3_t result = { { ~((int32_t)arg1.v[0]) & ((int32_t)arg2.v[0]), ~((int32_t)arg1.v[1]) & ((int32_t)arg2.v[1]),
                               ~((int32_t)arg1.v[2]) & ((int32_t)arg2.v[2]) } };
-    return tfSimd3iToSimd3f(result);
+    return tfS32x3iToSimd3f(result);
 }
-inline TSimdFloat32x3 tfSimd3fOr(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
-    TSimdInt32x3 result = { { ((int32_t)arg1.v[0]) | ((int32_t)arg2.v[0]), ((int32_t)arg1.v[1]) | ((int32_t)arg2.v[1]),
+inline Tsimd_f32x3_t tfS32x3FOr(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
+    Tsimd_i32x3_t result = { { ((int32_t)arg1.v[0]) | ((int32_t)arg2.v[0]), ((int32_t)arg1.v[1]) | ((int32_t)arg2.v[1]),
                               ((int32_t)arg1.v[2]) | ((int32_t)arg2.v[2]) } };
-    return tfSimd3iToSimd3f(result);
+    return tfS32x3iToSimd3f(result);
 }
-inline TSimdFloat32x3 tfSimd3fXor(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
-    TSimdInt32x3 result = { { ((int32_t)arg1.v[0]) ^ ((int32_t)arg2.v[0]), ((int32_t)arg1.v[1]) ^ ((int32_t)arg2.v[1]),
+inline Tsimd_f32x3_t tfS32x3FXor(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
+    Tsimd_i32x3_t result = { { ((int32_t)arg1.v[0]) ^ ((int32_t)arg2.v[0]), ((int32_t)arg1.v[1]) ^ ((int32_t)arg2.v[1]),
                               ((int32_t)arg1.v[2]) ^ ((int32_t)arg2.v[2]) } };
-    return tfSimd3iToSimd3f(result);
+    return tfS32x3iToSimd3f(result);
 }
 
-inline TSimdFloat32x3 tfSimd3fFloor(TSimdFloat32x3 value) { return { { floorf(value.v[0]), floorf(value.v[1]), floorf(value.v[2]) } }; }
-inline TSimdFloat32x3 tfSimd3fCeil(TSimdFloat32x3 value) { return { { ceilf(value.v[0]), ceilf(value.v[1]), ceilf(value.v[2]) } }; }
-inline TSimdFloat32x3 tfSimd3fRound(TSimdFloat32x3 value) {
+inline Tsimd_f32x3_t tfS32x3FFloor(Tsimd_f32x3_t value) { return { { floorf(value.v[0]), floorf(value.v[1]), floorf(value.v[2]) } }; }
+inline Tsimd_f32x3_t tfS32x3FCeil(Tsimd_f32x3_t value) { return { { ceilf(value.v[0]), ceilf(value.v[1]), ceilf(value.v[2]) } }; }
+inline Tsimd_f32x3_t tfS32x3FRound(Tsimd_f32x3_t value) {
     // While 'roundf' may seem the obvious choice here, it rounds halfway cases
     // away from zero regardless of the current rounding mode, but 'rintf' uses
     // the current rounding mode which is consistent with other implementations.
     return { { rintf(value.v[0]), rintf(value.v[1]), rintf(value.v[2]) } };
 }
-inline TSimdFloat32x3 tfSimd3fTruncate(TSimdFloat32x3 value) { return tfSimd3iToSimd3f(tfSimd3fToSimd3i(value)); }
-inline TSimdFloat32x3 tfSimd3fMin(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
+inline Tsimd_f32x3_t tfS32x3FTruncate(Tsimd_f32x3_t value) { return tfS32x3iToSimd3f(tfS32x3FToSimd3i(value)); }
+inline Tsimd_f32x3_t tfS32x3FMin(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
     return { { fminf(arg1.v[0], arg2.v[0]), fminf(arg1.v[1], arg2.v[1]), fminf(arg1.v[2], arg2.v[2]) } };
 }
-inline TSimdFloat32x3 tfSimd3fMax(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
+inline Tsimd_f32x3_t tfS32x3FMax(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
     return { { fmaxf(arg1.v[0], arg2.v[0]), fmaxf(arg1.v[1], arg2.v[1]), fmaxf(arg1.v[2], arg2.v[2]) } };
 }
-inline TSimdFloat32x3 tfSimd3fClamp(TSimdFloat32x3 value, TSimdFloat32x3 min, TSimdFloat32x3 max) {
-    return tfSimd3fMax(min, tfSimd3fMin(value, max));
+inline Tsimd_f32x3_t tfS32x3FClamp(Tsimd_f32x3_t value, Tsimd_f32x3_t min, Tsimd_f32x3_t max) {
+    return tfS32x3FMax(min, tfS32x3FMin(value, max));
 }
 
-inline TSimdInt32x3 tfSimd3fToSimd3i(TSimdFloat32x3 value) { return { (int32_t)value.v[0], (int32_t)value.v[1], (int32_t)value.v[2] }; }
+inline Tsimd_i32x3_t tfS32x3FToSimd3i(Tsimd_f32x3_t value) { return { (int32_t)value.v[0], (int32_t)value.v[1], (int32_t)value.v[2] }; }
 
-inline TSimdFloat32x3 tfSimd3iToSimd3f(TSimdInt32x3 value) { return { (float)value.v[0], (float)value.v[1], (float)value.v[2] }; }
+inline Tsimd_f32x3_t tfS32x3iToSimd3f(Tsimd_i32x3_t value) { return { (float)value.v[0], (float)value.v[1], (float)value.v[2] }; }
 
-inline float tfSimd3fSelectIndex0(TSimdFloat32x3 value) { return value.v[0]; }
+inline float tfS32x3FSelectIndex0(Tsimd_f32x3_t value) { return value.v[0]; }
 
-inline float tfSimd3fSelectIndex1(TSimdFloat32x3 value) { return value.v[1]; }
+inline float tfS32x3FSelectIndex1(Tsimd_f32x3_t value) { return value.v[1]; }
 
-inline float tfSimd3fSelectIndex2(TSimdFloat32x3 value) { return value.v[2]; }
+inline float tfS32x3FSelectIndex2(Tsimd_f32x3_t value) { return value.v[2]; }
 
-inline TSimdFloat32x3 tfSimd3fAdd(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
+inline Tsimd_f32x3_t tfS32x3FAdd(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
     return {
         arg1.v[0] + arg2.v[0],
         arg1.v[1] + arg2.v[1],
         arg1.v[2] + arg2.v[2],
     };
 }
-inline TSimdFloat32x3 tfSimd3fSub(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
+inline Tsimd_f32x3_t tfS32x3FSub(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
     return {
         arg1.v[0] - arg2.v[0],
         arg1.v[1] - arg2.v[1],
         arg1.v[2] - arg2.v[2],
     };
 }
-inline TSimdFloat32x3 tfSimd3fMul(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
+inline Tsimd_f32x3_t tfS32x3FMul(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
     return {
         arg1.v[0] * arg2.v[0],
         arg1.v[1] * arg2.v[1],
         arg1.v[2] * arg2.v[2],
     };
 }
-inline TSimdFloat32x3 tfSimd3fMadd(TSimdFloat32x3 mul1, TSimdFloat32x3 mul2, TSimdFloat32x3 add) {
-    return tfSimd3fAdd(tfSimd3fMul(mul1, mul2), add);
+inline Tsimd_f32x3_t tfS32x3FMadd(Tsimd_f32x3_t mul1, Tsimd_f32x3_t mul2, Tsimd_f32x3_t add) {
+    return tfS32x3FAdd(tfS32x3FMul(mul1, mul2), add);
 }
-inline TSimdFloat32x3 tfSimd3fDiv(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
+inline Tsimd_f32x3_t tfS32x3FDiv(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
     return { arg1.v[0] / arg2.v[0], arg1.v[1] / arg2.v[1], arg1.v[2] / arg2.v[2] };
 }
 
-inline TSimdFloat32x3 tfSimd3fAbs(TSimdFloat32x3 value) {
+inline Tsimd_f32x3_t tfS32x3FAbs(Tsimd_f32x3_t value) {
     return {
         abs(value.v[0]),
         abs(value.v[1]),
@@ -120,47 +120,47 @@ inline TSimdFloat32x3 tfSimd3fAbs(TSimdFloat32x3 value) {
     };
 }
 
-inline TSimdFloat32x3 tfSimdFloat3x32Load(float x, float y, float z) { return { x, y, z }; }
-inline TSimdInt32x3 tfSimdInt3x32Load(int32_t x, int32_t y, int32_t z) { return { x, y, z }; }
+inline Tsimd_f32x3_t tfSimd3x32FLoad(float x, float y, float z) { return { x, y, z }; }
+inline Tsimd_i32x3_t tfSimd3x32ILoad(int32_t x, int32_t y, int32_t z) { return { x, y, z }; }
 
-inline TSimdFloat32x2 tfSimd3fToSimd2f(TSimdFloat32x3 value) { return { value.v[0], value.v[1] }; }
+inline Tsimd_f32x2_t tfS32x3FToSimd2f(Tsimd_f32x3_t value) { return { value.v[0], value.v[1] }; }
 
-static inline TSimdFloat32x4 tfSimdFloat3To4Splat0(TSimdFloat32x3 value) { return { value.v[0], value.v[0], value.v[0], value.v[0] }; }
-static inline TSimdFloat32x4 tfSimdFloat3To4Splat1(TSimdFloat32x3 value) { return { value.v[1], value.v[1], value.v[1], value.v[1] }; }
-static inline TSimdFloat32x4 tfSimdFloat3To4Splat2(TSimdFloat32x3 value) { return { value.v[2], value.v[2], value.v[2], value.v[2] }; }
+static inline Tsimd_f32x4_t tfS32x3FTo32x4FSplat0(Tsimd_f32x3_t value) { return { value.v[0], value.v[0], value.v[0], value.v[0] }; }
+static inline Tsimd_f32x4_t tfS32x3FTo32x4FSplat1(Tsimd_f32x3_t value) { return { value.v[1], value.v[1], value.v[1], value.v[1] }; }
+static inline Tsimd_f32x4_t tfS32x3FTo32x4FSplat2(Tsimd_f32x3_t value) { return { value.v[2], value.v[2], value.v[2], value.v[2] }; }
 
-inline TSimdFloat32x3 tfSimd3fSplatIndex0(TSimdFloat32x3 value) { return { value.v[0], value.v[0], value.v[0] }; }
-inline TSimdFloat32x3 tfSimd3fSplatIndex1(TSimdFloat32x3 value) { return { value.v[1], value.v[1], value.v[1] }; }
-inline TSimdFloat32x3 tfSimd3fSplatIndex2(TSimdFloat32x3 value) { return { value.v[2], value.v[2], value.v[2] }; }
+inline Tsimd_f32x3_t tfS32x3FSplatIndex0(Tsimd_f32x3_t value) { return { value.v[0], value.v[0], value.v[0] }; }
+inline Tsimd_f32x3_t tfS32x3FSplatIndex1(Tsimd_f32x3_t value) { return { value.v[1], value.v[1], value.v[1] }; }
+inline Tsimd_f32x3_t tfS32x3FSplatIndex2(Tsimd_f32x3_t value) { return { value.v[2], value.v[2], value.v[2] }; }
 
-inline TSimdInt32x3 tfSimd3iSplat(int32_t value) { return { value, value, value }; }
-inline TSimdFloat32x3 tfSimd3fSplat(float value) { return { value, value, value }; }
+inline Tsimd_i32x3_t tfS32x3iSplat(int32_t value) { return { value, value, value }; }
+inline Tsimd_f32x3_t tfS32x3FSplat(float value) { return { value, value, value }; }
 
-inline TSimdInt32x3 tfSimd3iCmpEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iCmpEq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { { (arg1.v[0] == arg2.v[0]) ? (int32_t)0xFFFFFFFF : 0x00000000, (arg1.v[1] == arg2.v[1]) ? (int32_t)0xFFFFFFFF : 0x00000000,
                (arg1.v[2] == arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000 } };
 }
-inline TSimdInt32x3 tfSimd3iCmpNeq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iCmpNeq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { { (arg1.v[0] != arg2.v[0]) ? (int32_t)0xFFFFFFFF : 0x00000000, (arg1.v[1] != arg2.v[1]) ? (int32_t)0xFFFFFFFF : 0x00000000,
                (arg1.v[2] != arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000 } };
 }
-inline TSimdInt32x3 tfSimd3iCmpGt(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iCmpGt(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { { (arg1.v[0] > arg2.v[0]) ? (int32_t)0xFFFFFFFF : 0x00000000, (arg1.v[1] > arg2.v[1]) ? (int32_t)0xFFFFFFFF : 0x00000000,
                (arg1.v[2] > arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000 } };
 }
-inline TSimdInt32x3 tfSimd3iCmpGtEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iCmpGtEq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { { (arg1.v[0] >= arg2.v[0]) ? (int32_t)0xFFFFFFFF : 0x00000000, (arg1.v[1] >= arg2.v[1]) ? (int32_t)0xFFFFFFFF : 0x00000000,
                (arg1.v[2] >= arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000 } };
 }
-inline TSimdInt32x3 tfSimd3iCmpLt(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iCmpLt(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { { (arg1.v[0] < arg2.v[0]) ? (int32_t)0xFFFFFFFF : 0x00000000, (arg1.v[1] < arg2.v[1]) ? (int32_t)0xFFFFFFFF : 0x00000000,
                (arg1.v[2] < arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000 } };
 }
-inline TSimdInt32x3 tfSimd3iCmpLtEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline Tsimd_i32x3_t tfS32x3iCmpLtEq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     return { { (arg1.v[0] < arg2.v[0]) ? (int32_t)0xFFFFFFFF : 0x00000000, (arg1.v[1] < arg2.v[1]) ? (int32_t)0xFFFFFFFF : 0x00000000,
                (arg1.v[2] < arg2.v[2]) ? (int32_t)0xFFFFFFFF : 0x00000000 } };
 }
-inline bool tfSimd3fCmpAllEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
+inline bool tfS32x3FCmpAllEq(Tsimd_f32x3_t arg1, Tsimd_f32x3_t arg2) {
     for (int i = 0; i < 3; i++) {
         if (arg1.v[i] != arg2.v[i]) {
             return false;
@@ -169,7 +169,7 @@ inline bool tfSimd3fCmpAllEq(TSimdFloat32x3 arg1, TSimdFloat32x3 arg2) {
     return true;
 }
 
-inline bool tfSimd3iCmpAllEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
+inline bool tfS32x3iCmpAllEq(Tsimd_i32x3_t arg1, Tsimd_i32x3_t arg2) {
     for (int i = 0; i < 3; i++) {
         if (arg1.v[i] != arg2.v[i]) {
             return false;
@@ -178,7 +178,7 @@ inline bool tfSimd3iCmpAllEq(TSimdInt32x3 arg1, TSimdInt32x3 arg2) {
     return true;
 }
 
-static inline bool tfSimdFloat32x3CmpAllLt(TSimdFloat32x3 a, TSimdFloat32x3 b) {
+static inline bool tfSimdFloat32x3CmpAllLt(Tsimd_f32x3_t a, Tsimd_f32x3_t b) {
     for (int i = 0; i < 3; i++) {
         if (a.v[i] >= b.v[i]) {
             return false;
@@ -187,13 +187,13 @@ static inline bool tfSimdFloat32x3CmpAllLt(TSimdFloat32x3 a, TSimdFloat32x3 b) {
     return true;
 }
 
-static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex0ByValue(TSimdFloat32x3 input, float value) {
+static inline Tsimd_f32x3_t tfSimd3x32FReplaceIndex0ByValue(Tsimd_f32x3_t input, float value) {
     return {value, input.v[1], input.v[2]};
 }
-static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex1ByValue(TSimdFloat32x3 input, float value){
+static inline Tsimd_f32x3_t tfSimd3x32FReplaceIndex1ByValue(Tsimd_f32x3_t input, float value){
     return {input.v[0], value, input.v[2]};
 };
-static inline TSimdFloat32x3 tfSimdFloat3x32ReplaceIndex2ByValue(TSimdFloat32x3 input, float value){
+static inline Tsimd_f32x3_t tfSimd3x32FReplaceIndex2ByValue(Tsimd_f32x3_t input, float value){
     return {input.v[0], input.v[1], value};
 };
 
