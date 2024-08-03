@@ -46,7 +46,7 @@ static inline Tsimd_f32x4_t tfSimdZero_f32x4() { return {0,0,0,0}; }
 static inline Tsimd_f32x4_t tfSimdLoad_f32x4(float x, float y, float z, float w) { return { x, y, z, w }; }
 
 static inline Tsimd_f32x4_t tfSimdSplat_f32_f32x4(float value) { return { value, value, value, value }; }
-static inline Tsimd_f32x4_t tfSimdSplat_f32x4_f32x4(Tsimd_f32x4_t value, uint index) { ASSERT(index< 4); return { value.v[index], value.v[index], value.v[index], value.v[index] }; }
+static inline Tsimd_f32x4_t tfSimdSplat_f32x4_f32x4(Tsimd_f32x4_t value, int index) { ASSERT(index< 4); return { value.v[index], value.v[index], value.v[index], value.v[index] }; }
 
 static inline Tsimd_f32x4_t tfSimdDot_f32x4(Tsimd_f32x4_t a,Tsimd_f32x4_t b) {
     const float result = tfSimdDot_f32x4_f32(a, b);
@@ -193,19 +193,12 @@ static inline bool tfSimdCmpAllLtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2
 static inline Tsimd_i32x4_t tfSimdLoad_i32x4(int32_t x, int32_t y, int32_t z, int32_t w) { return { x, y, z, w }; }
 
 static inline Tsimd_i32x4_t tfSimdSplat_i32_i32x4(int32_t value) { return { value, value, value, value }; }
-static inline Tsimd_i32x4_t tfSimdSplat_i32x4_i32x4(Tsimd_i32x4_t value, uint index){ ASSERT(index< 4); return { value.v[index], value.v[index], value.v[index], value.v[index] }; } 
-// static inline Tsimd_i32x4_t tfSimdSplat1_i32x4(Tsimd_i32x4_t value){ return { value.v[1], value.v[1], value.v[1], value.v[1] }; } 
-// static inline Tsimd_i32x4_t tfSimdSplat2_i32x4(Tsimd_i32x4_t value){ return { value.v[2], value.v[2], value.v[2], value.v[2] }; } 
-// static inline Tsimd_i32x4_t tfSimdSplat3_i32x4(Tsimd_i32x4_t value){ return { value.v[3], value.v[3], value.v[3], value.v[3] }; }
+static inline Tsimd_i32x4_t tfSimdSplat_i32x4_i32x4(Tsimd_i32x4_t value, int index){ ASSERT(index< 4); return { value.v[index], value.v[index], value.v[index], value.v[index] }; } 
 
 static inline int32_t tfSimdGet_i32x4(Tsimd_i32x4_t value, int index) {
     ASSERT(index < 4);
     return value.v[index];
 }
-//static inline int32_t tfSimdSelect0_i32x4(Tsimd_i32x4_t value) { return value.v[0]; }
-//static inline int32_t tfSimdSelect1_i32x4(Tsimd_i32x4_t value) { return value.v[1]; }
-//static inline int32_t tfSimdSelect2_i32x4(Tsimd_i32x4_t value) { return value.v[2]; }
-//static inline int32_t tfSimdSelect3_i32x4(Tsimd_i32x4_t value) { return value.v[3]; }
 
 static inline Tsimd_i32x4_t tfSimdAdd_i32x4(Tsimd_i32x4_t a, Tsimd_i32x4_t b) {
     return { a.v[0] + b.v[0], a.v[1] + b.v[1], a.v[2] + b.v[2], a.v[3] + b.v[3] };

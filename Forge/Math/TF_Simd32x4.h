@@ -18,7 +18,7 @@ static inline Tsimd_f32x4_t tfSimdZero_f32x4();
 
 // Splat
 static inline Tsimd_f32x4_t tfSimdSplat_f32_f32x4(float value);
-static inline Tsimd_f32x4_t tfSimdSplat_f32x4_f32x4(Tsimd_f32x4_t value, uint index);
+static inline Tsimd_f32x4_t tfSimdSplat_f32x4_f32x4(Tsimd_f32x4_t value, int index);
 
 // Get 
 static inline float tfSimdGet_f32x4(Tsimd_f32x4_t value, int index);
@@ -79,7 +79,7 @@ static inline bool tfSimdIsClose_f32x4(Tsimd_f32x4_t ar0,Tsimd_f32x4_t ar1, floa
 static inline Tsimd_i32x4_t tfSimdLoad_i32x4(int32_t x, int32_t y, int32_t z, int32_t w);
 
 static inline Tsimd_i32x4_t tfSimdSplat_i32_i32x4(int value);
-static inline Tsimd_i32x4_t tfSimdSplat_i32x4_i32x4(Tsimd_i32x4_t value, uint index);
+static inline Tsimd_i32x4_t tfSimdSplat_i32x4_i32x4(Tsimd_i32x4_t value, int index);
  
 static inline int32_t tfSimdSelect_i32x4(Tsimd_i32x4_t value, int index);
 

@@ -9,7 +9,7 @@ static inline Tsimd_f32x4_t tfSimdLoad_f32x4(float x, float y, float z, float w)
 static inline Tsimd_f32x4_t tfSimdZero_f32x4() { return _mm_setzero_ps(); }
 
 static inline Tsimd_f32x4_t tfSimdSplat_f32_f32x4(float value) { return _mm_set1_ps(value); }
-static inline Tsimd_f32x4_t tfSimdSplat_f32x4_f32x4(Tsimd_f32x4_t value, uint index) {
+static inline Tsimd_f32x4_t tfSimdSplat_f32x4_f32x4(Tsimd_f32x4_t value, int index) {
     ASSERT(index < 4);
     switch(index) {
         case 0:return _mm_shuffle_ps(value, value, _MM_SHUFFLE(0, 0, 0, 0));
@@ -121,7 +121,7 @@ static inline bool tfSimdCmpAllLtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2
 static inline Tsimd_i32x4_t tfSimdLoad_i32x4(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
 
 static inline Tsimd_i32x4_t tfSimdSplat_i32_i32x4(int value) { return _mm_set1_epi32(value); }
-static inline Tsimd_i32x4_t tfSimdSplat_i32x4_i32x4(Tsimd_i32x4_t value, uint index) {
+static inline Tsimd_i32x4_t tfSimdSplat_i32x4_i32x4(Tsimd_i32x4_t value, int index) {
     ASSERT(index < 4);
     switch(index) {
         case 0:return _mm_shuffle_epi32(value, _MM_SHUFFLE(0, 0, 0, 0));
