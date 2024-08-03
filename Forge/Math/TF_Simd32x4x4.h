@@ -24,7 +24,7 @@ static inline Tsimd_f32x4_t tfSimdGetRow_f32x4x4(struct Tsimd_f32x4x4_s input, i
 static inline Tsimd_f32x4_t tfSimdGetColumn_f32x4x4(struct Tsimd_f32x4x4_s input, int column);
 static inline float tfSimdGet_f32x4x4(struct Tsimd_f32x4x4_s input, int column, int row);
 
-static inline struct Tsimd_f32x4x4_s tfSimdReplace_f32x4x4(struct Tsimd_f32x4x4_s input, float value, uint column, uint row);
+static inline struct Tsimd_f32x4x4_s tfSimdReplace_f32x4x4(struct Tsimd_f32x4x4_s input, float value, int column, int row);
 
 static inline Tsimd_f32x4x4_s tfSimdMul_f32x4x4_f32x4x4(struct Tsimd_f32x4x4_s a0, struct Tsimd_f32x4x4_s a1);
 static inline Tsimd_f32x4_t tfSimdMul_f32x4x4_f32x4x1(struct Tsimd_f32x4x4_s a0, Tsimd_f32x4_t a1);

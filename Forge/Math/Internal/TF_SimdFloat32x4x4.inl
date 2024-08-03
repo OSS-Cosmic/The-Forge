@@ -46,7 +46,7 @@ static inline Tsimd_f32x4_t tfSimdGetColumn_f32x4x4(struct Tsimd_f32x4x4_s input
   return input.mCol[column]; 
 }
 
-static inline struct Tsimd_f32x4x4_s tfSimdReplace_f32x4x4(struct Tsimd_f32x4x4_s input, float value, uint column, uint row) {
+static inline struct Tsimd_f32x4x4_s tfSimdReplace_f32x4x4(struct Tsimd_f32x4x4_s input, float value, int column, int row) {
     ASSERT(column < 4);
     input.mCol[column] = tfSimdReplace_f32_f32x4(row, input.mCol[column], value);
     return input;
