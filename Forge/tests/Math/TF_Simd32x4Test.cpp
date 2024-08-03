@@ -14,10 +14,10 @@
 UTEST(Tsimd_f32x4_t, Zero)
 {
   Tsimd_f32x4_t value = tfSimdZero_f32x4();
-  EXPECT_NEAR(tfSimdSelect_f32x4(value, 0), 0, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect_f32x4(value, 1), 0, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect_f32x4(value, 2), 0, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect_f32x4(value, 3), 0, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value, 0), 0, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value, 1), 0, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value, 2), 0, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value, 3), 0, DEFAULT_EPSILON);
 
 }
 
@@ -25,99 +25,98 @@ UTEST(Tsimd_f32x4_t, Load_Select)
 {
   Tsimd_f32x4_t value = tfSimdLoad_f32x4(123.0,12.f,45.f,12.5f);
 
-  EXPECT_NEAR(tfSimdSelect_f32x4(value, 0), 123.0f, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect_f32x4(value, 1), 12.0f, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect_f32x4(value, 2), 45.0f, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect_f32x4(value, 3), 12.5f, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value, 0), 123.0f, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value, 1), 12.0f, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value, 2), 45.0f, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value, 3), 12.5f, DEFAULT_EPSILON);
 
-  EXPECT_NEAR(tfSimdSelect0_f32x4(value), 123.0f, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect1_f32x4(value), 12.0f, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect2_f32x4(value), 45.0f, DEFAULT_EPSILON);
-  EXPECT_NEAR(tfSimdSelect3_f32x4(value), 12.5f, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value,0), 123.0f, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value,1), 12.0f, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value,2), 45.0f, DEFAULT_EPSILON);
+  EXPECT_NEAR(tfSimdGet_f32x4(value,3), 12.5f, DEFAULT_EPSILON);
 }
 
 UTEST(Tsimd_i32x4_t, Splat) {
     Tsimd_i32x4_t value = tfSimdLoad_i32x4(123, 12, 45, 12);
     {
-        Tsimd_i32x4_t test = tfSimdSplat_i32x4(123);
-        EXPECT_NEAR(tfSimdSelect0_i32x4(test), 123, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect1_i32x4(test), 123, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect2_i32x4(test), 123, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect3_i32x4(test), 123, DEFAULT_EPSILON);
+        Tsimd_i32x4_t test = tfSimdSplat_i32_i32x4(123);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,0), 123, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,1), 123, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,2), 123, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,3), 123, DEFAULT_EPSILON);
     }
     {
-        Tsimd_i32x4_t test = tfSimdSplat0_i32x4(value);
-        EXPECT_NEAR(tfSimdSelect0_i32x4(test), 123, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect1_i32x4(test), 123, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect2_i32x4(test), 123, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect3_i32x4(test), 123, DEFAULT_EPSILON);
-    }
-
-    {
-        Tsimd_i32x4_t test = tfSimdSplat1_i32x4(value);
-        EXPECT_NEAR(tfSimdSelect0_i32x4(test), 12, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect1_i32x4(test), 12, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect2_i32x4(test), 12, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect3_i32x4(test), 12, DEFAULT_EPSILON);
+        Tsimd_i32x4_t test = tfSimdSplat_i32x4_i32x4(value, 0);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,0), 123, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,1), 123, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,2), 123, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,3), 123, DEFAULT_EPSILON);
     }
 
     {
-        Tsimd_i32x4_t test = tfSimdSplat2_i32x4(value);
-        EXPECT_NEAR(tfSimdSelect0_i32x4(test), 45, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect1_i32x4(test), 45, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect2_i32x4(test), 45, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect3_i32x4(test), 45, DEFAULT_EPSILON);
+        Tsimd_i32x4_t test = tfSimdSplat_i32x4_i32x4(value, 1);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,0), 12, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,1), 12, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,2), 12, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,3), 12, DEFAULT_EPSILON);
     }
 
     {
-        Tsimd_i32x4_t test = tfSimdSplat3_i32x4(value);
-        EXPECT_NEAR(tfSimdSelect0_i32x4(test), 12, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect1_i32x4(test), 12, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect2_i32x4(test), 12, DEFAULT_EPSILON);
-        EXPECT_NEAR(tfSimdSelect3_i32x4(test), 12, DEFAULT_EPSILON);
+        Tsimd_i32x4_t test = tfSimdSplat_i32x4_i32x4(value, 2);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,0), 45, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,1), 45, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,2), 45, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,3), 45, DEFAULT_EPSILON);
+    }
+
+    {
+        Tsimd_i32x4_t test = tfSimdSplat_i32x4_i32x4(value, 3);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,0), 12, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,1), 12, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,2), 12, DEFAULT_EPSILON);
+        EXPECT_NEAR(tfSimdGet_i32x4(test,3), 12, DEFAULT_EPSILON);
     }
 }
 
 UTEST(Tsimd_f32x4_t, Splat) {
   Tsimd_f32x4_t value = tfSimdLoad_f32x4(123.0,12.f,45.f,12.5f);
   {
-      Tsimd_f32x4_t test = tfSimdSplat_f32x4(123.0f);
-      EXPECT_NEAR(tfSimdSelect0_f32x4(test), 123.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect1_f32x4(test), 123.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect2_f32x4(test), 123.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect3_f32x4(test), 123.0f, DEFAULT_EPSILON);
-
+      Tsimd_f32x4_t test = tfSimdSplat_f32_f32x4(123.0f);
+      EXPECT_NEAR(tfSimdGet_f32x4(test, 0), 123.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test, 1), 123.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test, 2), 123.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test, 3), 123.0f, DEFAULT_EPSILON);
   }
   {
-      Tsimd_f32x4_t test = tfSimdSplat0_f32x4(value);
-      EXPECT_NEAR(tfSimdSelect0_f32x4(test), 123.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect1_f32x4(test), 123.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect2_f32x4(test), 123.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect3_f32x4(test), 123.0f, DEFAULT_EPSILON);
-  }
-
-  {
-      Tsimd_f32x4_t test = tfSimdSplat1_f32x4(value);
-      EXPECT_NEAR(tfSimdSelect0_f32x4(test), 12.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect1_f32x4(test), 12.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect2_f32x4(test), 12.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect3_f32x4(test), 12.0f, DEFAULT_EPSILON);
+      Tsimd_f32x4_t test = tfSimdSplat_f32x4_f32x4(value, 0);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,0), 123.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,1), 123.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,2), 123.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,3), 123.0f, DEFAULT_EPSILON);
   }
 
   {
-      Tsimd_f32x4_t test = tfSimdSplat2_f32x4(value);
-      EXPECT_NEAR(tfSimdSelect0_f32x4(test), 45.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect1_f32x4(test), 45.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect2_f32x4(test), 45.0f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect3_f32x4(test), 45.0f, DEFAULT_EPSILON);
+      Tsimd_f32x4_t test = tfSimdSplat_f32x4_f32x4(value, 1);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,0), 12.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,1), 12.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,2), 12.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,3), 12.0f, DEFAULT_EPSILON);
   }
 
   {
-      Tsimd_f32x4_t test = tfSimdSplat3_f32x4(value);
-      EXPECT_NEAR(tfSimdSelect0_f32x4(test), 12.5f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect1_f32x4(test), 12.5f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect2_f32x4(test), 12.5f, DEFAULT_EPSILON);
-      EXPECT_NEAR(tfSimdSelect3_f32x4(test), 12.5f, DEFAULT_EPSILON);
+      Tsimd_f32x4_t test = tfSimdSplat_f32x4_f32x4(value, 2);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,0), 45.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,1), 45.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,2), 45.0f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,3), 45.0f, DEFAULT_EPSILON);
+  }
+
+  {
+      Tsimd_f32x4_t test = tfSimdSplat_f32x4_f32x4(value, 3);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,0), 12.5f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,1), 12.5f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,2), 12.5f, DEFAULT_EPSILON);
+      EXPECT_NEAR(tfSimdGet_f32x4(test,3), 12.5f, DEFAULT_EPSILON);
   }
 }
 
@@ -126,15 +125,11 @@ UTEST(Tsimd_i32x4_t, Load_Select)
 {
   Tsimd_i32x4_t value = tfSimdLoad_i32x4(123,12,45,165);
 
-  EXPECT_EQ(tfSimdSelect_i32x4(value, 0), 123);
-  EXPECT_EQ(tfSimdSelect_i32x4(value, 1), 12);
-  EXPECT_EQ(tfSimdSelect_i32x4(value, 2), 45);
-  EXPECT_EQ(tfSimdSelect_i32x4(value, 3), 165);
+  EXPECT_EQ(tfSimdGet_i32x4(value, 0), 123);
+  EXPECT_EQ(tfSimdGet_i32x4(value, 1), 12);
+  EXPECT_EQ(tfSimdGet_i32x4(value, 2), 45);
+  EXPECT_EQ(tfSimdGet_i32x4(value, 3), 165);
   
-  EXPECT_EQ(tfSimdSelect0_i32x4(value), 123);
-  EXPECT_EQ(tfSimdSelect1_i32x4(value), 12);
-  EXPECT_EQ(tfSimdSelect2_i32x4(value), 45);
-  EXPECT_EQ(tfSimdSelect3_i32x4(value), 165);
 }
 
 UTEST(Tsimd_f32x4_t, tfSimdCmpGt_f32x4)
@@ -164,6 +159,99 @@ UTEST(Tsimd_f32x4_t, tfSimdCmpGt_f32x4)
       EXPECT_TRUE(tfSimdCmpAllEq_i32x4(result, tests[i].test));
   }
 }
+
+UTEST(Tsimd_f32x4_t, tfSimdReplace_f32_f32x4)
+{
+    Tsimd_f32x4_t input = tfSimdLoad_f32x4(0, -1, 1, 0);
+    input = tfSimdReplace_f32_f32x4(0, input, 125.f);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(125.f, -1, 1, 0), DEFAULT_EPSILON));
+
+    input = tfSimdReplace_f32_f32x4(1, input, 250.f);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(125.f, 250.f, 1, 0), DEFAULT_EPSILON));
+
+    // Test case 3: Replace element at index 2
+    input = tfSimdReplace_f32_f32x4(2, input, 375.f);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(125.f, 250.f, 375.f, 0), DEFAULT_EPSILON));
+
+    // Test case 4: Replace element at index 3
+    input = tfSimdReplace_f32_f32x4(3, input, 500.f);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(125.f, 250.f, 375.f, 500.f), DEFAULT_EPSILON));
+
+}
+
+UTEST(Tsimd_f32x4_t, tfSimdReplace_f32x4_f32x4)
+{
+    Tsimd_f32x4_t input = tfSimdLoad_f32x4(0, -1, 1, 0);
+    input = tfSimdReplace_f32x4_f32x4(0, input, tfSimdLoad_f32x4(100.0f, 123.52f, 145.5f, 21.5f));
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(100.f, -1, 1.0, 0), DEFAULT_EPSILON));
+
+    input = tfSimdReplace_f32x4_f32x4(1, input, tfSimdLoad_f32x4(200.0f, 223.52f, 245.5f, 221.5f));
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(100.f, 223.52f, 1.0, 0), DEFAULT_EPSILON));
+
+    input = tfSimdReplace_f32x4_f32x4(2, input, tfSimdLoad_f32x4(200.0f, 223.52f, 245.5f, 221.5f));
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(100.f, 223.52f, 245.5f, 0), DEFAULT_EPSILON));
+
+    input = tfSimdReplace_f32x4_f32x4(3, input, tfSimdLoad_f32x4(300.0f, 323.52f, 345.5f, 321.5f));
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(100.f, 223.52f, 245.5f, 321.5f), DEFAULT_EPSILON));
+}
+
+UTEST(Tsimd_f32x4_t, tfSimdLength_f32x4)
+{
+    // Test case 1
+    Tsimd_f32x4_t input1 = tfSimdLoad_f32x4(3.0f, 4.0f, 0.0f, 0.0f);
+    Tsimd_f32x4_t result1 = tfSimdLength_f32x4(input1);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(result1));
+    EXPECT_NEAR(tfSimdGet_f32x4(result1, 1), 5.0f, DEFAULT_EPSILON);
+
+    // Test case 2
+    Tsimd_f32x4_t input2 = tfSimdLoad_f32x4(1.0f, 2.0f, 2.0f, 2.0f);
+    Tsimd_f32x4_t result2 = tfSimdLength_f32x4(input2);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(result2));
+    EXPECT_NEAR(tfSimdGet_f32x4(result2, 0), 3.605f, DEFAULT_EPSILON);
+
+    // Test case 3
+    Tsimd_f32x4_t input3 = tfSimdLoad_f32x4(0.0f, 0.0f, 0.0f, 0.0f);
+    Tsimd_f32x4_t result3 = tfSimdLength_f32x4(input3);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(result3));
+    EXPECT_NEAR(tfSimdGet_f32x4(result3, 0), 0.0f, DEFAULT_EPSILON);
+}
+
+UTEST(Tsimd_f32x4_t, tfNormWithLength_f32x4)
+{
+    // Test case 1
+    Tsimd_f32x4_t input1 = tfSimdLoad_f32x4(3.0f, 4.0f, 0.0f, 0.0f);
+    float length1;
+    Tsimd_f32x4_t result1 = tfNormWithLength_f32x4(input1, &length1);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(result1));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(result1, tfSimdLoad_f32x4(0.6f, 0.8f, 0.0f, 0.0f), DEFAULT_EPSILON));
+    EXPECT_NEAR(length1, 5.0f, DEFAULT_EPSILON);
+
+    // Test case 2
+    Tsimd_f32x4_t input2 = tfSimdLoad_f32x4(1.0f, 2.0f, 2.0f, 2.0f);
+    float length2;
+    Tsimd_f32x4_t result2 = tfNormWithLength_f32x4(input2, &length2);
+    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(result2));
+    EXPECT_TRUE(tfSimdIsClose_f32x4(result2, tfSimdLoad_f32x4(0.277350f, 0.554700f, 0.554700f, 0.554700f), DEFAULT_EPSILON));
+    EXPECT_NEAR(length2, 3.605551, DEFAULT_EPSILON);
+
+//TODO: handle zero case
+//    // Test case 3
+//    Tsimd_f32x4_t input3 = tfSimdLoad_f32x4(0.0f, 0.0f, 0.0f, 0.0f);
+//    float length3;
+//    Tsimd_f32x4_t result3 = tfNormWithLength_f32x4(input3, &length3);
+//    DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(result3));
+//    EXPECT_TRUE(tfSimdIsClose_f32x4(result3, tfSimdLoad_f32x4(0.0f, 0.0f, 0.0f, 0.0f), DEFAULT_EPSILON));
+//    EXPECT_NEAR(length3, 0.0f, DEFAULT_EPSILON);
+}
+
 
 UTEST(Tsimd_f32x4_t, tfSimdCmpEq_f32x4)
 {

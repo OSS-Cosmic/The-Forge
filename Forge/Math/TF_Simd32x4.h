@@ -16,22 +16,37 @@
 static inline Tsimd_f32x4_t tfSimdLoad_f32x4(float x, float y, float z, float w);
 static inline Tsimd_f32x4_t tfSimdZero_f32x4();
 
-static inline Tsimd_f32x4_t tfSimdSplat_f32x4(float value);
-static inline Tsimd_f32x4_t tfSimdSplat0_f32x4(Tsimd_f32x4_t value);
-static inline Tsimd_f32x4_t tfSimdSplat1_f32x4(Tsimd_f32x4_t value);
-static inline Tsimd_f32x4_t tfSimdSplat2_f32x4(Tsimd_f32x4_t value);
-static inline Tsimd_f32x4_t tfSimdSplat3_f32x4(Tsimd_f32x4_t value);
+static inline Tsimd_f32x4_t tfSimdSplat_f32_f32x4(float value);
+static inline Tsimd_f32x4_t tfSimdSplat_f32x4_f32x4(Tsimd_f32x4_t value, uint index);
 
-static inline Tsimd_f32x4_t tfSimdDot_f32x4(Tsimd_f32x4_t a,Tsimd_f32x4_t b); 
-static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a,Tsimd_f32x4_t b); 
+// these operations will be slower for scalar
+static inline Tsimd_f32x4_t tfSimdDot_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b);
+static inline Tsimd_f32x4_t tfSimdLengthSqr_f32x4(Tsimd_f32x4_t a) { return tfSimdDot_f32x4(a,a);}
+static inline Tsimd_f32x4_t tfSimdLength_f32x4(Tsimd_f32x4_t a);
 
-static inline float tfSimdSelect_f32x4(Tsimd_f32x4_t value, int index);
-static inline float tfSimdSelect0_f32x4(Tsimd_f32x4_t value);
-static inline float tfSimdSelect1_f32x4(Tsimd_f32x4_t value);
-static inline float tfSimdSelect2_f32x4(Tsimd_f32x4_t value);
-static inline float tfSimdSelect3_f32x4(Tsimd_f32x4_t value);
+static Tsimd_f32x4_t tfNormWithLength_f32x4(Tsimd_f32x4_t input, float* outLength); 
+
+static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a, Tsimd_f32x4_t b);
+static inline float tfSimdLength_f32x4_f32(Tsimd_f32x4_t a);
+
+static inline Tsimd_f32x4_t tfSimdReplace_f32_f32x4(int index, Tsimd_f32x4_t a,  float b);
+static inline Tsimd_f32x4_t tfSimdReplaceX_f32_f32x4(Tsimd_f32x4_t a, float b) { return tfSimdReplace_f32_f32x4(0, a, b); }
+static inline Tsimd_f32x4_t tfSimdReplaceY_f32_f32x4(Tsimd_f32x4_t a, float b) { return tfSimdReplace_f32_f32x4(1, a, b); }
+static inline Tsimd_f32x4_t tfSimdReplaceZ_f32_f32x4(Tsimd_f32x4_t a, float b) { return tfSimdReplace_f32_f32x4(2, a, b); }
+static inline Tsimd_f32x4_t tfSimdReplaceW_f32_f32x4(Tsimd_f32x4_t a, float b) { return tfSimdReplace_f32_f32x4(3, a, b); }
+static inline Tsimd_f32x4_t tfSimdReplace_f32x4_f32x4(int index, Tsimd_f32x4_t a, Tsimd_f32x4_t b);
+
+static inline float tfSimdGet_f32x4(Tsimd_f32x4_t value, int index);
+static inline float tfSimdGetX_f32x4(Tsimd_f32x4_t value) { return tfSimdGet_f32x4(value, 0); }
+static inline float tfSimdGetY_f32x4(Tsimd_f32x4_t value) { return tfSimdGet_f32x4(value, 1); }
+static inline float tfSimdGetZ_f32x4(Tsimd_f32x4_t value) { return tfSimdGet_f32x4(value, 2); }
+static inline float tfSimdGetW_f32x4(Tsimd_f32x4_t value) { return tfSimdGet_f32x4(value, 3); } 
+
+static inline Tsimd_f32x4_t tfSimdRcp_f32x4(Tsimd_f32x4_t a);
+static inline Tsimd_f32x4_t tfSimdSqrt_f32x4(Tsimd_f32x4_t a);
 
 static inline Tsimd_f32x4_t tfSimdAdd_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b);
+static inline Tsimd_f32x4_t tfSimdSub_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b);
 static inline Tsimd_f32x4_t tfSimdMul_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b);
 static inline Tsimd_f32x4_t tfSimdDiv_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b);
 static inline Tsimd_f32x4_t tfSimdAbs_f32x4(Tsimd_f32x4_t a);
@@ -57,21 +72,15 @@ static inline bool tfSimdCmpAllGtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2
 static inline bool tfSimdCmpAllLt_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2);
 static inline bool tfSimdCmpAllLtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2);
 
+static inline bool tfSimdIsClose_f32x4(Tsimd_f32x4_t ar0,Tsimd_f32x4_t ar1, float epsilon);
+
 // Tsimd_i32x4_t
 static inline Tsimd_i32x4_t tfSimdLoad_i32x4(int32_t x, int32_t y, int32_t z, int32_t w);
 
-
-static inline Tsimd_i32x4_t tfSimdSplat_i32x4(int32_t value);
-static inline Tsimd_i32x4_t tfSimdSplat0_i32x4(Tsimd_i32x4_t value);
-static inline Tsimd_i32x4_t tfSimdSplat1_i32x4(Tsimd_i32x4_t value);
-static inline Tsimd_i32x4_t tfSimdSplat2_i32x4(Tsimd_i32x4_t value);
-static inline Tsimd_i32x4_t tfSimdSplat3_i32x4(Tsimd_i32x4_t value);
-
-static inline int32_t tfSimdSelect_i32x4(Tsimd_i32x4_t value, int index);
-static inline int32_t tfSimdSelect0_i32x4(Tsimd_i32x4_t value);
-static inline int32_t tfSimdSelect1_i32x4(Tsimd_i32x4_t value);
-static inline int32_t tfSimdSelect2_i32x4(Tsimd_i32x4_t value);
-static inline int32_t tfSimdSelect3_i32x4(Tsimd_i32x4_t value);
+static inline Tsimd_i32x4_t tfSimdSplat_i32_i32x4(int value);
+static inline Tsimd_i32x4_t tfSimdSplat_i32x4_i32x4(Tsimd_i32x4_t value, uint index);
+ 
+static inline int32_t tfSimdGet_i32x4(Tsimd_i32x4_t value, int index);
 
 static inline Tsimd_i32x4_t tfSimdAdd_i32x4(Tsimd_i32x4_t a, Tsimd_i32x4_t b);
 static inline Tsimd_i32x4_t tfSimdMul_i32x4(Tsimd_i32x4_t a, Tsimd_i32x4_t b);
@@ -102,6 +111,7 @@ static inline bool tfSimdCmpAllLtEq_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2
 
 static inline Tsimd_i32x4_t tfSimd_f32x4_To_i32x4(Tsimd_f32x4_t a);
 static inline Tsimd_f32x4_t tfSimd_i32x4_To_f32x4(Tsimd_i32x4_t a);
+static inline Tsimd_f32x3_t tfSimd_f32x4_To_f32x3(Tsimd_f32x4_t a);
 
 
 
@@ -189,6 +199,7 @@ static inline Tsimd_f32x4_t tfSimd_i32x4_To_f32x4(Tsimd_i32x4_t a);
 //inline bool tfS32x4FCmpAllLt(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2);
 //inline bool tfS32x4FCmpAllGt(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2);
 
+#include "Internal/TF_Simd32x4.inl"
 #if defined(TF_FEATURE_CPU_SSE)
 #include "Internal/TF_Simd32x4_sse.inl"
 #elif defined(TF_FEATURE_CPU_NEON)

@@ -7,44 +7,61 @@
 // Tsimd_f32x4_t
 static inline Tsimd_f32x4_t tfSimdLoad_f32x4(float x, float y, float z, float w) { return _mm_set_ps(w, z, y, x); }
 static inline Tsimd_f32x4_t tfSimdZero_f32x4() { return _mm_setzero_ps(); }
-static inline Tsimd_f32x4_t tfSimdSplat_f32x4(float value) { return _mm_set1_ps(value); }
 
-static inline Tsimd_f32x4_t tfSimdSplat0_f32x4(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(0, 0, 0, 0)); }
-static inline Tsimd_f32x4_t tfSimdSplat1_f32x4(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(1, 1, 1, 1)); }
-static inline Tsimd_f32x4_t tfSimdSplat2_f32x4(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(2, 2, 2, 2)); };
-static inline Tsimd_f32x4_t tfSimdSplat3_f32x4(Tsimd_f32x4_t value) { return _mm_shuffle_ps(value, value, _MM_SHUFFLE(3, 3, 3, 3)); }
+static inline Tsimd_f32x4_t tfSimdSplat_f32_f32x4(float value) { return _mm_set1_ps(value); }
+static inline Tsimd_f32x4_t tfSimdSplat_f32x4_f32x4(Tsimd_f32x4_t value, uint index) {
+    ASSERT(index < 4);
+    switch(index) {
+        case 0:return _mm_shuffle_ps(value, value, _MM_SHUFFLE(0, 0, 0, 0));
+        case 1:return _mm_shuffle_ps(value, value, _MM_SHUFFLE(1, 1, 1, 1));
+        case 2:return _mm_shuffle_ps(value, value, _MM_SHUFFLE(2, 2, 2, 2));
+        case 3:
+            return _mm_shuffle_ps(value, value, _MM_SHUFFLE(3, 3, 3, 3));
+        }
+        return {};
+}
 
-
-static inline Tsimd_f32x4_t tfSimdDot_f32x4(Tsimd_f32x4_t a,Tsimd_f32x4_t b) {
+static inline Tsimd_f32x4_t tfSimdDot_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) {
     Tsimd_f32x4_t x2 = _mm_mul_ps(a, b);
     Tsimd_f32x4_t tmp = _mm_hadd_ps(x2, x2);
     return _mm_hadd_ps(tmp, tmp);
 }
 
-static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a,Tsimd_f32x4_t b) {
-    return _mm_cvtss_f32(tfSimdDot_f32x4(a,b));
+static inline Tsimd_f32x4_t tfSimdLength_f32x4(Tsimd_f32x4_t a) { return tfSimdSqrt_f32x4(tfSimdDot_f32x4(a, a)); }
+static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_cvtss_f32(tfSimdDot_f32x4(a, b)); }
+static inline float tfSimdLength_f32x4_f32(Tsimd_f32x4_t a) { return _mm_cvtss_f32(tfSimdLength_f32x4(a)); }
+
+
+static inline float tfSimdGet_f32x4(Tsimd_f32x4_t value, int index) {
+    ASSERT(index < 4);
+    return _mm_cvtss_f32(tfSimdSplat_f32x4_f32x4(value, index));
 }
 
-static inline float tfSimdSelect_f32x4(Tsimd_f32x4_t value, int index) {
+static inline Tsimd_f32x4_t tfSimdReplace_f32_f32x4(int index, Tsimd_f32x4_t a, float b) {
+    return tfSimdReplace_f32x4_f32x4(index, a, tfSimdSplat_f32_f32x4(b));
+}
+static inline Tsimd_f32x4_t tfSimdReplace_f32x4_f32x4(int index, Tsimd_f32x4_t a, Tsimd_f32x4_t b) {
     ASSERT(index < 4);
-    switch (index) {
-    case 0: return tfSimdSelect0_f32x4(value);
-    case 1: return tfSimdSelect1_f32x4(value);
-    case 2: return tfSimdSelect2_f32x4(value);
-    case 3: return tfSimdSelect3_f32x4(value);
+    switch(index) {
+        case 0: return _mm_blend_ps(a, b, 0b0001);
+        case 1: return _mm_blend_ps(a, b, 0b0010);
+        case 2: return _mm_blend_ps(a, b, 0b0100);
+        case 3: return _mm_blend_ps(a, b, 0b1000);
+        default:
+            break;
     }
     return {};
 }
-static inline float tfSimdSelect0_f32x4(Tsimd_f32x4_t value) { return _mm_cvtss_f32(value); }
-static inline float tfSimdSelect1_f32x4(Tsimd_f32x4_t value) { return _mm_cvtss_f32(tfSimdSplat1_f32x4(value)); }
-static inline float tfSimdSelect2_f32x4(Tsimd_f32x4_t value) { return _mm_cvtss_f32(tfSimdSplat2_f32x4(value)); }
-static inline float tfSimdSelect3_f32x4(Tsimd_f32x4_t value) { return _mm_cvtss_f32(tfSimdSplat3_f32x4(value)); }
 
+static inline Tsimd_f32x4_t tfSimdSqrt_f32x4(Tsimd_f32x4_t a) { return _mm_sqrt_ps(a); }
+static inline Tsimd_f32x4_t tfSimdRcp_f32x4(Tsimd_f32x4_t a) { return _mm_rcp_ps(a); }
+
+static inline Tsimd_f32x4_t tfSimdSub_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_sub_ps(a, b); }
 static inline Tsimd_f32x4_t tfSimdAdd_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_add_ps(a, b); }
 static inline Tsimd_f32x4_t tfSimdMul_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_mul_ps(a, b); }
 static inline Tsimd_f32x4_t tfSimdDiv_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_div_ps(a, b); }
 static inline Tsimd_f32x4_t tfSimdAbs_f32x4(Tsimd_f32x4_t a) { 
-    const __m128 signMask = tfSimd_i32x4_To_f32x4(tfSimdSplat_i32x4(0x7FFFFFFF));
+    const __m128 signMask = tfSimd_i32x4_To_f32x4(tfSimdSplat_i32_i32x4(0x7FFFFFFF));
     return tfSimdAnd_f32x4(a, signMask);
 }
 static inline Tsimd_f32x4_t tfSimdMadd_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b, Tsimd_f32x4_t c) {
@@ -52,7 +69,7 @@ static inline Tsimd_f32x4_t tfSimdMadd_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b, T
 }
 
 static inline Tsimd_f32x4_t tfSimdNot_f32x4(Tsimd_f32x4_t value) {
-    return _mm_andnot_ps(value, tfSimd_i32x4_To_f32x4(tfSimdSplat_i32x4((int32_t)(0xFFFFFFFF))));
+    return _mm_andnot_ps(value, tfSimd_i32x4_To_f32x4(tfSimdSplat_i32_i32x4((int32_t)(0xFFFFFFFF))));
 }
 static inline Tsimd_f32x4_t tfSimdAnd_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_and_ps(arg1, arg2); }
 static inline Tsimd_f32x4_t tfSimdAndNot_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2) { return _mm_andnot_ps(arg1, arg2); }
@@ -87,38 +104,34 @@ static inline bool tfSimdCmpAllLtEq_f32x4(Tsimd_f32x4_t arg1, Tsimd_f32x4_t arg2
 
 // Tsimd_i32x4_t
 static inline Tsimd_i32x4_t tfSimdLoad_i32x4(int32_t x, int32_t y, int32_t z, int32_t w) { return _mm_set_epi32(w, z, y, x); }
-static inline Tsimd_i32x4_t tfSimdSplat_i32x4(int32_t value) { return _mm_set1_epi32(value); }
-static inline Tsimd_i32x4_t tfSimdSplat0_i32x4(Tsimd_i32x4_t value) { return _mm_shuffle_epi32(value, _MM_SHUFFLE(0, 0, 0, 0)); }
-static inline Tsimd_i32x4_t tfSimdSplat1_i32x4(Tsimd_i32x4_t value) { return _mm_shuffle_epi32(value, _MM_SHUFFLE(1, 1, 1, 1)); }
-static inline Tsimd_i32x4_t tfSimdSplat2_i32x4(Tsimd_i32x4_t value) { return _mm_shuffle_epi32(value, _MM_SHUFFLE(2, 2, 2, 2)); }
-static inline Tsimd_i32x4_t tfSimdSplat3_i32x4(Tsimd_i32x4_t value) { return _mm_shuffle_epi32(value, _MM_SHUFFLE(3, 3, 3, 3)); }
 
-static inline int32_t tfSimdSelect_i32x4(Tsimd_i32x4_t value, int index) {
+static inline Tsimd_i32x4_t tfSimdSplat_i32_i32x4(int value) { return _mm_set1_epi32(value); }
+static inline Tsimd_i32x4_t tfSimdSplat_i32x4_i32x4(Tsimd_i32x4_t value, uint index) {
     ASSERT(index < 4);
     switch(index) {
-        case 0: return tfSimdSelect0_i32x4(value);
-        case 1: return tfSimdSelect1_i32x4(value);
-        case 2: return tfSimdSelect2_i32x4(value);
-        case 3: return tfSimdSelect3_i32x4(value);
+        case 0:return _mm_shuffle_epi32(value, _MM_SHUFFLE(0, 0, 0, 0));
+        case 1:return _mm_shuffle_epi32(value, _MM_SHUFFLE(1, 1, 1, 1));
+        case 2:return _mm_shuffle_epi32(value, _MM_SHUFFLE(2, 2, 2, 2));
+        case 3:return _mm_shuffle_epi32(value, _MM_SHUFFLE(3, 3, 3, 3));
     }
     return {};
-
 }
-static inline int32_t tfSimdSelect0_i32x4(Tsimd_i32x4_t value) { return _mm_cvtsi128_si32(value); }
-static inline int32_t tfSimdSelect1_i32x4(Tsimd_i32x4_t value) { return _mm_cvtsi128_si32(tfSimdSplat1_i32x4(value)); };
-static inline int32_t tfSimdSelect2_i32x4(Tsimd_i32x4_t value) { return _mm_cvtsi128_si32(tfSimdSplat2_i32x4(value)); };
-static inline int32_t tfSimdSelect3_i32x4(Tsimd_i32x4_t value) { return _mm_cvtsi128_si32(tfSimdSplat3_i32x4(value)); };
+
+static inline int32_t tfSimdGet_i32x4(Tsimd_i32x4_t value, int index) {
+    ASSERT(index < 4);
+    return _mm_cvtsi128_si32(tfSimdSplat_i32x4_i32x4(value, index));
+}
 
 static inline Tsimd_i32x4_t tfSimd_f32x4_To_i32x4(Tsimd_f32x4_t a) { return _mm_castps_si128(a); }
 static inline Tsimd_f32x4_t tfSimd_i32x4_To_f32x4(Tsimd_i32x4_t a) { return _mm_castsi128_ps(a); }
 
-static inline Tsimd_f32x4_t tfSimdAdd_i32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_add_epi32(a, b); }
-static inline Tsimd_f32x4_t tfSimdMul_i32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_mul_epi32(a, b); }
-static inline Tsimd_f32x4_t tfSimdAbs_i32x4(Tsimd_f32x4_t a) { return _mm_abs_epi32(a); }
-static inline Tsimd_f32x4_t tfSimdMadd_i32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b, Tsimd_f32x4_t c) {
+static inline Tsimd_i32x4_t tfSimdAdd_i32x4(Tsimd_i32x4_t a, Tsimd_i32x4_t b) { return _mm_add_epi32(a, b); }
+static inline Tsimd_i32x4_t tfSimdMul_i32x4(Tsimd_i32x4_t a, Tsimd_i32x4_t b) { return _mm_mul_epi32(a, b); }
+static inline Tsimd_i32x4_t tfSimdAbs_i32x4(Tsimd_i32x4_t a) { return _mm_abs_epi32(a); }
+static inline Tsimd_i32x4_t tfSimdMadd_i32x4(Tsimd_i32x4_t a, Tsimd_i32x4_t b, Tsimd_i32x4_t c) {
     return tfSimdAdd_i32x4(tfSimdMul_i32x4(a, b), c);
 }
-static inline Tsimd_i32x4_t tfSimdNot_i32x4(Tsimd_i32x4_t value) { return _mm_andnot_si128(value, tfSimdSplat_i32x4(0xFFFFFFFF)); }
+static inline Tsimd_i32x4_t tfSimdNot_i32x4(Tsimd_i32x4_t value) { return _mm_andnot_si128(value, tfSimdSplat_i32_i32x4(0xFFFFFFFF)); }
 static inline Tsimd_i32x4_t tfSimdAnd_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_and_si128(arg1, arg2); }
 static inline Tsimd_i32x4_t tfSimdAndNot_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_andnot_si128(arg1, arg2); }
 static inline Tsimd_i32x4_t tfSimdOr_i32x4(Tsimd_i32x4_t arg1, Tsimd_i32x4_t arg2) { return _mm_or_si128(arg1, arg2); }

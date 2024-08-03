@@ -4,6 +4,7 @@
 
 #include "Forge/TF_Config.h"
 #include "Forge/TF_Types.h"
+#include <cmath>
 
 #if defined(TF_FEATURE_CPU_SSE) 
     #include <xmmintrin.h>
@@ -59,12 +60,7 @@
     typedef struct { int32_t v[2]; } Tsimd_i32x2_t;
 #endif
 
-// TODO: keep it simple only implement square matricies
-// everything is column major
-
-struct TSimdQuatFloat {
-  Tsimd_f32x4_t mValue; 
-};
+typedef Tsimd_f32x4_t Tsimd_quat_f32x4_t;
 
 struct Tsimd_f32x4x4_s {
     union {
@@ -78,7 +74,31 @@ struct Tsimd_f32x4x4_s {
     };
 };
 
+struct Tsimd_f32x4x3_s {
+    union {
+        struct {
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+            Tsimd_f32x4_t mCol2;
+        };
+        Tsimd_f32x4_t mCol[3];
+    };
+};
 
+struct Tsimd_f32x4x2_s {
+    union {
+        struct {
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+        };
+        Tsimd_f32x4_t mCol[2];
+    };
+};
+
+
+// deprecate anything past this 
+// -------------------------------------------------------
+//
 struct TSimdFloat4x1 {
     union
     {

@@ -20,27 +20,26 @@
 } while(false);
 
 #define LOG_FORMAT_SIMD_32x4f(input) \
-    "%.3f, %.3f, %.3f, %.3f", tfSimdSelect0_f32x4(input), tfSimdSelect1_f32x4(input), tfSimdSelect2_f32x4(input), tfSimdSelect3_f32x4(input)
+    "%.6f, %.6f, %.6f, %.6f", tfSimdGet_f32x4(input,0), tfSimdGet_f32x4(input,1), tfSimdGet_f32x4(input, 2), tfSimdGet_f32x4(input,3)
 #define LOG_FORMAT_SIMD_32x4i(input) \
-    "%d, %d, %d, %d", tfSimdSelect0_i32x4(input), tfSimdSelect1_i32x4(input), tfSimdSelect2_i32x4(input), tfSimdSelect3_i32x4(input)
+    "%d, %d, %d, %d", tfSimdGet_i32x4(input, 0), tfSimdGet_i32x4(input, 1), tfSimdGet_i32x4(input, 2), tfSimdGet_i32x4(input, 3)
 
-#define LOG_SIMD_32x4x4f(input, LOG, ...)                                                                                            \
-    LOG(__VA_ARGS__, "%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", tfSimdSelectIndex0_f32x4(input.mCol0), \
-        tfSimdSelectIndex1_f32x4(input.mCol1), tfSimdSelectIndex2_f32x4(input.mCol2), tfSimdSelectIndex3_f32x4(input.mCol3),            \
-        tfSimdSelectIndex0_f32x4(input.mCol0), tfSimdSelectIndex1_f32x4(input.mCol1), tfSimdSelectIndex2_f32x4(input.mCol2),            \
-        tfSimdSelectIndex3_f32x4(input.mCol3), tfSimdSelectIndex0_f32x4(input.mCol0), tfSimdSelectIndex1_f32x4(input.mCol1),            \
-        tfSimdSelectIndex2_f32x4(input.mCol2), tfSimdSelectIndex3_f32x4(input.mCol3), tfSimdSelectIndex0_f32x4(input.mCol0),            \
-        tfSimdSelectIndex1_f32x4(input.mCol1), tfSimdSelectIndex2_f32x4(input.mCol2), tfSimdSelectIndex3_f32x4(input.mCol3))
+#define LOG_FORMAT_SIMD_32x4x4f(input)                                                                                                        \
+    "\n %.6f, %.6f, %.6f, %.6f \n %.6f, %.6f, %.6f, %.6f, \n %.6f %.6f, %.6f, %.6f \n %.6f, %.6f, %.6f, %.6f",                                \
+        tfSimdGet_f32x4(input.mCol0, 0), tfSimdGet_f32x4(input.mCol1, 0), tfSimdGet_f32x4(input.mCol2, 0), tfSimdGet_f32x4(input.mCol3, 0),   \
+        tfSimdGet_f32x4(input.mCol0, 1), tfSimdGet_f32x4(input.mCol1, 1), tfSimdGet_f32x4(input.mCol2, 1), tfSimdGet_f32x4(input.mCol3, 1),   \
+        tfSimdGet_f32x4(input.mCol0, 2), tfSimdGet_f32x4(input.mCol1, 2), tfSimdGet_f32x4(input.mCol2, 2), tfSimdGet_f32x4(input.mCol3, 2),   \
+        tfSimdGet_f32x4(input.mCol0, 3), tfSimdGet_f32x4(input.mCol1, 3), tfSimdGet_f32x4(input.mCol2, 3), tfSimdGet_f32x4(input.mCol3, 3)      
 
 static inline void debugPrintSimd4F(Tsimd_f32x4_t input) {
- // DLOGF(LogLevel::eDEBUG, "%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
+ // DLOGF(LogLevel::eDEBUG, "%.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f",
  //         tfSimdSelectIndex0_f32x4(input),
  //         tfSimdSelectIndex1_f32x4(input),
  //         tfSimdSelectIndex2_f32x4(input),
  //         tfSimdSelectIndex3_f32x4(input));
 }
 static inline void debugPrintSimd4x4F(struct Tsimd_f32x4x4_s  input) {
-   // DLOGF(LogLevel::eDEBUG,"%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
+   // DLOGF(LogLevel::eDEBUG,"%.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f",
    //       tfSimdSelectIndex0_f32x4(input.mCol0),
    //       tfSimdSelectIndex1_f32x4(input.mCol1),
    //       tfSimdSelectIndex2_f32x4(input.mCol2),
