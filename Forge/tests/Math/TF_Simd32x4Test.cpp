@@ -163,21 +163,21 @@ UTEST(Tsimd_f32x4_t, tfSimdCmpGt_f32x4)
 UTEST(Tsimd_f32x4_t, tfSimdReplace_f32_f32x4)
 {
     Tsimd_f32x4_t input = tfSimdLoad_f32x4(0, -1, 1, 0);
-    input = tfSimdReplace_f32_f32x4(0, input, 125.f);
+    input = tfSimdReplace_f32_f32x4(input,0, 125.f);
     DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
     EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(125.f, -1, 1, 0), DEFAULT_EPSILON));
 
-    input = tfSimdReplace_f32_f32x4(1, input, 250.f);
+    input = tfSimdReplace_f32_f32x4( input, 1, 250.f);
     DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
     EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(125.f, 250.f, 1, 0), DEFAULT_EPSILON));
 
     // Test case 3: Replace element at index 2
-    input = tfSimdReplace_f32_f32x4(2, input, 375.f);
+    input = tfSimdReplace_f32_f32x4( input,2, 375.f);
     DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
     EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(125.f, 250.f, 375.f, 0), DEFAULT_EPSILON));
 
     // Test case 4: Replace element at index 3
-    input = tfSimdReplace_f32_f32x4(3, input, 500.f);
+    input = tfSimdReplace_f32_f32x4( input,3, 500.f);
     DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
     EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(125.f, 250.f, 375.f, 500.f), DEFAULT_EPSILON));
 
@@ -186,19 +186,19 @@ UTEST(Tsimd_f32x4_t, tfSimdReplace_f32_f32x4)
 UTEST(Tsimd_f32x4_t, tfSimdReplace_f32x4_f32x4)
 {
     Tsimd_f32x4_t input = tfSimdLoad_f32x4(0, -1, 1, 0);
-    input = tfSimdReplace_f32x4_f32x4(0, input, tfSimdLoad_f32x4(100.0f, 123.52f, 145.5f, 21.5f));
+    input = tfSimdReplace_f32x4_f32x4( input,0, tfSimdLoad_f32x4(100.0f, 123.52f, 145.5f, 21.5f));
     DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
     EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(100.f, -1, 1.0, 0), DEFAULT_EPSILON));
 
-    input = tfSimdReplace_f32x4_f32x4(1, input, tfSimdLoad_f32x4(200.0f, 223.52f, 245.5f, 221.5f));
+    input = tfSimdReplace_f32x4_f32x4( input,1, tfSimdLoad_f32x4(200.0f, 223.52f, 245.5f, 221.5f));
     DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
     EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(100.f, 223.52f, 1.0, 0), DEFAULT_EPSILON));
 
-    input = tfSimdReplace_f32x4_f32x4(2, input, tfSimdLoad_f32x4(200.0f, 223.52f, 245.5f, 221.5f));
+    input = tfSimdReplace_f32x4_f32x4( input, 2,tfSimdLoad_f32x4(200.0f, 223.52f, 245.5f, 221.5f));
     DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
     EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(100.f, 223.52f, 245.5f, 0), DEFAULT_EPSILON));
 
-    input = tfSimdReplace_f32x4_f32x4(3, input, tfSimdLoad_f32x4(300.0f, 323.52f, 345.5f, 321.5f));
+    input = tfSimdReplace_f32x4_f32x4( input,3, tfSimdLoad_f32x4(300.0f, 323.52f, 345.5f, 321.5f));
     DLOGF(LogLevel::eDEBUG, LOG_FORMAT_SIMD_32x4f(input));
     EXPECT_TRUE(tfSimdIsClose_f32x4(input, tfSimdLoad_f32x4(100.f, 223.52f, 245.5f, 321.5f), DEFAULT_EPSILON));
 }

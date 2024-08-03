@@ -38,14 +38,14 @@ static inline struct Tsimd_f32x4x4_s tfSimdLoadOrthographicLH_f32x4x4(float left
 	diff = _mm_sub_ps(rtf, lbn);
 	inv_diff = tfSimdRcp_f32x4(diff);
 	neg_inv_diff = _mm_sub_ps(_mm_setzero_ps(),inv_diff);
-    sum = _mm_add_ps(rtf, tfSimdReplace_f32x4_f32x4(2, lbn, _mm_sub_ps(n, f)));
-	diagonal = _mm_add_ps(inv_diff, tfSimdReplace_f32x4_f32x4(2, inv_diff, tfSimdZero_f32x4()));
+    sum = _mm_add_ps(rtf, tfSimdReplace_f32x4_f32x4(lbn,2,  _mm_sub_ps(n, f)));
+	diagonal = _mm_add_ps(inv_diff, tfSimdReplace_f32x4_f32x4( inv_diff,2, tfSimdZero_f32x4()));
 	column = _mm_mul_ps(sum, neg_inv_diff);
     return {
-        tfSimdReplace_f32x4_f32x4(0, tfSimdZero_f32x4(), diagonal),
-        tfSimdReplace_f32x4_f32x4(1, tfSimdZero_f32x4(), diagonal),
-        tfSimdReplace_f32x4_f32x4(2, tfSimdZero_f32x4(), diagonal),
-        tfSimdReplace_f32x4_f32x4(3, column, tfSimdSplat_f32_f32x4(1.0f)),
+        tfSimdReplace_f32x4_f32x4( tfSimdZero_f32x4(),0, diagonal),
+        tfSimdReplace_f32x4_f32x4( tfSimdZero_f32x4(),1, diagonal),
+        tfSimdReplace_f32x4_f32x4( tfSimdZero_f32x4(),2, diagonal),
+        tfSimdReplace_f32x4_f32x4( column,3, tfSimdSplat_f32_f32x4(1.0f)),
     };
 }
 

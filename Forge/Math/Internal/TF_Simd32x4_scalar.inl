@@ -4,11 +4,11 @@
 #include "../TF_Simd32x4.h"
 #endif
 
-static inline Tsimd_f32x4_t tfSimdReplace_f32_f32x4(int index, Tsimd_f32x4_t a, float b) {
+static inline Tsimd_f32x4_t tfSimdReplace_f32_f32x4(Tsimd_f32x4_t a, int index, float b) {
     a.v[index] = b;
     return a;
 }
-static inline Tsimd_f32x4_t tfSimdReplace_f32x4_f32x4(int index, Tsimd_f32x4_t a, Tsimd_f32x4_t b) {
+static inline Tsimd_f32x4_t tfSimdReplace_f32x4_f32x4( Tsimd_f32x4_t a,int index, Tsimd_f32x4_t b) {
     ASSERT(index < 4);
     a.v[index] = b.v[index];
     return a;
@@ -20,6 +20,24 @@ static inline Tsimd_f32x4_t tfSimdRcp_f32x4(Tsimd_f32x4_t a) { return  {
     1.0f/a.v[2],
     1.0f/a.v[3]
 }; }
+
+static inline float tfSimdMaxElem_f32x4_f32(Tsimd_f32x4_t a) { return fmaxf(fmaxf(a.v[0], a.v[1]), fmaxf(a.v[2], a.v[3])); }
+static inline float tfSimdMinElem_f32x4_f32(Tsimd_f32x4_t a) { return fminf(fminf(a.v[0], a.v[1]), fminf(a.v[2], a.v[3])); }
+
+static inline Tsimd_f32x4_t tfSimdMaxElem_f32x4(Tsimd_f32x4_t a) {
+    const float result = tfSimdMaxElem_f32x4_f32(a);
+    return { result, result, result, result };
+}
+static inline Tsimd_f32x4_t tfSimdMaxPerElem_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) {
+    return { fmaxf(a.v[0], b.v[0]), fmaxf(a.v[1], b.v[1]), fmaxf(a.v[2], b.v[2]), fmaxf(a.v[3], b.v[3]) };
+}
+static inline Tsimd_f32x4_t tfSimdMinElem_f32x4(Tsimd_f32x4_t a) {
+    const float result = tfSimdMinElem_f32x4_f32(a);
+    return { result, result, result, result };
+}
+static inline Tsimd_f32x4_t tfSimdMinPerElem_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) {
+    return { fminf(a.v[0], b.v[0]), fminf(a.v[1], b.v[1]), fminf(a.v[2], b.v[2]), fminf(a.v[3], b.v[3]) };
+}
 
 static inline Tsimd_f32x4_t tfSimdSqrt_f32x4(Tsimd_f32x4_t a) { return { sqrtf(a.v[0]), sqrtf(a.v[1]), sqrtf(a.v[2]), sqrtf(a.v[3]) }; }
 

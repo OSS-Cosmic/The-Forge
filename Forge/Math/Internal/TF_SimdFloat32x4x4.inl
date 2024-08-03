@@ -28,16 +28,6 @@ static inline struct Tsimd_f32x4x4_s tfSimdLoadIdentity_f32x4x4() {
   );
 }
 
-static inline struct Tsimd_f32x4x4_s tfSimdLoadTranslation_f32x3(Tsimd_f32x3_t translation) {
-  struct Tsimd_f32x4x4_s result = tfSimdLoadIdentity_f32x4x4();
-  ASSERT(false);
-  //result.mCol3 = tfSimdReplace_f32x4_f32x4(0, result.mCol3, translation);
-  //result.mCol3 = tfSimdReplace_f32x4_f32x4(1, result.mCol3, translation);
-  //result.mCol3 = tfSimdReplace_f32x4_f32x4(2, result.mCol3, translation);
-  return result;
-}
-
-
 static inline bool tfSimdIsClose_f32x4x4(struct Tsimd_f32x4x4_s arg0,struct Tsimd_f32x4x4_s arg1, float epsilon) {
   return 
   tfSimdIsClose_f32x4(arg0.mCol0, arg1.mCol0, epsilon ) &&
@@ -58,7 +48,7 @@ static inline Tsimd_f32x4_t tfSimdGetColumn_f32x4x4(struct Tsimd_f32x4x4_s input
 
 static inline struct Tsimd_f32x4x4_s tfSimdReplace_f32x4x4(struct Tsimd_f32x4x4_s input, float value, uint column, uint row) {
     ASSERT(column < 4);
-    input.mCol[column] = tfSimdReplace_f32_f32x4(input.mCol[column], row,  value);
+    input.mCol[column] = tfSimdReplace_f32_f32x4(row, input.mCol[column], value);
     return input;
 }
 
@@ -160,8 +150,8 @@ static inline struct Tsimd_f32x4x4_s tfSimdLoadOrthographicRH_f32x4x4(float left
 
 static inline struct Tsimd_f32x4x4_s tfSimdLoadOrthographicLH_ReverseZ_f32x4x4(float left, float right, float bottom, float top, float zNear, float zFar) {
     struct Tsimd_f32x4x4_s result = tfSimdLoadOrthographicLH_f32x4x4(left, right, bottom, top, zNear, zFar);
-    result.mCol2 = tfSimdReplace_f32_f32x4(result.mCol2, 2, -tfSimdGet_f32x4(result.mCol2,2));
-    result.mCol3 = tfSimdReplace_f32_f32x4(result.mCol3, 2, -tfSimdGet_f32x4(result.mCol3,2));
+    result.mCol2 = tfSimdReplace_f32_f32x4(result.mCol2,2, -tfSimdGet_f32x4(result.mCol2,2));
+    result.mCol3 = tfSimdReplace_f32_f32x4(result.mCol3,2, -tfSimdGet_f32x4(result.mCol3,2));
     return result;
 }
 

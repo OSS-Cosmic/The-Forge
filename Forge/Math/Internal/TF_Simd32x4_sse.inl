@@ -31,16 +31,31 @@ static inline Tsimd_f32x4_t tfSimdLength_f32x4(Tsimd_f32x4_t a) { return tfSimdS
 static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_cvtss_f32(tfSimdDot_f32x4(a, b)); }
 static inline float tfSimdLength_f32x4_f32(Tsimd_f32x4_t a) { return _mm_cvtss_f32(tfSimdLength_f32x4(a)); }
 
+static inline float tfSimdMaxElem_f32x4_f32(Tsimd_f32x4_t a) { return _mm_cvtss_f32(tfSimdMaxElem_f32x4(a)); }
+static inline float tfSimdMinElem_f32x4_f32(Tsimd_f32x4_t a) { return _mm_cvtss_f32(tfSimdMinElem_f32x4(a)); }
+
+static inline Tsimd_f32x4_t tfSimdMaxElem_f32x4(Tsimd_f32x4_t a) {
+    return _mm_max_ps(_mm_max_ps(tfSimdSplat_f32x4_f32x4(a, 0), tfSimdSplat_f32x4_f32x4(a, 1)),
+                      _mm_max_ps(tfSimdSplat_f32x4_f32x4(a, 2), tfSimdSplat_f32x4_f32x4(a, 3)));
+}
+
+static inline Tsimd_f32x4_t tfSimdMinElem_f32x4(Tsimd_f32x4_t a) {
+    return _mm_min_ps(_mm_min_ps(tfSimdSplat_f32x4_f32x4(a, 0), tfSimdSplat_f32x4_f32x4(a, 1)),
+                      _mm_min_ps(tfSimdSplat_f32x4_f32x4(a, 2), tfSimdSplat_f32x4_f32x4(a, 3)));
+}
+
+static inline Tsimd_f32x4_t tfSimdMaxPerElem_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_max_ps(a, b); }
+static inline Tsimd_f32x4_t tfSimdMinPerElem_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_min_ps(a, b); }
 
 static inline float tfSimdGet_f32x4(Tsimd_f32x4_t value, int index) {
     ASSERT(index < 4);
     return _mm_cvtss_f32(tfSimdSplat_f32x4_f32x4(value, index));
 }
 
-static inline Tsimd_f32x4_t tfSimdReplace_f32_f32x4(int index, Tsimd_f32x4_t a, float b) {
-    return tfSimdReplace_f32x4_f32x4(index, a, tfSimdSplat_f32_f32x4(b));
+static inline Tsimd_f32x4_t tfSimdReplace_f32_f32x4(Tsimd_f32x4_t a,int index, float b) {
+    return tfSimdReplace_f32x4_f32x4( a,index, tfSimdSplat_f32_f32x4(b));
 }
-static inline Tsimd_f32x4_t tfSimdReplace_f32x4_f32x4(int index, Tsimd_f32x4_t a, Tsimd_f32x4_t b) {
+static inline Tsimd_f32x4_t tfSimdReplace_f32x4_f32x4(Tsimd_f32x4_t a,int index,  Tsimd_f32x4_t b) {
     ASSERT(index < 4);
     switch(index) {
         case 0: return _mm_blend_ps(a, b, 0b0001);
