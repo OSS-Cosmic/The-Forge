@@ -1,4 +1,6 @@
 
+#include "Forge/Math/TF_Simd32x4.h"
+
 #define DEFAULT_EPSILON 1e-3f
 #define EXPECT_NEAR_VECTOR4(a, b, epsilon) do { \
   Vector4 __a = a; \
@@ -16,4 +18,47 @@
   EXPECT_EQ(__a.getZ(), __b.getZ()); \
   EXPECT_EQ(__a.getW(), __b.getW()); \
 } while(false);
+
+#define LOG_FORMAT_SIMD_32x4f(input) \
+    "%.6f, %.6f, %.6f, %.6f", tfSimdGet_f32x4(input,0), tfSimdGet_f32x4(input,1), tfSimdGet_f32x4(input, 2), tfSimdGet_f32x4(input,3)
+#define LOG_FORMAT_SIMD_32x4i(input) \
+    "%d, %d, %d, %d", tfSimdGet_i32x4(input, 0), tfSimdGet_i32x4(input, 1), tfSimdGet_i32x4(input, 2), tfSimdGet_i32x4(input, 3)
+
+#define LOG_FORMAT_SIMD_32x4x4f(input)                                                                                                        \
+    "\n %.6f, %.6f, %.6f, %.6f \n %.6f, %.6f, %.6f, %.6f, \n %.6f %.6f, %.6f, %.6f \n %.6f, %.6f, %.6f, %.6f",                                \
+        tfSimdGet_f32x4(input.mCol0, 0), tfSimdGet_f32x4(input.mCol1, 0), tfSimdGet_f32x4(input.mCol2, 0), tfSimdGet_f32x4(input.mCol3, 0),   \
+        tfSimdGet_f32x4(input.mCol0, 1), tfSimdGet_f32x4(input.mCol1, 1), tfSimdGet_f32x4(input.mCol2, 1), tfSimdGet_f32x4(input.mCol3, 1),   \
+        tfSimdGet_f32x4(input.mCol0, 2), tfSimdGet_f32x4(input.mCol1, 2), tfSimdGet_f32x4(input.mCol2, 2), tfSimdGet_f32x4(input.mCol3, 2),   \
+        tfSimdGet_f32x4(input.mCol0, 3), tfSimdGet_f32x4(input.mCol1, 3), tfSimdGet_f32x4(input.mCol2, 3), tfSimdGet_f32x4(input.mCol3, 3)      
+
+static inline void debugPrintSimd4F(Tsimd_f32x4_t input) {
+ // DLOGF(LogLevel::eDEBUG, "%.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f",
+ //         tfSimdSelectIndex0_f32x4(input),
+ //         tfSimdSelectIndex1_f32x4(input),
+ //         tfSimdSelectIndex2_f32x4(input),
+ //         tfSimdSelectIndex3_f32x4(input));
+}
+static inline void debugPrintSimd4x4F(struct Tsimd_f32x4x4_s  input) {
+   // DLOGF(LogLevel::eDEBUG,"%.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f",
+   //       tfSimdSelectIndex0_f32x4(input.mCol0),
+   //       tfSimdSelectIndex1_f32x4(input.mCol1),
+   //       tfSimdSelectIndex2_f32x4(input.mCol2),
+   //       tfSimdSelectIndex3_f32x4(input.mCol3),
+
+   //       tfSimdSelectIndex0_f32x4(input.mCol0),
+   //       tfSimdSelectIndex1_f32x4(input.mCol1),
+   //       tfSimdSelectIndex2_f32x4(input.mCol2),
+   //       tfSimdSelectIndex3_f32x4(input.mCol3),
+   //       
+   //       tfSimdSelectIndex0_f32x4(input.mCol0),
+   //       tfSimdSelectIndex1_f32x4(input.mCol1),
+   //       tfSimdSelectIndex2_f32x4(input.mCol2),
+   //       tfSimdSelectIndex3_f32x4(input.mCol3),
+   //       
+   //       tfSimdSelectIndex0_f32x4(input.mCol0),
+   //       tfSimdSelectIndex1_f32x4(input.mCol1),
+   //       tfSimdSelectIndex2_f32x4(input.mCol2),
+   //       tfSimdSelectIndex3_f32x4(input.mCol3)
+   // );
+}
 

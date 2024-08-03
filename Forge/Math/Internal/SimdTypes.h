@@ -4,6 +4,7 @@
 
 #include "Forge/TF_Config.h"
 #include "Forge/TF_Types.h"
+#include <cmath>
 
 #if defined(TF_FEATURE_CPU_SSE) 
     #include <xmmintrin.h>
@@ -17,14 +18,14 @@
     #define TF_SIMDI_MAX 0xFFFFFFFF
     #define TF_SIMDF_MAX 0xFFFFFFFF
 
-    typedef __m128 TSimdf32x4;
-    typedef __m128i TSimdi32x4;
+    typedef __m128 Tsimd_f32x4_t;
+    typedef __m128i Tsimd_i32x4_t;
 
-    typedef __m128 TSimdf32x3;
-    typedef __m128i TSimdi32x3;
+    typedef __m128 Tsimd_f32x3_t;
+    typedef __m128i Tsimd_i32x3_t;
 
-    typedef __m128 TSimdf32x2;
-    typedef __m128i TSimdi32x2;
+    typedef __m128 Tsimd_f32x2_t;
+    typedef __m128i Tsimd_i32x2_t;
 #elif defined(TF_FEATURE_CPU_NEON)
     #include <arm_neon.h>
     
@@ -33,14 +34,14 @@
     
     #define TF_SIMDI_MAX 0xFFFFFFFF
     
-    typedef float32x4_t TSimdf32x4;
-    typedef int32x4_t TSimdi32x4;
+    typedef float32x4_t Tsimd_f32x4_t;
+    typedef int32x4_t Tsimd_i32x4_t;
 
-    typedef float32x4_t TSimdf32x3;
-    typedef int32x4_t TSimdi32x3;
+    typedef float32x4_t Tsimd_f32x3_t;
+    typedef int32x4_t Tsimd_i32x3_t;
 
-    typedef float32x2_t TSimdf32x2;
-    typedef int32x2_t TSimdi32x2;
+    typedef float32x2_t Tsimd_f32x2_t;
+    typedef int32x2_t Tsimd_i32x2_t;
 #elif defined(TF_FEATURE_CPU_SCALAR)
     #include <cmath>
     
@@ -49,41 +50,171 @@
     
     #define TF_SIMDI_MAX 0xFFFFFFFF
     
-    typedef struct { float   v[4]; } TSimdf32x4;
-    typedef struct { int32_t v[4]; } TSimdi32x4;
+    typedef struct { float   v[4]; } Tsimd_f32x4_t;
+    typedef struct { int32_t v[4]; } Tsimd_i32x4_t;
 
-    typedef struct { float   v[3]; } TSimdf32x3;
-    typedef struct { int32_t v[3]; } TSimdi32x3;
+    typedef struct { float   v[3]; } Tsimd_f32x3_t;
+    typedef struct { int32_t v[3]; } Tsimd_i32x3_t;
     
-    typedef struct { float   v[2]; } TSimdf32x2;
-    typedef struct { int32_t v[2]; } TSimdi32x2;
+    typedef struct { float   v[2]; } Tsimd_f32x2_t;
+    typedef struct { int32_t v[2]; } Tsimd_i32x2_t;
 #endif
 
-struct simd_float4
-{
-  TSimdf32x4 mCol0; 
+typedef Tsimd_f32x4_t Tsimd_quat_f32x4_t;
+
+struct Tsimd_f32x4x4_s {
+    union {
+        struct {
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+            Tsimd_f32x4_t mCol2;
+            Tsimd_f32x4_t mCol3;
+        };
+        Tsimd_f32x4_t mCol[4];
+    };
 };
 
-struct simd_float4x2
-{
-  TSimdf32x4 mCol0; 
-  TSimdf32x4 mCol1; 
+struct Tsimd_f32x4x3_s {
+    union {
+        struct {
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+            Tsimd_f32x4_t mCol2;
+        };
+        Tsimd_f32x4_t mCol[3];
+    };
 };
 
-struct simd_float4x3
-{
-  TSimdf32x4 mCol0; 
-  TSimdf32x4 mCol1; 
-  TSimdf32x4 mCol2; 
+struct Tsimd_f32x4x2_s {
+    union {
+        struct {
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+        };
+        Tsimd_f32x4_t mCol[2];
+    };
 };
 
-struct simd_float4x4
-{
-  TSimdf32x4 mCol0; 
-  TSimdf32x4 mCol1; 
-  TSimdf32x4 mCol2; 
-  TSimdf32x4 mCol3; 
+
+// deprecate anything past this 
+// -------------------------------------------------------
+//
+struct TSimdFloat4x1 {
+    union
+    {
+        struct
+        {
+            Tsimd_f32x4_t mCol0;
+        };
+        Tsimd_f32x4_t mCol[1];
+    };
 };
+
+struct TSimdFloat4x2
+{
+    union
+    {
+        struct
+        {
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+        };
+        Tsimd_f32x4_t mCol[2];
+    };
+};
+
+struct TSimdFloat4x3 {
+  union {
+    struct {
+      Tsimd_f32x4_t mCol0; 
+      Tsimd_f32x4_t mCol1; 
+      Tsimd_f32x4_t mCol2; 
+    };
+    Tsimd_f32x4_t mCol[3]; 
+  };
+};
+
+struct TSimdFloat4x4
+{
+    union
+    {
+        struct
+        {
+            Tsimd_f32x4_t mCol0;
+            Tsimd_f32x4_t mCol1;
+            Tsimd_f32x4_t mCol2;
+            Tsimd_f32x4_t mCol3;
+        };
+        Tsimd_f32x4_t mCol[4];
+    };
+};
+
+struct TSimdFloat3
+{
+  Tsimd_f32x3_t mRow; 
+};
+
+struct TSimdFloat3x1 {
+    union {
+        struct {
+            Tsimd_f32x3_t mCol0;
+        };
+        Tsimd_f32x3_t mCol[1];
+    };
+};
+
+struct TSimdFloat3x2
+{
+    union
+    {
+        struct
+        {
+            Tsimd_f32x3_t mCol0;
+            Tsimd_f32x3_t mCol1;
+        };
+        Tsimd_f32x3_t mCol[2];
+    };
+};
+
+struct TSimdFloat3x3
+{
+    union
+    {
+        struct
+        {
+            Tsimd_f32x3_t mCol0;
+            Tsimd_f32x3_t mCol1;
+            Tsimd_f32x3_t mCol2;
+        };
+        Tsimd_f32x3_t mCol[3];
+    };
+};
+
+struct TSimdFloat2 {
+  Tsimd_f32x2_t mRow; 
+};
+
+struct TSimdFloat2x1
+{
+    union {
+        struct {
+          Tsimd_f32x2_t mCol0; 
+        };
+        Tsimd_f32x2_t mCol[1];
+    };
+};
+
+struct TSimdFloat2x2
+{
+    union {
+        struct {
+            Tsimd_f32x2_t mCol0;
+            Tsimd_f32x2_t mCol1;
+        };
+        Tsimd_f32x2_t mCol[2];
+    };
+};
+
 
 
 #endif

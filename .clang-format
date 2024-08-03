@@ -30,7 +30,17 @@ BreakAfterJavaFieldAnnotations: false
 #BreakArrays:     true
 BreakBeforeBinaryOperators: None
 BreakBeforeConceptDeclarations: true
-BreakBeforeBraces: Allman
+BreakBeforeBraces: Attach
+BraceWrapping:
+    AfterClass: true
+    AfterControlStatement: true
+    AfterEnum: true
+    AfterFunction: true
+    AfterNamespace: true
+    BeforeLambdaBody: true
+    AfterStruct: true
+    BeforeElse: true
+    SplitEmptyFunction: true
 #BreakBeforeInlineASMColon: OnlyMultiline
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: AfterColon
@@ -169,4 +179,3 @@ SpacesInSquareBrackets: false
 Standard:        Latest
 TabWidth:        4
 UseTab:          Never
-...

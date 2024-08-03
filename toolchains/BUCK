@@ -55,7 +55,7 @@ cxx_tools_info_toolchain(
         "config//os:linux": select({
           "tf_platform//build:debug": [
             "-g",
-            "-O1"
+            "-O0"
           ],
           "tf_platform//build:release": [
              "-O2",

@@ -238,6 +238,7 @@ cxx_library(
           "Math/**/*.hpp",
           "Math/*.h",
           "Math/**/*.h",
+          "Math/**/*.inl",
 
           "Graphics/*.h",
           "Graphics/**/*.h",
