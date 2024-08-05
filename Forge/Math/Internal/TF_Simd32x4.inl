@@ -20,10 +20,9 @@ static Tsimd_f32x4_t tfNormWithLength_f32x4(Tsimd_f32x4_t input, float* outLengt
         input.v[3] / len,
     };
 #else
-  Tsimd_f32x4_t len = tfSimdLength_f32x4(input);
-  if(outLength) 
-    (*outLength) = tfSimdGet_f32x4(len, 0);
-  return tfSimdDiv_f32x4(input, len);
+    Tsimd_f32x4_t len = tfSimdLength_f32x4(input);
+    if (outLength)
+        (*outLength) = tfSimdGet_f32x4(len, 0);
+    return tfSimdDiv_f32x4(input, len);
 #endif
 }
-

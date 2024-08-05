@@ -60,8 +60,6 @@
     typedef struct { int32_t v[2]; } Tsimd_i32x2_t;
 #endif
 
-typedef Tsimd_f32x4_t Tsimd_quat_f32x4_t;
-
 struct Tsimd_f32x4x4_s {
     union {
         struct {

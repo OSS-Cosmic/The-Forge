@@ -7,7 +7,7 @@
 
 struct AffineTransform {
   Tsimd_f32x3_t translation; 
-  Tsimd_quat_f32x4_t rotation;
+  Tsimd_f32x4_t rotation;
   Tsimd_f32x3_t scale;
 };
 

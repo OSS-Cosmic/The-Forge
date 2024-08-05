@@ -26,10 +26,10 @@ static inline Tsimd_f32x4_t tfSimdDot_f32x4(Tsimd_f32x4_t a, Tsimd_f32x4_t b) {
     Tsimd_f32x4_t tmp = _mm_hadd_ps(x2, x2);
     return _mm_hadd_ps(tmp, tmp);
 }
-
 static inline Tsimd_f32x4_t tfSimdLength_f32x4(Tsimd_f32x4_t a) { return tfSimdSqrt_f32x4(tfSimdDot_f32x4(a, a)); }
 static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a, Tsimd_f32x4_t b) { return _mm_cvtss_f32(tfSimdDot_f32x4(a, b)); }
 static inline float tfSimdLength_f32x4_f32(Tsimd_f32x4_t a) { return _mm_cvtss_f32(tfSimdLength_f32x4(a)); }
+static inline float tfSimdLengthSqr_f32x4_f32(Tsimd_f32x4_t a) {return _mm_cvtss_f32(tfSimdDot_f32x4(a, a));}
 
 static inline float tfSimdMaxElem_f32x4_f32(Tsimd_f32x4_t a) { return _mm_cvtss_f32(tfSimdMaxElem_f32x4(a)); }
 static inline float tfSimdMinElem_f32x4_f32(Tsimd_f32x4_t a) { return _mm_cvtss_f32(tfSimdMinElem_f32x4(a)); }

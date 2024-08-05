@@ -160,6 +160,44 @@ UTEST(Tsimd_f32x4_t, tfSimdCmpGt_f32x4)
   }
 }
 
+
+UTEST(Tsimd_f32x4_t, tfSimdMaxElem_f32x4)
+{
+    Tsimd_f32x4_t value = tfSimdLoad_f32x4(1.0f, 2.0f, 3.0f, 4.0f);
+    EXPECT_TRUE(tfSimdIsClose_f32x4(tfSimdMaxElem_f32x4(value), tfSimdLoad_f32x4(4.0f,4.0f,4.0f,4.f), DEFAULT_EPSILON));
+}
+
+
+UTEST(Tsimd_f32x4_t, tfSimdMaxElem_f32x4_f32)
+{
+    Tsimd_f32x4_t value = tfSimdLoad_f32x4(1.0f, 2.0f, 3.0f, 4.0f);
+    float maxElem = tfSimdMaxElem_f32x4_f32(value);
+    EXPECT_EQ(maxElem, 4.0f);
+
+    value = tfSimdLoad_f32x4(-1.0f, -2.0f, -3.0f, -4.0f);
+    maxElem = tfSimdMaxElem_f32x4_f32(value);
+    EXPECT_EQ(maxElem, -1.0f);
+
+    value = tfSimdLoad_f32x4(0.0f, 0.0f, 0.0f, 0.0f);
+    maxElem = tfSimdMaxElem_f32x4_f32(value);
+    EXPECT_EQ(maxElem, 0.0f);
+}
+
+UTEST(Tsimd_f32x4_t, tfSimdMinElem_f32x4_f32)
+{
+    Tsimd_f32x4_t value = tfSimdLoad_f32x4(1.0f, 2.0f, 3.0f, 4.0f);
+    float minElem = tfSimdMinElem_f32x4_f32(value);
+    EXPECT_EQ(minElem, 1.0f);
+
+    value = tfSimdLoad_f32x4(-1.0f, -2.0f, -3.0f, -4.0f);
+    minElem = tfSimdMinElem_f32x4_f32(value);
+    EXPECT_EQ(minElem, -4.0f);
+
+    value = tfSimdLoad_f32x4(0.0f, 0.0f, 0.0f, 0.0f);
+    minElem = tfSimdMinElem_f32x4_f32(value);
+    EXPECT_EQ(minElem, 0.0f);
+}
+
 UTEST(Tsimd_f32x4_t, tfSimdReplace_f32_f32x4)
 {
     Tsimd_f32x4_t input = tfSimdLoad_f32x4(0, -1, 1, 0);
@@ -821,9 +859,7 @@ UTEST(Tsimd_f32x4_t, tfSimdDot_f32x4)
     Tsimd_f32x4_t a = tfSimdLoad_f32x4(1.0f, 2.0f, 3.0f, 4.0f);
     Tsimd_f32x4_t b = tfSimdLoad_f32x4(5.0f, 6.0f, 7.0f, 8.0f);
     Tsimd_f32x4_t result = tfSimdDot_f32x4(a, b);
-    Tsimd_f32x4_t expected = tfSimdLoad_f32x4(70.0f, 70.0f, 70.0f, 70.0f); // 1*5 + 2*6 + 3*7 + 4*8 = 70
-
-    EXPECT_TRUE(tfSimdCmpAllEq_f32x4(result, expected));
+    EXPECT_TRUE(tfSimdCmpAllEq_f32x4(result, tfSimdLoad_f32x4(70.0f, 70.0f, 70.0f, 70.0f)));
 }
 
 UTEST(Tsimd_f32x4_t, tfSimdDot_f32x4_f32)
@@ -831,10 +867,39 @@ UTEST(Tsimd_f32x4_t, tfSimdDot_f32x4_f32)
     Tsimd_f32x4_t a = tfSimdLoad_f32x4(1.0f, 2.0f, 3.0f, 4.0f);
     Tsimd_f32x4_t b = tfSimdLoad_f32x4(5.0f, 6.0f, 7.0f, 8.0f);
     float result = tfSimdDot_f32x4_f32(a, b);
-    float expected = 70.0f; // 1*5 + 2*6 + 3*7 + 4*8 = 70
-
-    EXPECT_EQ(result, expected);
+    EXPECT_EQ(result, 70.0f);
 }
+
+UTEST(Tsimd_f32x4_t, tfSimdLength_f32x4_f32)
+{
+    Tsimd_f32x4_t value = tfSimdLoad_f32x4(1.0f, 2.0f, 2.0f, 2.0f);
+    float length = tfSimdLength_f32x4_f32(value);
+    EXPECT_NEAR(length, 3.6055f, DEFAULT_EPSILON);
+
+    value = tfSimdLoad_f32x4(0.0f, 0.0f, 0.0f, 0.0f);
+    length = tfSimdLength_f32x4_f32(value);
+    EXPECT_NEAR(length, 0.0f, DEFAULT_EPSILON);
+
+    value = tfSimdLoad_f32x4(3.0f, 4.0f, 0.0f, 0.0f);
+    length = tfSimdLength_f32x4_f32(value);
+    EXPECT_NEAR(length, 5.0f, DEFAULT_EPSILON);
+}
+
+UTEST(Tsimd_f32x4_t, tfSimdLengthSqr_f32x4_f32)
+{
+    Tsimd_f32x4_t value = tfSimdLoad_f32x4(1.0f, 2.0f, 2.0f, 2.0f);
+    float lengthSqr = tfSimdLengthSqr_f32x4_f32(value);
+    EXPECT_NEAR(lengthSqr, 13.0f, DEFAULT_EPSILON);
+
+    value = tfSimdLoad_f32x4(0.0f, 0.0f, 0.0f, 0.0f);
+    lengthSqr = tfSimdLengthSqr_f32x4_f32(value);
+    EXPECT_NEAR(lengthSqr, 0.0f, DEFAULT_EPSILON);
+
+    value = tfSimdLoad_f32x4(3.0f, 4.0f, 0.0f, 0.0f);
+    lengthSqr = tfSimdLengthSqr_f32x4_f32(value);
+    EXPECT_NEAR(lengthSqr, 25.0f, DEFAULT_EPSILON);
+}
+
 
 #include "Forge/Mem/TF_Memory.h"
 #include "Forge/TF_FileSystem.h"

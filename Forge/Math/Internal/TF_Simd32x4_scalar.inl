@@ -61,6 +61,9 @@ static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a, Tsimd_f32x4_t b) {
     return (a.v[0] * b.v[0]) + (a.v[1] * b.v[1]) + (a.v[2] * b.v[2]) + (a.v[3] * b.v[3]);
 }
 
+static inline float tfSimdLengthSqr_f32x4_f32(Tsimd_f32x4_t a) {return tfSimdDot_f32x4_f32(a, a);}
+
+
 static inline float tfSimdLength_f32x4_f32(Tsimd_f32x4_t a) {
     return sqrtf((a.v[0] * a.v[0]) + (a.v[1] * a.v[1]) + (a.v[2] * a.v[2]) + (a.v[3] * a.v[3]));
 }
