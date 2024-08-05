@@ -31,6 +31,7 @@ static Tsimd_f32x4_t tfNormWithLength_f32x4(Tsimd_f32x4_t input, float* outLengt
 
 static inline float tfSimdDot_f32x4_f32(Tsimd_f32x4_t a, Tsimd_f32x4_t b);
 static inline float tfSimdLength_f32x4_f32(Tsimd_f32x4_t a);
+static inline float tfSimdLengthSqr_f32x4_f32(Tsimd_f32x4_t a);
 
 static inline Tsimd_f32x4_t tfSimdReplace_f32_f32x4(Tsimd_f32x4_t a, int index,  float b);
 static inline Tsimd_f32x4_t tfSimdReplace_f32x4_f32x4(Tsimd_f32x4_t a, int index,  Tsimd_f32x4_t b);
