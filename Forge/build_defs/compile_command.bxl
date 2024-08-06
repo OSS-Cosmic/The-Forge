@@ -8,7 +8,6 @@ load(
     "@prelude//cxx:comp_db.bzl",
     "CxxCompilationDbInfo",
 )
-load("@prelude//:paths.bzl", "paths")
 load("@prelude//paths.bzl", "paths")
 
 def _gen_compile_command(ctx: BxlContext) -> None:
