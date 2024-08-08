@@ -343,6 +343,8 @@ extern "C"
     /// appends '\0' to the end of string
     FORGE_API size_t fsReadBstringFromStream(FileStream* stream, struct bstring* pStr, size_t symbolsCount);
 
+    FORGE_API void fsReadLineFromStream(FileStream* stream, struct TStr* pStr);
+
     /// Wraps stream into new memory stream using fsStreamMemoryMap
     /// returns true: old stream is wrapped by new one with new IO.
     /// returns false: stream is unaffected.

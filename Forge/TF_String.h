@@ -56,16 +56,33 @@ struct TStrSpan {
   size_t len;
 }; 
 
-static inline struct TStrSpan tfToRef(const char* c) { return TStrSpan{ (char*)c, (size_t)strlen(c) }; }
-static inline struct TStrSpan tfToRef(struct TStr str) { return TStrSpan{ str.buf, str.len }; }
+static inline struct TStrSpan tfCToStrRef(const char* c) { 
+  struct TStrSpan result;
+  result.buf = (char*)c;
+  result.len = (size_t)strlen(c);
+  return result; 
+}
+static inline struct TStrSpan tfToStrRef(struct TStr str) { 
+  struct TStrSpan result;
+  result.buf = (char*)str.buf;
+  result.len = str.len;
+  return result; 
+}
 
 static inline struct TStrSpan tfSub(struct TStrSpan slice, size_t a, size_t b) {
     ASSERT((b - a) <= slice.len);
-    return TStrSpan{ slice.buf + a, b - a };
+    struct TStrSpan result;
+    result.buf = slice.buf + a;
+    result.len = b - a;
+    return result;
 }
 
-static inline size_t tfStrAvailLen(TStr str) { return str.alloc - str.len;}
-static inline TStrSpan tfStrAvailSpan(TStr str) { return TStrSpan{str.buf + str.len, tfStrAvailLen(str)};}
+static inline size_t tfStrAvailLen(struct TStr str) { return str.alloc - str.len;}
+static inline struct TStrSpan tfStrAvailSpan(struct TStr str) { return TStrSpan{str.buf + str.len, tfStrAvailLen(str)};}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Creates a string from a slice 
@@ -316,5 +333,10 @@ int tfStrLastIndexOfAny(const struct TStrSpan haystack, const struct TStrSpan ch
 
 int tfPrettyPrintBytes(struct TStrSpan slice,ssize_t numBytes);
 int tfPrettyPrintDuration(struct TStrSpan slice,double nanoseconds);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

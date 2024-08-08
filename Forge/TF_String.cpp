@@ -1014,7 +1014,7 @@ static int doubleToShortStr(struct TStrSpan str, double d, int precision)
 int tfPrettyPrintBytes(struct TStrSpan slice, ssize_t numBytes)
 {
     const TStrSpan strs[] = {
-        tfToRef("B"), tfToRef("KB"), tfToRef("MB"), tfToRef("GB"), tfToRef("TB"),
+        tfCToStrRef("B"), tfCToStrRef("KB"), tfCToStrRef("MB"), tfCToStrRef("GB"), tfCToStrRef("TB"),
     };
     double   value = (double)numBytes;
     uint64_t i = 0;
@@ -1038,7 +1038,7 @@ int tfPrettyPrintBytes(struct TStrSpan slice, ssize_t numBytes)
 
 int tfPrettyPrintDuration(struct TStrSpan slice, double ns)
 {
-    const TStrSpan strs[] = { tfToRef("ns"), tfToRef("ms"), tfToRef("s"), tfToRef("m"), tfToRef("h"), tfToRef("d") };
+    const TStrSpan strs[] = { tfCToStrRef("ns"), tfCToStrRef("ms"), tfCToStrRef("s"), tfCToStrRef("m"), tfCToStrRef("h"), tfCToStrRef("d") };
 
     uint64_t i = 0;
 

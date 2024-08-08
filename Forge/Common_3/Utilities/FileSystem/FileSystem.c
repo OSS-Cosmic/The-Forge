@@ -28,8 +28,9 @@
 
 #include "Forge/TF_FileSystem.h"
 #include "Forge/TF_Log.h"
-#include"Forge/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "Forge/Core/TF_Time.h"
+#include "Forge/TF_String.h"
 
 #include "Forge/Mem/TF_Memory.h"
 
@@ -794,6 +795,11 @@ bool fsOpenStreamFromPath(ResourceDirectory resourceDir, const char* fileName, F
 
     return fsIoOpenStreamFromPath(io, resourceDir, fileName, mode, pOut);
 }
+
+void fsReadLineFromStream(FileStream* stream, struct TStr* pStr) {
+
+}
+
 
 size_t fsReadBstringFromStream(FileStream* stream, bstring* pStr, size_t symbolsCount)
 {
