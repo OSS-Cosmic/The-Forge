@@ -66,7 +66,21 @@ cxx_library(
       "@tf//3rdparty:cgltf",
       "@tf//:TF"
   ],
-  srcs = ["Formats/TF_gltf.cpp"],
+  srcs = ["Formats/TF_gltf.c"],
+  link_style = "static",
+  visibility = ["PUBLIC"],
+)
+
+
+cxx_library(
+  name = "TF~Ply",
+  exported_headers = { 
+    "Forge/Formats/TF_ply.h":"Formats/TF_ply.h" 
+  },
+  deps = [
+      "@tf//:TF"
+  ],
+  srcs = ["Formats/TF_ply.c"],
   link_style = "static",
   visibility = ["PUBLIC"],
 )

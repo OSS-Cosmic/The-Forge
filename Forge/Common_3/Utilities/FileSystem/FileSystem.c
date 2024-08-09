@@ -28,8 +28,9 @@
 
 #include "Forge/TF_FileSystem.h"
 #include "Forge/TF_Log.h"
-#include"Forge/TF_Thread.h"
+#include "Forge/TF_Thread.h"
 #include "Forge/Core/TF_Time.h"
+#include "Forge/TF_String.h"
 
 #include "Forge/Mem/TF_Memory.h"
 
@@ -794,6 +795,32 @@ bool fsOpenStreamFromPath(ResourceDirectory resourceDir, const char* fileName, F
 
     return fsIoOpenStreamFromPath(io, resourceDir, fileName, mode, pOut);
 }
+
+size_t fsReadLineFromStream(struct StreamLineReader* reader, struct TStr* pStr) {
+    tfStrClear(pStr);
+
+    size_t numBytesRead = 0;
+    struct TStrSpan bufferSpan = {reader->buffer, TF_ARRAY_COUNT(reader->buffer)};
+    bool finished = false;
+    do {
+        const size_t initalBufferPos = reader->bufferPos; 
+        for(; reader->bufferPos < reader->bufferReadBytes; reader->bufferPos++) {
+            const char c = reader->buffer[reader->bufferPos];
+            if(c == '\n') {
+                const struct TStrSpan subStr = tfSub(bufferSpan, initalBufferPos, reader->bufferPos);
+                numBytesRead += subStr.len;
+                tfStrAppendSlice(pStr, tfSub(bufferSpan, initalBufferPos, reader->bufferPos));
+                return numBytesRead;
+            }
+        }
+        tfStrAppendSlice(pStr, bufferSpan);
+        numBytesRead += bufferSpan.len;
+        reader->bufferReadBytes = fsReadFromStream(reader->stream, reader->buffer, 512);
+        reader->bufferPos = 0;
+    } while (reader->bufferReadBytes > 0);
+    return numBytesRead;
+}
+
 
 size_t fsReadBstringFromStream(FileStream* stream, bstring* pStr, size_t symbolsCount)
 {

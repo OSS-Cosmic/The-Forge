@@ -32,7 +32,7 @@ static struct TStrSpan tfGPUConfigIter(struct TFStrGpuConfigIterable* iterable)
         if (iterable->buffer.buf[cursor] == '\n' || iterable->buffer.buf[cursor] == '\r')
         {
             struct TStrSpan res = tfSub(iterable->buffer, iterable->cursor, cursor);
-            const int       leaderOffset = tfStrIndexOfOffset(res, 0, tfToRef("#"));
+            const int       leaderOffset = tfStrIndexOfOffset(res, 0, tfCToStrRef("#"));
             if (leaderOffset >= 0)
             {
                 res = tfSub(res, 0, leaderOffset);
@@ -106,17 +106,17 @@ void tfFreeGPUConfiguration(struct GPUConfiguration* config)
 
 static GPUPresetLevel strToPresetLevel(TStrSpan input)
 {
-    if (tfStrCaselessEqual(input, tfToRef("office")))
+    if (tfStrCaselessEqual(input, tfCToStrRef("office")))
         return GPU_PRESET_OFFICE;
-    if (tfStrCaselessEqual(input, tfToRef("verylow")))
+    if (tfStrCaselessEqual(input, tfCToStrRef("verylow")))
         return GPU_PRESET_VERYLOW;
-    if (tfStrCaselessEqual(input, tfToRef("low")))
+    if (tfStrCaselessEqual(input, tfCToStrRef("low")))
         return GPU_PRESET_LOW;
-    if (tfStrCaselessEqual(input, tfToRef("medium")))
+    if (tfStrCaselessEqual(input, tfCToStrRef("medium")))
         return GPU_PRESET_MEDIUM;
-    if (tfStrCaselessEqual(input, tfToRef("high")))
+    if (tfStrCaselessEqual(input, tfCToStrRef("high")))
         return GPU_PRESET_HIGH;
-    if (tfStrCaselessEqual(input, tfToRef("ultra")))
+    if (tfStrCaselessEqual(input, tfCToStrRef("ultra")))
         return GPU_PRESET_ULTRA;
     return GPU_PRESET_NONE;
 }
@@ -140,26 +140,26 @@ static bool isOpRuleToken(const char token)
 
 static GPUConfigExprSymbol getOpSymbol(struct TStrSpan input)
 {
-    if (tfStrEqual(input, tfToRef(">=")))
+    if (tfStrEqual(input, tfCToStrRef(">=")))
         return GPUConfigExprSymbol::GPUSymbolOpGTE;
-    if (tfStrEqual(input, tfToRef(">")))
+    if (tfStrEqual(input, tfCToStrRef(">")))
         return GPUConfigExprSymbol::GPUSymbolOpGT;
-    if (tfStrEqual(input, tfToRef("<=")))
+    if (tfStrEqual(input, tfCToStrRef("<=")))
         return GPUConfigExprSymbol::GPUSymbolOpLTE;
-    if (tfStrEqual(input, tfToRef(">")))
+    if (tfStrEqual(input, tfCToStrRef(">")))
         return GPUConfigExprSymbol::GPUSymbolOpGT;
-    if (tfStrEqual(input, tfToRef("<")))
+    if (tfStrEqual(input, tfCToStrRef("<")))
         return GPUConfigExprSymbol::GPUSymbolOpLT;
-    if (tfStrEqual(input, tfToRef("==")))
+    if (tfStrEqual(input, tfCToStrRef("==")))
         return GPUConfigExprSymbol::GPUSymbolOpEQ;
-    if (tfStrEqual(input, tfToRef("!=")))
+    if (tfStrEqual(input, tfCToStrRef("!=")))
         return GPUConfigExprSymbol::GPUSymbolOpNE;
     return GPUConfigExprSymbol::GPUSymbolNone;
 }
 
 static bool parseDriverVersionNumber(TStrSpan input, GPUDriverVersion* version)
 {
-    struct TFStrSplitIterable versionIter = { input, tfToRef("."), 0 };
+    struct TFStrSplitIterable versionIter = { input, tfCToStrRef("."), 0 };
     unsigned long long        value = 0;
     while (versionIter.cursor < versionIter.buffer.len)
     {
@@ -178,7 +178,7 @@ static bool parseGPUTerm(struct TFScratchAllocator* alloc, struct GPUConfigTerm*
 {
     unsigned long long value = 0;
     memset(term, 0, sizeof(struct GPUConfigTerm));
-    if (tfStrIndexOf(input, tfToRef(".")) > 0)
+    if (tfStrIndexOf(input, tfCToStrRef(".")) > 0)
     {
         term->mSymbol = GPUConfigExprSymbol::GPUSymbolDriverVersion;
         return parseDriverVersionNumber(input, &term->mDriverVersion);
@@ -262,21 +262,21 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
     {
         line = tfGPUConfigIter(&iterable);
 
-        if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_SELECTION;")) >= 0)
+        if (tfStrIndexOf(line, tfCToStrRef("BEGIN_GPU_SELECTION;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
                     continue;
-                if (tfStrIndexOf(line, tfToRef("END_GPU_SELECTION;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_GPU_SELECTION;")) >= 0)
                     break;
 
 
-                struct TFStrSplitIterable tokenIterable = { line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable tokenIterable = { line, tfCToStrRef(";"), 0 };
                 TStrSpan                  ruleSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
 
-                struct TFStrSplitIterable ruleIterable = { ruleSpan, tfToRef(","), 0 };
+                struct TFStrSplitIterable ruleIterable = { ruleSpan, tfCToStrRef(","), 0 };
                 bool                      isValid = true;
 
                 struct GPUConfigurationSelection configurationSelection = { 0 };
@@ -313,18 +313,18 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 }
             }
         }
-        else if (tfStrIndexOf(line, tfToRef("BEGIN_DRIVER_REJECTION;")) >= 0)
+        else if (tfStrIndexOf(line, tfCToStrRef("BEGIN_DRIVER_REJECTION;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
                     continue;
-                if (tfStrIndexOf(line, tfToRef("END_DRIVER_REJECTION;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_DRIVER_REJECTION;")) >= 0)
                     break;
 
 
-                struct TFStrSplitIterable tokenIterable = { line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable tokenIterable = { line, tfCToStrRef(";"), 0 };
                 TStrSpan                  vendorSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 TStrSpan                  ruleParametersSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 TStrSpan                  reasonSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
@@ -342,7 +342,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                     continue;
                 }
 
-                struct TFStrSplitIterable ruleIterable = { ruleParametersSpan, tfToRef(","), 0 };
+                struct TFStrSplitIterable ruleIterable = { ruleParametersSpan, tfCToStrRef(","), 0 };
                 while (ruleIterable.cursor < ruleIterable.buffer.len)
                 {
                     struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
@@ -377,17 +377,17 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 arrpush(config->mGPURejection, rejection);
             }
         }
-        else if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_SETTINGS;")) >= 0)
+        else if (tfStrIndexOf(line, tfCToStrRef("BEGIN_GPU_SETTINGS;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
                     continue;
-                if (tfStrIndexOf(line, tfToRef("END_GPU_SETTINGS;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_GPU_SETTINGS;")) >= 0)
                     break;
 
-                struct TFStrSplitIterable tokenIterable = { line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable tokenIterable = { line, tfCToStrRef(";"), 0 };
                 TStrSpan                  propertySpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 TStrSpan                  ruleParametersSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 TStrSpan                  assignmentSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
@@ -402,7 +402,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 struct GPUConfigurationSetting setting = { 0 }; //&config->mConfigurationSetting[config->mGpuConfigurationSettingCount];
 
-                struct TFStrSplitIterable ruleIterable = { ruleParametersSpan, tfToRef(","), 0 };
+                struct TFStrSplitIterable ruleIterable = { ruleParametersSpan, tfCToStrRef(","), 0 };
                 while (ruleIterable.cursor < ruleIterable.buffer.len)
                 {
                     struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
@@ -437,17 +437,17 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 arrpush(config->mConfigurationSetting, setting);
             }
         }
-        else if (tfStrIndexOf(line, tfToRef("BEGIN_USER_SETTINGS;")) >= 0)
+        else if (tfStrIndexOf(line, tfCToStrRef("BEGIN_USER_SETTINGS;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
                     continue;
-                if (tfStrIndexOf(line, tfToRef("END_USER_SETTINGS;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_USER_SETTINGS;")) >= 0)
                     break;
 
-                struct TFStrSplitIterable tokenIterable = { line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable tokenIterable = { line, tfCToStrRef(";"), 0 };
                 TStrSpan                  propertySpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 TStrSpan                  ruleParametersSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 TStrSpan                  assignmentSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
@@ -462,7 +462,7 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
 
                 struct GPUConfigurationSetting setting = { 0 };
 
-                struct TFStrSplitIterable ruleIterable = { ruleParametersSpan, tfToRef(","), 0 };
+                struct TFStrSplitIterable ruleIterable = { ruleParametersSpan, tfCToStrRef(","), 0 };
                 while (ruleIterable.cursor < ruleIterable.buffer.len)
                 {
                     struct TStrSpan exprSpan = tfStrTrim(tfStrSplitIter(&ruleIterable));
@@ -527,19 +527,19 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
     {
         line = tfGPUConfigIter(&iterable);
 
-        if (tfStrIndexOf(line, tfToRef("BEGIN_DEFAULT_CONFIGURATION;")) >= 0)
+        if (tfStrIndexOf(line, tfCToStrRef("BEGIN_DEFAULT_CONFIGURATION;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
                     continue;
-                if (tfStrIndexOf(line, tfToRef("END_DEFAULT_CONFIGURATION;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_DEFAULT_CONFIGURATION;")) >= 0)
                     break;
-                struct TFStrSplitIterable tokenIterable = { line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable tokenIterable = { line, tfCToStrRef(";"), 0 };
                 TStrSpan                  ruleNameSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
                 TStrSpan                  assignmentSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
-                if (tfStrIndexOf(ruleNameSpan, tfToRef("DefaultPresetLevel")) >= 0)
+                if (tfStrIndexOf(ruleNameSpan, tfCToStrRef("DefaultPresetLevel")) >= 0)
                 {
                     GPUPresetLevel defaultLevel = strToPresetLevel(assignmentSpan);
                     if (defaultLevel != GPUPresetLevel::GPU_PRESET_NONE)
@@ -557,17 +557,17 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                 }
             }
         }
-        else if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_LIST;")) >= 0)
+        else if (tfStrIndexOf(line, tfCToStrRef("BEGIN_GPU_LIST;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
                     continue;
-                if (tfStrIndexOf(line, tfToRef("END_GPU_LIST;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_GPU_LIST;")) >= 0)
                     break;
                 struct GPUModelDefinition modelDef = { 0 };
-                struct TFStrSplitIterable iterable = { line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable iterable = { line, tfCToStrRef(";"), 0 };
                 TStrSpan                  vendorIdSpan = tfStrTrim(tfStrSplitIter(&iterable));
                 TStrSpan                  modelIdSpan = tfStrTrim(tfStrSplitIter(&iterable));
                 TStrSpan                  presetSpan = tfStrTrim(tfStrSplitIter(&iterable));
@@ -598,7 +598,7 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                 }
             }
         }
-        else if (tfStrIndexOf(line, tfToRef("BEGIN_VENDOR_LIST;")) >= 0)
+        else if (tfStrIndexOf(line, tfCToStrRef("BEGIN_VENDOR_LIST;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
@@ -607,17 +607,17 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                 {
                     continue;
                 }
-                if (tfStrIndexOf(line, tfToRef("END_VENDOR_LIST;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_VENDOR_LIST;")) >= 0)
                 {
                     break;
                 }
                 GPUVendorDefinition* vendorDef = &config->mVendorDefinitions[config->mVendorCount];
                 memset(vendorDef, 0, sizeof(GPUVendorDefinition));
 
-                struct TFStrSplitIterable iterable = {line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable iterable = {line, tfCToStrRef(";"), 0 };
                 TStrSpan                  vendorSpan = tfStrSplitIter(&iterable);
                 TStrSpan                  identiferSpan = tfStrSplitIter(&iterable);
-                struct TFStrSplitIterable idIterable = { identiferSpan, tfToRef(","),  0 };
+                struct TFStrSplitIterable idIterable = { identiferSpan, tfCToStrRef(","),  0 };
                 while (idIterable.cursor < idIterable.buffer.len)
                 {
                     TStrSpan           idSpan = tfStrTrim(tfStrSplitIter(&idIterable));
@@ -685,7 +685,7 @@ static bool writeVariableToProperty(GPUConfigSelection* pSelection, TStrSpan var
     if (value->mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
     {
 #define GPU_CONFIG_PROPERTY(VAR, PROPERTY)                                       \
-    if (tfStrCaselessEqual(tfToRef(VAR), variable))                              \
+    if (tfStrCaselessEqual(tfCToStrRef(VAR), variable))                              \
     {                                                                            \
         COMPILE_ASSERT(sizeof(decltype(pSelection->PROPERTY)) <= sizeof(value)); \
         pSelection->PROPERTY = (decltype(pSelection->PROPERTY))value->mValue;    \
@@ -702,7 +702,7 @@ static bool writeVariableToProperty(GPUConfigSelection* pSelection, TStrSpan var
 
 static bool readVariableFromProperty(GPUConfigSelection* pSelection, TStrSpan variable, GPUConfigTerm* value)
 {
-    if (tfStrCaselessEqual(variable, tfToRef("driverversion")))
+    if (tfStrCaselessEqual(variable, tfCToStrRef("driverversion")))
     {
         if (parseDriverVersionNumber(
                 TStrSpan{ pSelection->mDeviceAdapter->mGpuDriverVersion, strlen(pSelection->mDeviceAdapter->mGpuDriverVersion) },
@@ -715,7 +715,7 @@ static bool readVariableFromProperty(GPUConfigSelection* pSelection, TStrSpan va
     }
 
 #define GPU_CONFIG_PROPERTY(VAR, PROPERTY)                      \
-    if (tfStrCaselessEqual(tfToRef(VAR), variable))             \
+    if (tfStrCaselessEqual(tfCToStrRef(VAR), variable))             \
     {                                                           \
         (*value).mSymbol = GPUConfigExprSymbol::GPUSymbolDigit; \
         (*value).mValue = (uint64_t)(pSelection->PROPERTY);     \
