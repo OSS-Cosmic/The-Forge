@@ -35,13 +35,14 @@ struct PlyElement {
   uint32_t mNumAttributes;
   struct PlyAttribute* mAttributes;
   uint32_t mNumElements;
-  void* mInput;
+  FileStream mInput;
 };
 
 struct TPlyFile {
   struct TFScratchAllocator mAlloc; // temporary scratch allocator for the lifetime of the configuration
   enum PlyFormatData format;
-
+  size_t mNumElements;
+  struct PlyElement mElements[16];
 };
 
 #ifdef __cplusplus
