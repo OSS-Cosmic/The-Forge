@@ -184,6 +184,8 @@ struct TStr tfStrDup(const struct TStr* str)
 
 bool tfStrAppendSlice(struct TStr* str, const struct TStrSpan slice)
 {
+    if(slice.len == 0)
+        return;
     if (!tfStrMakeRoomFor(str, slice.len + 1))
         return false;
     memmove(str->buf + str->len, slice.buf, slice.len);

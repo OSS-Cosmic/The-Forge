@@ -71,6 +71,20 @@ cxx_library(
   visibility = ["PUBLIC"],
 )
 
+
+cxx_library(
+  name = "TF~Ply",
+  exported_headers = { 
+    "Forge/Formats/TF_ply.h":"Formats/TF_ply.h" 
+  },
+  deps = [
+      "@tf//:TF"
+  ],
+  srcs = ["Formats/TF_ply.c"],
+  link_style = "static",
+  visibility = ["PUBLIC"],
+)
+
 cxx_library(
     name = "TF",
     srcs = glob([

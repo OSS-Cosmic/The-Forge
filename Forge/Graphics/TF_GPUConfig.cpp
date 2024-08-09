@@ -557,17 +557,17 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                 }
             }
         }
-        else if (tfStrIndexOf(line, tfToRef("BEGIN_GPU_LIST;")) >= 0)
+        else if (tfStrIndexOf(line, tfCToStrRef("BEGIN_GPU_LIST;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
                 line = tfGPUConfigIter(&iterable);
                 if (tfStrEmpty(line))
                     continue;
-                if (tfStrIndexOf(line, tfToRef("END_GPU_LIST;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_GPU_LIST;")) >= 0)
                     break;
                 struct GPUModelDefinition modelDef = { 0 };
-                struct TFStrSplitIterable iterable = { line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable iterable = { line, tfCToStrRef(";"), 0 };
                 TStrSpan                  vendorIdSpan = tfStrTrim(tfStrSplitIter(&iterable));
                 TStrSpan                  modelIdSpan = tfStrTrim(tfStrSplitIter(&iterable));
                 TStrSpan                  presetSpan = tfStrTrim(tfStrSplitIter(&iterable));
@@ -598,7 +598,7 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                 }
             }
         }
-        else if (tfStrIndexOf(line, tfToRef("BEGIN_VENDOR_LIST;")) >= 0)
+        else if (tfStrIndexOf(line, tfCToStrRef("BEGIN_VENDOR_LIST;")) >= 0)
         {
             while (iterable.cursor < iterable.buffer.len)
             {
@@ -607,17 +607,17 @@ bool tfLoadGPUData(struct GPUConfiguration* config, TStrSpan input)
                 {
                     continue;
                 }
-                if (tfStrIndexOf(line, tfToRef("END_VENDOR_LIST;")) >= 0)
+                if (tfStrIndexOf(line, tfCToStrRef("END_VENDOR_LIST;")) >= 0)
                 {
                     break;
                 }
                 GPUVendorDefinition* vendorDef = &config->mVendorDefinitions[config->mVendorCount];
                 memset(vendorDef, 0, sizeof(GPUVendorDefinition));
 
-                struct TFStrSplitIterable iterable = {line, tfToRef(";"), 0 };
+                struct TFStrSplitIterable iterable = {line, tfCToStrRef(";"), 0 };
                 TStrSpan                  vendorSpan = tfStrSplitIter(&iterable);
                 TStrSpan                  identiferSpan = tfStrSplitIter(&iterable);
-                struct TFStrSplitIterable idIterable = { identiferSpan, tfToRef(","),  0 };
+                struct TFStrSplitIterable idIterable = { identiferSpan, tfCToStrRef(","),  0 };
                 while (idIterable.cursor < idIterable.buffer.len)
                 {
                     TStrSpan           idSpan = tfStrTrim(tfStrSplitIter(&idIterable));
@@ -685,7 +685,7 @@ static bool writeVariableToProperty(GPUConfigSelection* pSelection, TStrSpan var
     if (value->mSymbol == GPUConfigExprSymbol::GPUSymbolDigit)
     {
 #define GPU_CONFIG_PROPERTY(VAR, PROPERTY)                                       \
-    if (tfStrCaselessEqual(tfToRef(VAR), variable))                              \
+    if (tfStrCaselessEqual(tfCToStrRef(VAR), variable))                              \
     {                                                                            \
         COMPILE_ASSERT(sizeof(decltype(pSelection->PROPERTY)) <= sizeof(value)); \
         pSelection->PROPERTY = (decltype(pSelection->PROPERTY))value->mValue;    \
@@ -702,7 +702,7 @@ static bool writeVariableToProperty(GPUConfigSelection* pSelection, TStrSpan var
 
 static bool readVariableFromProperty(GPUConfigSelection* pSelection, TStrSpan variable, GPUConfigTerm* value)
 {
-    if (tfStrCaselessEqual(variable, tfToRef("driverversion")))
+    if (tfStrCaselessEqual(variable, tfCToStrRef("driverversion")))
     {
         if (parseDriverVersionNumber(
                 TStrSpan{ pSelection->mDeviceAdapter->mGpuDriverVersion, strlen(pSelection->mDeviceAdapter->mGpuDriverVersion) },
@@ -715,7 +715,7 @@ static bool readVariableFromProperty(GPUConfigSelection* pSelection, TStrSpan va
     }
 
 #define GPU_CONFIG_PROPERTY(VAR, PROPERTY)                      \
-    if (tfStrCaselessEqual(tfToRef(VAR), variable))             \
+    if (tfStrCaselessEqual(tfCToStrRef(VAR), variable))             \
     {                                                           \
         (*value).mSymbol = GPUConfigExprSymbol::GPUSymbolDigit; \
         (*value).mValue = (uint64_t)(pSelection->PROPERTY);     \

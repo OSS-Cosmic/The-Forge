@@ -78,7 +78,12 @@ static inline struct TStrSpan tfSub(struct TStrSpan slice, size_t a, size_t b) {
 }
 
 static inline size_t tfStrAvailLen(struct TStr str) { return str.alloc - str.len;}
-static inline struct TStrSpan tfStrAvailSpan(struct TStr str) { return TStrSpan{str.buf + str.len, tfStrAvailLen(str)};}
+static inline struct TStrSpan tfStrAvailSpan(struct TStr str) { 
+  struct TStrSpan result;
+  result.buf = str.buf + str.len;
+  result.len = tfStrAvailLen(str);
+  return result;
+}
 
 #ifdef __cplusplus
 extern "C" {

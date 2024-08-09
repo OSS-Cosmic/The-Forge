@@ -796,8 +796,29 @@ bool fsOpenStreamFromPath(ResourceDirectory resourceDir, const char* fileName, F
     return fsIoOpenStreamFromPath(io, resourceDir, fileName, mode, pOut);
 }
 
-void fsReadLineFromStream(FileStream* stream, struct TStr* pStr) {
+size_t fsReadLineFromStream(struct StreamLineReader* reader, struct TStr* pStr) {
+    tfStrClear(pStr);
 
+    size_t numBytesRead = 0;
+    struct TStrSpan bufferSpan = {reader->buffer, TF_ARRAY_COUNT(reader->buffer)};
+    bool finished = false;
+    do {
+        const size_t initalBufferPos = reader->bufferPos; 
+        for(; reader->bufferPos < reader->bufferReadBytes; reader->bufferPos++) {
+            const char c = reader->buffer[reader->bufferPos];
+            if(c == '\n') {
+                const struct TStrSpan subStr = tfSub(bufferSpan, initalBufferPos, reader->bufferPos);
+                numBytesRead += subStr.len;
+                tfStrAppendSlice(pStr, tfSub(bufferSpan, initalBufferPos, reader->bufferPos));
+                return numBytesRead;
+            }
+        }
+        tfStrAppendSlice(pStr, bufferSpan);
+        numBytesRead += bufferSpan.len;
+        reader->bufferReadBytes = fsReadFromStream(reader->stream, reader->buffer, 512);
+        reader->bufferPos = 0;
+    } while (reader->bufferReadBytes > 0);
+    return numBytesRead;
 }
 
 
