@@ -22,19 +22,6 @@ platform(
     visibility = ["PUBLIC"],
 )
 
-platform(
-    name = "windows_11_x86_64",
-    constraint_values = [
-        "config//os/constraints:windows",
-        "config//cpu/constraints:x86_64",
-        "tf_platform//D3D12:supported",
-        "tf_platform//D3D11:supported",
-        "tf_platform//VULKAN:supported",
-        "tf_platform//target:win11",
-    ] + host_configuration.common_constraints,
-    visibility = ["PUBLIC"],
-)
-
 
 platform(
     name = "linux_x86_64",

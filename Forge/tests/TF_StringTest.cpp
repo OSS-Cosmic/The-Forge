@@ -31,6 +31,39 @@ UTEST(Core, tfIndexOf)
     EXPECT_EQ(tfStrIndexOf(tfCToStrRef("abc"), tfCToStrRef("abcd")), -1);
 }
 
+UTEST(Core, tfStrReadDouble) 
+{
+    double result = 0;
+    EXPECT_TRUE(tfStrReadDouble(tfCToStrRef(".01"), &result));
+    EXPECT_NEAR(result, .01f, .0001f);
+    
+    EXPECT_TRUE(tfStrReadDouble(tfCToStrRef("5.01"), &result));
+    EXPECT_NEAR(result, 5.01f, .0001f);
+    
+    EXPECT_TRUE(tfStrReadDouble(tfCToStrRef("5.01"), &result));
+    EXPECT_NEAR(result, 5.01f, .0001f);
+    
+    EXPECT_TRUE(tfStrReadDouble(tfCToStrRef("-5.01"), &result));
+    EXPECT_NEAR(result, -5.01f, .0001f);
+}
+
+UTEST(Core, tfStrReadFloat)
+{
+    float result = 0;
+    EXPECT_TRUE(tfStrReadFloat(tfCToStrRef(".01"), &result));
+    EXPECT_NEAR(result, .01f, .0001f);
+    
+    EXPECT_TRUE(tfStrReadFloat(tfCToStrRef("5.01"), &result));
+    EXPECT_NEAR(result, 5.01f, .0001f);
+    
+    EXPECT_TRUE(tfStrReadFloat(tfCToStrRef("5.01"), &result));
+    EXPECT_NEAR(result, 5.01f, .0001f);
+    
+    EXPECT_TRUE(tfStrReadFloat(tfCToStrRef("-5.01"), &result));
+    EXPECT_NEAR(result, -5.01f, .0001f);
+
+}
+
 UTEST(Core, tfLastIndexOf)
 {
     EXPECT_EQ(tfStrLastIndexOf(tfCToStrRef("foo foo"), tfCToStrRef(" ")), 3);

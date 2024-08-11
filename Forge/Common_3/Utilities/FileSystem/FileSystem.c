@@ -796,9 +796,8 @@ bool fsOpenStreamFromPath(ResourceDirectory resourceDir, const char* fileName, F
     return fsIoOpenStreamFromPath(io, resourceDir, fileName, mode, pOut);
 }
 
-size_t fsReadLineFromStream(struct StreamLineReader* reader, struct TStr* pStr) {
+size_t fsReadLineFromStream(struct TStreamLineReader* reader, struct TStr* pStr) {
     tfStrClear(pStr);
-
     size_t numBytesRead = 0;
     struct TStrSpan bufferSpan = {reader->buffer, TF_ARRAY_COUNT(reader->buffer)};
     bool finished = false;

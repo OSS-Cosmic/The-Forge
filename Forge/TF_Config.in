@@ -51,7 +51,6 @@
 #configure TF_ENABLE_MEMORY_TRACKING
 
 
-
 #if (defined(TF_FEATURE_CPU_NEON) + defined(TF_FEATURE_CPU_SSE) + defined(TF_FEATURE_CPU_SCALAR)) == 0 
 
 #configure TF_FEATURE_CPU_NEON 

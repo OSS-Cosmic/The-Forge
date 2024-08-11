@@ -12,6 +12,7 @@ enum PlyFormatData {
 };
 
 enum PlyAttributeType {
+  PLY_ATTRIBUTE_UNKNOWN,
   PLY_ATTRIBUTE_CHAR8,
   PLY_ATTRIBUTE_UCHAR8,
   PLY_ATTRIBUTE_SHORT16,
@@ -19,30 +20,37 @@ enum PlyAttributeType {
   PLY_ATTRIBUTE_INT32,
   PLY_ATTRIBUTE_UINT32,
   PLY_ATTRIBUTE_FLOAT32,
-  PLY_ATTRIBUTE_FLOAT64,
+  PLY_ATTRIBUTE_FLOAT64
 };
 
 
-
-struct PlyAttribute {
-  uint32_t attributeType: 3;
-  uint32_t listType: 3;
-  uint32_t isList: 1;
-  struct TStrSpan name;
+struct TPlyAttribute {
+  uint32_t attributeType: 4;
+  uint32_t attributeListType: 4;
+  struct TStrSpan mName;
 };
 
-struct PlyElement {
-  uint32_t mNumAttributes;
-  struct PlyAttribute* mAttributes;
+struct TPlyElement {
   uint32_t mNumElements;
-  FileStream mInput;
+  struct TStrSpan mName;
+  struct TPlyAttribute* mAttributes;
 };
 
-struct TPlyFile {
+struct TPlyReader {
   struct TFScratchAllocator mAlloc; // temporary scratch allocator for the lifetime of the configuration
   enum PlyFormatData format;
-  size_t mNumElements;
-  struct PlyElement mElements[16];
+  struct TPlyElement* mElements;
+  size_t mDataSeekPosition;
+};
+
+struct TPlyReaderDesc {
+  struct TFScratchAllocDesc desc;
+};
+
+struct TPlyFindAttrib {
+  size_t mCursorOffset; // offset into element
+  size_t mNumElement;
+  struct TPlyAttribute* attrib;
 };
 
 #ifdef __cplusplus
@@ -50,7 +58,50 @@ extern "C"
 {
 #endif
 
-void tfCreatePlyFileReader(FileStream* stream, struct TPlyFile* outFile);
+bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct TPlyReader* reader);
+
+size_t tfPlyNextElement(FileStream* stream, size_t cursor, struct TPlyElement* element);
+bool tfPlyFindAttrib(FileStream* stream, size_t cursor, struct TPlyElement* element, struct TStrSpan attribName, struct TPlyFindAttrib* offset);
+
+void tfFreePlyFileReader(struct TPlyReader* reader);
+
+enum PlyAttributeType toPlyAttribute(struct TStrSpan input);
+static inline size_t toPlyAttributeSize(enum PlyAttributeType attribute) {
+    switch (attribute) {
+    case PLY_ATTRIBUTE_CHAR8:
+    case PLY_ATTRIBUTE_UCHAR8:
+        return 1;
+    case PLY_ATTRIBUTE_SHORT16:
+    case PLY_ATTRIBUTE_USHORT16:
+        return 2;
+    case PLY_ATTRIBUTE_INT32:
+    case PLY_ATTRIBUTE_UINT32:
+        return 4;
+    case PLY_ATTRIBUTE_FLOAT32:
+    case PLY_ATTRIBUTE_FLOAT64:
+        return 8;
+    default:
+        break;
+    }
+    return 0;
+}
+static inline bool isAttributeNatrual(enum PlyAttributeType attribute) {
+    switch (attribute) {
+    case PLY_ATTRIBUTE_CHAR8:
+    case PLY_ATTRIBUTE_UCHAR8:
+    case PLY_ATTRIBUTE_SHORT16:
+    case PLY_ATTRIBUTE_USHORT16:
+    case PLY_ATTRIBUTE_INT32:
+    case PLY_ATTRIBUTE_UINT32:
+        return true;
+    case PLY_ATTRIBUTE_FLOAT32:
+    case PLY_ATTRIBUTE_FLOAT64:
+    default:
+        break;
+    }
+    return false;
+}
+
 
 #ifdef __cplusplus
 }

@@ -68,7 +68,7 @@ struct TFStackAllocDesc
 // stack allocator
 void tfAddFixedAllocator(struct TFFixedBufferAllocator* alloc, struct TFFixedBufferAllocDesc* desc);
 //void tfAddStackAllocator(struct TFStackAllocator* alloc, struct TFStackAllocDesc* desc);
-void tfAddScratchAllocator(struct TFScratchAllocator* alloc, TFScratchAllocDesc* desc);
+void tfAddScratchAllocator(struct TFScratchAllocator* alloc, struct TFScratchAllocDesc* desc);
 
 void tfFreeScratchAllocator(struct TFScratchAllocator* alloc);
 void tfFreeStackAllocator(struct TFStackAllocator* alloc);

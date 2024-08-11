@@ -344,14 +344,14 @@ extern "C"
     /// appends '\0' to the end of string
     FORGE_API size_t fsReadBstringFromStream(FileStream* stream, struct bstring* pStr, size_t symbolsCount);
 
-    struct StreamLineReader {
+    struct TStreamLineReader {
         FileStream* stream;
         char buffer[512];
         size_t bufferPos;
         size_t bufferReadBytes;
     };
 
-    FORGE_API size_t fsReadLineFromStream(struct StreamLineReader* reader, struct TStr* pStr);
+    FORGE_API size_t fsReadLineFromStream(struct TStreamLineReader* reader, struct TStr* pStr);
 
     /// Wraps stream into new memory stream using fsStreamMemoryMap
     /// returns true: old stream is wrapped by new one with new IO.

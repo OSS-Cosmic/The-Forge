@@ -272,7 +272,6 @@ bool tfLoadGPUConfig(struct GPUConfiguration* config, TStrSpan input)
                 if (tfStrIndexOf(line, tfCToStrRef("END_GPU_SELECTION;")) >= 0)
                     break;
 
-
                 struct TFStrSplitIterable tokenIterable = { line, tfCToStrRef(";"), 0 };
                 TStrSpan                  ruleSpan = tfStrTrim(tfStrSplitIter(&tokenIterable));
 

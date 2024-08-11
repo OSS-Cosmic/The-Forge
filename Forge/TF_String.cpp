@@ -185,7 +185,7 @@ struct TStr tfStrDup(const struct TStr* str)
 bool tfStrAppendSlice(struct TStr* str, const struct TStrSpan slice)
 {
     if(slice.len == 0)
-        return;
+        return true;
     if (!tfStrMakeRoomFor(str, slice.len + 1))
         return false;
     memmove(str->buf + str->len, slice.buf, slice.len);
@@ -411,9 +411,9 @@ bool tfstrcatfmt(struct TStr* s, char const* fmt, ...)
 static inline size_t readNumberSign(const char* buf, size_t pos, size_t len, int* result_sign)
 {
     ASSERT(result_sign);
-    if (pos + 1 >= len)
+    if (pos + 1 < len)
     {
-        switch (buf[0])
+        switch (buf[pos])
         {
         case '+':
             (*result_sign) = 1;
@@ -430,9 +430,9 @@ static inline size_t readNumberBase(const char* buf, size_t pos, size_t len, int
 {
     ASSERT(base);
     (*base) = 10;
-    if (pos + 2 < len && buf[0] == '0')
+    if (pos + 2 < len && buf[pos] == '0')
     {
-        switch (downcase(buf[1]))
+        switch (downcase(buf[pos + 1]))
         {
         case 'b':
             (*base) = 2;
@@ -451,9 +451,9 @@ static inline size_t readNumberBase(const char* buf, size_t pos, size_t len, int
 bool tfStrReadull(struct TStrSpan slice, unsigned long long* result)
 {
     ASSERT(result);
-    if(tfStrEmpty(slice)) {
+    if (tfStrEmpty(slice))
         return false;
-    }
+
     size_t pos = 0;
     int    numBase = 0;
     pos += readNumberBase(slice.buf, pos, slice.len, &numBase);
@@ -475,9 +475,9 @@ bool tfStrReadull(struct TStrSpan slice, unsigned long long* result)
 bool tfStrReadll(struct TStrSpan slice, long long* result)
 {
     ASSERT(result);
-    if(tfStrEmpty(slice)) {
+    if (tfStrEmpty(slice))
         return false;
-    }
+
     size_t pos = 0;
     int    sign = 1;
     int    numBase = 0;
@@ -493,6 +493,79 @@ bool tfStrReadll(struct TStrSpan slice, long long* result)
         if (val != 0)
         {
             val *= numBase;
+        }
+        val += (digit * sign);
+    }
+    (*result) = val;
+    return true;
+}
+
+bool tfStrReadFloat(struct TStrSpan slice, float* result) {
+    ASSERT(result);
+    if (tfStrEmpty(slice))
+        return false;
+    size_t pos = 0;
+    int    sign = 1;
+    pos += readNumberSign(slice.buf, pos, slice.len, &sign);
+    float val = 0;
+    for (; pos < slice.len; pos++)
+    {
+        uint8_t digit = 0;
+        if(slice.buf[pos] == '.') {
+            pos++;
+            size_t pos2 = slice.len - 1;
+            float fract = 0.0f;
+            while (pos <= pos2) {
+                if (!charToDigit(slice.buf[pos2], 10, &digit))
+                    return false;
+                fract += (digit * sign);
+                fract /= 10.0f;
+                pos2--;
+            }
+            val += fract;
+            break;
+        }
+        if (!charToDigit(slice.buf[pos], 10, &digit))
+            return false;
+        if (val != 0)
+        {
+            val *= 10;
+        }
+        val += (digit * sign);
+    }
+    (*result) = val;
+    return true;
+}
+bool tfStrReadDouble(struct TStrSpan slice, double* result) {
+    ASSERT(result);
+    if (tfStrEmpty(slice))
+        return false;
+    size_t pos = 0;
+    int    sign = 1;
+    pos += readNumberSign(slice.buf, pos, slice.len, &sign);
+    double val = 0;
+    for (; pos < slice.len; pos++)
+    {
+        uint8_t digit = 0;
+        if(slice.buf[pos] == '.') {
+            pos++;
+            size_t pos2 = slice.len - 1;
+            double fract = 0.0f;
+            while (pos <= pos2) {
+                if (!charToDigit(slice.buf[pos2], 10, &digit))
+                    return false;
+                fract += (digit * sign);
+                fract /= 10.0;
+                pos2--;
+            }
+            val += fract;
+            break;
+        }
+        if (!charToDigit(slice.buf[pos], 10, &digit))
+            return false;
+        if (val != 0)
+        {
+            val *= 10;
         }
         val += (digit * sign);
     }

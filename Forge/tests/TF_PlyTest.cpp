@@ -2,7 +2,7 @@
 
 #include "Forge/TF_Types.h"
 #include "Forge/stb/stb_ds.h"
-#include "Forge/Formats/TF_ply.h"
+#include "Forge/Formats/ply/TF_ply.h"
 #include "utest.h"
 
 #include "Forge/TF_FileSystem.h"

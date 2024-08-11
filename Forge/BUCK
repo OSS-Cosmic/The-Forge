@@ -75,12 +75,12 @@ cxx_library(
 cxx_library(
   name = "TF~Ply",
   exported_headers = { 
-    "Forge/Formats/TF_ply.h":"Formats/TF_ply.h" 
+    "Forge/Formats/ply/TF_ply.h":"Formats/ply/TF_ply.h" 
   },
   deps = [
       "@tf//:TF"
   ],
-  srcs = ["Formats/TF_ply.c"],
+  srcs = ["Formats/ply/TF_ply.c"],
   link_style = "static",
   visibility = ["PUBLIC"],
 )
@@ -238,6 +238,7 @@ cxx_library(
         "Forge/TF_FileSystem.h": "TF_FileSystem.h",
         "Forge/TF_Log.h": "TF_Log.h",
         "Forge/TF_Thread.h": "TF_Thread.h",
+        "Forge/TF_Endian.h": "TF_Endian.h",
         "Forge/Graphics/Vulkan/volk/volk.c": "Graphics/Vulkan/volk/volk.c"
       } |
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp"]) } |

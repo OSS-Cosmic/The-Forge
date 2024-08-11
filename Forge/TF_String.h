@@ -298,6 +298,8 @@ int tfstrfmtull(struct TStrSpan slice, unsigned long long value);
 bool tfStrReadll(struct TStrSpan, long long* result);
 bool tfStrReadull(struct TStrSpan, unsigned long long* result);
 
+bool tfStrReadFloat(struct TStrSpan, float* result);
+bool tfStrReadDouble(struct TStrSpan, double* result);
 /* Scan/search functions */
 /*  
  *  Compare two strings without differentiating between case. The return
