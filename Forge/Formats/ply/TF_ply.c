@@ -4,21 +4,21 @@
 #include "Forge/TF_Endian.h"
 
 enum PlyAttributeType toPlyAttribute(struct TStrSpan input) {
-    if (tfStrIndexOf(input, tfCToStrRef("char"))) {
+    if (tfStrEqual(input, tfCToStrRef("char"))) {
         return PLY_ATTRIBUTE_CHAR8;
-    } else if (tfStrIndexOf(input, tfCToStrRef("uchar"))) {
+    } else if (tfStrEqual(input, tfCToStrRef("uchar"))) {
         return PLY_ATTRIBUTE_UCHAR8;
-    } else if (tfStrIndexOf(input, tfCToStrRef("short"))) {
+    } else if (tfStrEqual(input, tfCToStrRef("short"))) {
         return PLY_ATTRIBUTE_SHORT16;
-    } else if (tfStrIndexOf(input, tfCToStrRef("ushort"))) {
+    } else if (tfStrEqual(input, tfCToStrRef("ushort"))) {
         return PLY_ATTRIBUTE_USHORT16;
-    } else if (tfStrIndexOf(input, tfCToStrRef("int"))) {
+    } else if (tfStrEqual(input, tfCToStrRef("int"))) {
         return PLY_ATTRIBUTE_INT32;
-    } else if (tfStrIndexOf(input, tfCToStrRef("uint"))) {
+    } else if (tfStrEqual(input, tfCToStrRef("uint"))) {
         return PLY_ATTRIBUTE_UINT32;
-    } else if (tfStrIndexOf(input, tfCToStrRef("float"))) {
+    } else if (tfStrEqual(input, tfCToStrRef("float"))) {
         return PLY_ATTRIBUTE_FLOAT32;
-    } else if (tfStrIndexOf(input, tfCToStrRef("double"))) {
+    } else if (tfStrEqual(input, tfCToStrRef("double"))) {
         return PLY_ATTRIBUTE_FLOAT64;
     }
     return PLY_ATTRIBUTE_UNKNOWN;
@@ -103,31 +103,125 @@ void tfFreePlyFileReader(struct TPlyReader* reader) {
     arrfree(reader->mElements);
 }
 
-static inline size_t tfPlyReadAttribCount(FileStream* stream, size_t cursor, struct TPlyAttribute* attrib, size_t* numElements) {
+size_t tfPlyReadAttribCount(FileStream* stream, struct TPlyReader* reader, size_t cursor, struct TPlyAttribute* attrib, size_t* numElements) {
     if (attrib->attributeListType != PLY_ATTRIBUTE_UNKNOWN) {
-        fsSeekStream(stream, SBO_CURRENT_POSITION, cursor);
-        const size_t expectedAttribSize = toPlyAttributeSize(attrib->attributeListType);
-        uint64_t     listSize = 0;
-        const size_t currAttribSize = fsReadFromStream(stream, &listSize, expectedAttribSize);
-        ASSERT(expectedAttribSize == currAttribSize);
-        (*numElements) = listSize;
-        return expectedAttribSize;
+        struct TPlyNumber number;
+        if(tfPlyDecodeNumber(stream, cursor, reader->mFormat, attrib->attributeListType, &number)) {
+            switch(attrib->attributeListType) {
+                case PLY_ATTRIBUTE_CHAR8:
+                    (*numElements) = number.i8;
+                    break;
+                case PLY_ATTRIBUTE_UCHAR8:
+                    (*numElements) = number.u8;
+                    break;
+                case PLY_ATTRIBUTE_SHORT16:
+                    (*numElements) = number.i16;
+                    break;
+                case PLY_ATTRIBUTE_USHORT16:
+                    (*numElements) = number.u16;
+                    break;
+                case PLY_ATTRIBUTE_INT32:
+                    (*numElements) = number.i32;
+                    break;
+                case PLY_ATTRIBUTE_UINT32:
+                    (*numElements) = number.u32;
+                    break;
+                case PLY_ATTRIBUTE_FLOAT32:
+                    (*numElements) = number.flt;
+                    break;
+                case PLY_ATTRIBUTE_FLOAT64:
+                    (*numElements) = number.dbl;
+                    break;
+            }
+            return toPlyAttributeSize(attrib->attributeListType);
+        }
     }
     (*numElements) = 1;
     return 0;
 }
 
-bool tfPlyFindAttrib(FileStream* stream, size_t elementCursor, struct TPlyElement* element, struct TStrSpan attribName, struct TPlyFindAttrib* outRead) {
-    ASSERT(outRead);
+bool tfPlySeekElementStream(FileStream* stream, struct TPlyReader* reader, struct TStrSpan name, struct TPlyElement** outElement, size_t* cursor) {
+    size_t streamCursor= 0;
+    for(size_t i = 0; i < arrlen(reader->mElements); i++) {
+        struct TPlyElement* element = &reader->mElements[i]; 
+        if(tfStrEqual(element->mName, name)) {
+            (*cursor) = streamCursor;
+            (*outElement) = element;
+            return true;
+        }
+        for(size_t k = 0; k < element->mNumElements; k++) {
+            streamCursor += tfPlyNextElement(stream, reader, streamCursor, element);
+        }
+    }
+    return false;
+} 
+
+bool tfPlyDecodeNumber(FileStream* stream, size_t cursor, enum PlyFormatData format, enum PlyAttributeType type, struct TPlyNumber* result) {
+    memset(result, 0, sizeof(struct TPlyNumber));
+    const size_t expectedAttribSize = toPlyAttributeSize(type);
+    ASSERT(expectedAttribSize > 0);
+    fsSeekStream(stream, SBO_START_OF_FILE, cursor);
+    if (fsReadFromStream(stream, &result->buf, expectedAttribSize)  == expectedAttribSize) {
+        switch (type) {
+        case PLY_ATTRIBUTE_SHORT16:
+        case PLY_ATTRIBUTE_USHORT16:
+            switch (format) {
+            case PLY_FORMAT_BIG_ENDIAN:
+                result->u16 = tfBE16ToHost(result->u16);
+            case PLY_FORMAT_LITTLE_ENDIAN:
+                result->u16 = tfLE16ToHost(result->u16);
+                break;
+            default:
+                break;
+            }
+            break;
+        case PLY_ATTRIBUTE_INT32:
+        case PLY_ATTRIBUTE_UINT32:
+        case PLY_ATTRIBUTE_FLOAT32:
+            switch (format) {
+            case PLY_FORMAT_BIG_ENDIAN:
+                result->u32 = tfBE32ToHost(result->u32);
+            case PLY_FORMAT_LITTLE_ENDIAN:
+                result->u32 = tfLE32ToHost(result->u32);
+                break;
+            default:
+                break;
+            }
+            break;
+        case PLY_ATTRIBUTE_FLOAT64:
+            switch (format) {
+            case PLY_FORMAT_BIG_ENDIAN:
+                result->u64 = tfBE64ToHost(result->u64);
+            case PLY_FORMAT_LITTLE_ENDIAN:
+                result->u64 = tfLE64ToHost(result->u64);
+                break;
+            default:
+                break;
+            }
+        default:
+        case PLY_ATTRIBUTE_CHAR8:
+        case PLY_ATTRIBUTE_UCHAR8:
+            break;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool tfPlyFindAttrib(FileStream* stream, struct TPlyReader* reader, size_t cursor, struct TPlyElement* element, struct TStrSpan attribName, 
+                     struct TPlyAttribResult* result) {
     size_t offset = 0;
     for (size_t i = 0; i < arrlen(element->mAttributes); i++) {
         struct TPlyAttribute* attrib = &element->mAttributes[i];
         size_t                numElements = 0;
-        offset += tfPlyReadAttribCount(stream, offset, attrib, &numElements);
+        offset += tfPlyReadAttribCount(stream, reader, offset, attrib, &numElements);
         if(tfStrEqual(attrib->mName, attribName)) {
-            outRead->attrib = attrib;
-            outRead->mNumElement = numElements;
-            outRead->mCursorOffset = offset;
+            result->mType = attrib->attributeType;
+            result->mNumElement = numElements;
+            result->mCursor = cursor + offset;
+            result->mStride = toPlyAttributeSize(attrib->attributeType); 
             return true;
         }
         offset += toPlyAttributeSize(attrib->attributeType) * numElements;
@@ -135,22 +229,25 @@ bool tfPlyFindAttrib(FileStream* stream, size_t elementCursor, struct TPlyElemen
     return false;
 }
 
-size_t tfPlyNextElement(FileStream* stream, size_t cursor, struct TPlyElement* element) {
+
+size_t tfPlyNextElement(FileStream* stream, struct TPlyReader* reader, size_t cursor, struct TPlyElement* element) {
     size_t offset = 0;
     for (size_t i = 0; i < arrlen(element->mAttributes); i++) {
         struct TPlyAttribute* attrib = &element->mAttributes[i];
         size_t                numElements = 0;
-        offset += tfPlyReadAttribCount(stream, offset, attrib, &numElements);
+        offset += tfPlyReadAttribCount(stream, reader, cursor, attrib, &numElements);
         offset += toPlyAttributeSize(attrib->attributeType) * numElements;
     }
     return offset;
 }
 
-bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct TPlyReader* plyReader) {
+bool tfAddPlyFileReader(FileStream* stream, struct TPlyReader* plyReader) {
     struct TStr             line = {};
     struct TStreamLineReader reader = {};
     reader.stream = stream;
-    tfAddScratchAllocator(&plyReader->mAlloc, &desc->desc);
+    struct TFScratchAllocDesc scratchAllocDesc = {};
+    scratchAllocDesc.blockSize = 2048;
+    tfAddScratchAllocator(&plyReader->mAlloc, &scratchAllocDesc);
 
     size_t seekPosition = 0;
     seekPosition += fsReadLineFromStream(&reader, &line);
@@ -170,11 +267,11 @@ bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct 
 
         struct TStrSpan typeSpan = tfStrSplitIter(&lineIterable);
         if (tfStrIndexOf(typeSpan, tfCToStrRef("ascii")) >= 0) {
-            plyReader->format = PLY_FORMAT_ASCII;
+            plyReader->mFormat = PLY_FORMAT_ASCII;
         } else if (tfStrIndexOf(typeSpan, tfCToStrRef("binary_little_endian")) >= 0) {
-            plyReader->format = PLY_FORMAT_LITTLE_ENDIAN;
+            plyReader->mFormat = PLY_FORMAT_LITTLE_ENDIAN;
         } else if (tfStrIndexOf(typeSpan, tfCToStrRef("binary_big_endian")) >= 0) {
-            plyReader->format = PLY_FORMAT_BIG_ENDIAN;
+            plyReader->mFormat = PLY_FORMAT_BIG_ENDIAN;
         } else {
             LOGF(eERROR, "Malformed format type '%.*s'", (int)typeSpan.len, typeSpan.buf);
             goto error;
@@ -235,15 +332,15 @@ bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct 
                 if (tfStrIndexOf(arg1, tfCToStrRef("list")) >= 0) {
                     enum PlyAttributeType attribListType = toPlyAttribute(tfStrTrim(tfStrSplitIter(&lineIterable)));
                     enum PlyAttributeType attribType = toPlyAttribute(tfStrTrim(tfStrSplitIter(&lineIterable)));
-                    if (attribListType == PLY_ATTRIBUTE_UNKNOWN || attribType == PLY_ATTRIBUTE_UNKNOWN)
-                        goto error;
                     attribute.attributeListType = attribListType;
                     attribute.attributeType = attribType;
+                    if (attribListType == PLY_ATTRIBUTE_UNKNOWN || attribType == PLY_ATTRIBUTE_UNKNOWN)
+                        goto error;
                 } else {
                     enum PlyAttributeType attribType = toPlyAttribute(arg1);
-                    if (attribute.attributeType == PLY_ATTRIBUTE_UNKNOWN)
-                        goto error;
                     attribute.attributeType = attribType;
+                    if (attribType == PLY_ATTRIBUTE_UNKNOWN)
+                        goto error;
                 }
                 struct TStrSpan nameSpan = tfStrTrim(tfStrSplitIter(&lineIterable));
                 attribute.mName.buf = (char*)tfScratchAlloc(&plyReader->mAlloc, nameSpan.len);
@@ -253,6 +350,7 @@ bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct 
             } else if (tfStrIndexOf(typeSpan, tfCToStrRef("element")) >= 0) {
                 goto process_element;
             } else {
+                LOGF(eERROR, "Invalid Type '%.*s'", (int)typeSpan.len, typeSpan.buf);
                 goto error;
             }
             break;
@@ -262,8 +360,9 @@ bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct 
         }
     }
 
+finish:
     // for asscii we need to convert it to raw data
-    if (plyReader->format == PLY_FORMAT_ASCII) {
+    if (plyReader->mFormat == PLY_FORMAT_ASCII) {
         size_t bufferSize = 2048;
         size_t bufferPos = 0;
         void*  buf = tf_malloc(2048);
@@ -283,22 +382,17 @@ bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct 
 
                     if (attr->attributeListType != PLY_ATTRIBUTE_UNKNOWN) {
                         struct TStrSpan lenSpan = tfStrTrim(tfStrSplitIter(&lineIterable));
-                        if (tfStrEmpty(line)) {
-                            tf_free(buf);
-                            goto error;
-                        }
                         unsigned long long len = 0;
                         if (!tfStrReadull(lenSpan, &len)) {
                             tf_free(buf);
                             goto error;
                         }
                         const size_t elementSize = (attribSize * len) + listAttribSize;
-                        while (elementSize + bufferPos < bufferSize) {
+                        while (elementSize + bufferPos > bufferSize) {
                             bufferSize = bufferSize + (bufferSize / 2);
-                            tf_realloc(buf, bufferSize);
+                            buf = tf_realloc(buf, bufferSize);
                         }
-                        struct TStrSpan listSpan = tfStrTrim(tfStrSplitIter(&lineIterable));
-                        if (!writeAttributeNativeASCII(attr->attributeListType, listSpan, buf, &bufferPos)) {
+                        if (!writeAttributeNativeASCII(attr->attributeListType, lenSpan, buf, &bufferPos)) {
                             tf_free(buf);
                             goto error;
                         }
@@ -310,9 +404,9 @@ bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct 
                             }
                         }
                     } else {
-                        while (attribSize + bufferPos < bufferSize) {
+                        while (attribSize + bufferPos > bufferSize) {
                             bufferSize = bufferSize + (bufferSize / 2);
-                            tf_realloc(buf, bufferSize);
+                            buf = tf_realloc(buf, bufferSize);
                         }
                         struct TStrSpan valSpan = tfStrTrim(tfStrSplitIter(&lineIterable));
                         if (!writeAttributeNativeASCII(attr->attributeType, valSpan, buf, &bufferPos)) {
@@ -330,8 +424,7 @@ bool tfAddPlyFileReader(FileStream* stream, struct TPlyReaderDesc* desc, struct 
         fsStreamWrapMemoryMap(stream);
     }
 
-finish:
-    plyReader->mDataSeekPosition = seekPosition;
+    //plyReader->mDataSeekPosition = seekPosition;
     tfStrFree(&line);
     return true;
 error:

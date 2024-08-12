@@ -53,33 +53,21 @@ struct TFStackAllocDesc
     size_t mAlignment;
 };
 
-//struct TFStackAllocator
-//{
-//    struct TFStackAllocBlock* mFreeBlocks;
-//    struct TFStackAllocBlock* mTail;
-//    struct TFStackAllocBlock* mHead;
-//    size_t                    mTotalAllocated;
-//    size_t                    mPos;
-//    size_t                    mBlockSize;
-//    size_t                    mAlignment;
-//};
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // stack allocator
 void tfAddFixedAllocator(struct TFFixedBufferAllocator* alloc, struct TFFixedBufferAllocDesc* desc);
-//void tfAddStackAllocator(struct TFStackAllocator* alloc, struct TFStackAllocDesc* desc);
 void tfAddScratchAllocator(struct TFScratchAllocator* alloc, struct TFScratchAllocDesc* desc);
 
 void tfFreeScratchAllocator(struct TFScratchAllocator* alloc);
 void tfFreeStackAllocator(struct TFStackAllocator* alloc);
 
-// checkpoint allows for the allocation to restore to a checkpoint
-//struct TFStackAllocatorCheckpoint tfStackAllocGetCheckpoint(struct TFStackAllocator* alloc);
-//void tfStackAllocRestoreCheckpoint(struct TFStackAllocator* alloc, struct TFStackAllocatorCheckpoint* checkpoint);
-//void tfStackAllocReset(struct TFStackAllocator* alloc);
-//void tfStackAllocCompaction(struct TFStackAllocator* alloc, size_t reserveSize);
-
 void* tfScratchAlloc(struct TFScratchAllocator* alloc, size_t size);
-//void* tfStackAlloc(struct TFStackAllocator* alloc, size_t size);
 void* tfFixedBufferAlloc(struct TFFixedBufferAllocator* alloc, size_t size);
 
+#ifdef __cplusplus
+}
+#endif
