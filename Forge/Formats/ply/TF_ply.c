@@ -216,7 +216,7 @@ bool tfPlyFindAttrib(FileStream* stream, struct TPlyReader* reader, size_t curso
     for (size_t i = 0; i < arrlen(element->mAttributes); i++) {
         struct TPlyAttribute* attrib = &element->mAttributes[i];
         size_t                numElements = 0;
-        offset += tfPlyReadAttribCount(stream, reader, offset, attrib, &numElements);
+        offset += tfPlyReadAttribCount(stream, reader, cursor, attrib, &numElements);
         if(tfStrEqual(attrib->mName, attribName)) {
             result->mType = attrib->attributeType;
             result->mNumElement = numElements;

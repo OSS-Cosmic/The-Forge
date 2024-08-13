@@ -57,49 +57,66 @@ end_header\n\
   struct TPlyElement* element;
   EXPECT_TRUE(tfPlySeekElementStream(&stream, &reader, tfCToStrRef("vertex"), &element, &cursor));
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("x"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("x"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 0.0f, 0.0001f);
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("y"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("y"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 0.0f, 0.0001f);
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("z"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("z"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 0.0f, 0.0001f);
 
-  cursor += tfPlyNextElement(&stream, &reader, cursor, &reader.mElements[0]);
+  cursor += tfPlyNextElement(&stream, &reader, cursor, element);
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("x"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("x"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 0.0f, 0.0001f);
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("y"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("y"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 1.0f, 0.0001f);
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("z"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("z"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 1.0f, 0.0001f);
 
-  cursor += tfPlyNextElement(&stream, &reader, cursor, &reader.mElements[0]);
+  cursor += tfPlyNextElement(&stream, &reader, cursor, element);
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("x"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("x"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 1.0f, 0.0001f);
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("y"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("y"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 0.0f, 0.0001f);
 
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("z"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("z"), &findAttrib));
   EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
   EXPECT_NEAR(number.flt, 1.0f, 0.0001f);
  
   EXPECT_TRUE(tfPlySeekElementStream(&stream, &reader, tfCToStrRef("face"), &element, &cursor));
-  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, &reader.mElements[0], tfCToStrRef("vertex_indices"), &findAttrib));
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("vertex_indices"), &findAttrib));
+  EXPECT_EQ(findAttrib.mNumElement, 3);
+  EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
+  EXPECT_EQ(number.i32, 0);
+  EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor + findAttrib.mStride, reader.mFormat, findAttrib.mType, &number));
+  EXPECT_EQ(number.i32, 1);
+  EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor + (findAttrib.mStride * 2), reader.mFormat, findAttrib.mType, &number));
+  EXPECT_EQ(number.i32, 2);
 
+  cursor += tfPlyNextElement(&stream, &reader, cursor, element);
+  
+  EXPECT_TRUE(tfPlyFindAttrib(&stream, &reader, cursor, element, tfCToStrRef("vertex_indices"), &findAttrib));
+  EXPECT_EQ(findAttrib.mNumElement, 3);
+  EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor, reader.mFormat, findAttrib.mType, &number));
+  EXPECT_EQ(number.i32, 0);
+  EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor + findAttrib.mStride, reader.mFormat, findAttrib.mType, &number));
+  EXPECT_EQ(number.i32, 2);
+  EXPECT_TRUE(tfPlyDecodeNumber(&stream, findAttrib.mCursor + (findAttrib.mStride * 2), reader.mFormat, findAttrib.mType, &number));
+  EXPECT_EQ(number.i32, 3);
 
   fsCloseStream(&stream);
   tfFreePlyFileReader(&reader);
