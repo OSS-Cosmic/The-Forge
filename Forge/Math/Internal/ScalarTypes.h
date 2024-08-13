@@ -20,6 +20,19 @@ struct Tf32x4_s {
 };
 TF_COMPILE_ASSERT(sizeof(struct Tf32x4_s) == 4 * 4);
 
+struct Tf32x4x4_s {
+    union {
+        struct {
+            struct Tf32x4_s mCol0;
+            struct Tf32x4_s mCol1;
+            struct Tf32x4_s mCol2;
+            struct Tf32x4_s mCol3;
+        };
+        struct Tf32x4_s mCol[4];
+    };
+};
+TF_COMPILE_ASSERT(sizeof(struct Tf32x4x4_s) == 4 * 4 * 4);
+
 struct Tf32x3_s {
     union
     {
@@ -36,6 +49,8 @@ struct Tf32x3_s {
 
 };
 TF_COMPILE_ASSERT(sizeof(struct Tf32x3_s) == 3 * 4);
+
+
 
 struct Tf64x4_s{
     union

@@ -40,6 +40,8 @@ struct TPlyReader {
   struct TFScratchAllocator mAlloc; // temporary scratch allocator for the lifetime of the configuration
   enum PlyFormatData mFormat;
   struct TPlyElement* mElements;
+
+  size_t mDataSeekPosition;
 };
 
 
@@ -77,10 +79,11 @@ bool tfAddPlyFileReader(FileStream* stream, struct TPlyReader* reader);
 bool tfPlySeekElementStream(FileStream* stream, struct TPlyReader* reader, struct TStrSpan name, struct TPlyElement** outElement,
                              size_t* cursor);
 
-size_t tfPlyReadAttribCount(FileStream* stream, struct TPlyReader* reader, size_t cursor, struct TPlyAttribute* attrib, size_t* numElements);
+size_t tfPlyReadAttribCount(FileStream* stream, struct TPlyReader* reader, size_t cursor, struct TPlyAttribute* attrib,
+                            size_t* numElements);
 size_t tfPlyNextElement(FileStream* stream, struct TPlyReader* reader, size_t elementCursor, struct TPlyElement* element);
-bool   tfPlyFindAttrib(FileStream* stream, struct TPlyReader* reader, size_t elementCursor, struct TPlyElement* element, struct TStrSpan attribName,
-                       struct TPlyAttribResult* result);
+bool   tfPlyFindAttrib(FileStream* stream, struct TPlyReader* reader, size_t elementCursor, struct TPlyElement* element,
+                       struct TStrSpan attribName, struct TPlyAttribResult* result);
 
 bool tfPlyDecodeNumber(FileStream* stream, size_t cursor, enum PlyFormatData format, enum PlyAttributeType type, struct TPlyNumber* result);
 

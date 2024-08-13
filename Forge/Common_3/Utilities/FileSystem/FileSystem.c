@@ -813,8 +813,9 @@ size_t fsReadLineFromStream(struct TStreamLineReader* reader, struct TStr* pStr)
                 return numBytesRead;
             }
         }
-        tfStrAppendSlice(pStr, tfSub(bufferSpan, initalBufferPos, reader->bufferPos));
-        numBytesRead += bufferSpan.len;
+        const struct TStrSpan subStr = tfSub(bufferSpan, initalBufferPos, reader->bufferPos);
+        tfStrAppendSlice(pStr, subStr);
+        numBytesRead += subStr.len;
         reader->bufferReadBytes = fsReadFromStream(reader->stream, reader->buffer, 512);
         reader->bufferPos = 0;
     } while (reader->bufferReadBytes > 0);

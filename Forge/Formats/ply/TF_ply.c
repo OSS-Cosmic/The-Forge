@@ -141,7 +141,7 @@ size_t tfPlyReadAttribCount(FileStream* stream, struct TPlyReader* reader, size_
 }
 
 bool tfPlySeekElementStream(FileStream* stream, struct TPlyReader* reader, struct TStrSpan name, struct TPlyElement** outElement, size_t* cursor) {
-    size_t streamCursor= 0;
+    size_t streamCursor = reader->mDataSeekPosition;
     for(size_t i = 0; i < arrlen(reader->mElements); i++) {
         struct TPlyElement* element = &reader->mElements[i]; 
         if(tfStrEqual(element->mName, name)) {
@@ -419,8 +419,10 @@ finish:
         }
         fsCloseStream(stream);
         fsOpenStreamFromMemory(buf, bufferSize, FM_READ_WRITE_APPEND_ALLOW_READ, true, stream);
+       plyReader->mDataSeekPosition = 0;
     } else {
         fsSeekStream(stream, SBO_START_OF_FILE, seekPosition);
+        plyReader->mDataSeekPosition = seekPosition;
         fsStreamWrapMemoryMap(stream);
     }
 
