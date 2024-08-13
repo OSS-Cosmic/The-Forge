@@ -41,6 +41,7 @@
 
 #include "Forge/TF_Types.h"
 #include "Forge/TF_Log.h"
+#include "Math/TF_FastHash.h"
 
 #define TFSTR_LLSTR_SIZE 21
 #define TFSTR_LSTR_SIZE 16 
@@ -340,6 +341,9 @@ int tfStrLastIndexOfAny(const struct TStrSpan haystack, const struct TStrSpan ch
 
 int tfPrettyPrintBytes(struct TStrSpan slice,ssize_t numBytes);
 int tfPrettyPrintDuration(struct TStrSpan slice,double nanoseconds);
+
+static inline hash32_t tfStrHash32(struct TStrSpan slice) { return tfHash32_data(TF_HASH_INITIAL_VALUE_32, slice.buf, slice.len); }
+static inline hash64_t tfStrHash64(struct TStrSpan slice) { return tfHash64_data(TF_HASH_INITIAL_VALUE_64, slice.buf, slice.len); }
 
 #ifdef __cplusplus
 }

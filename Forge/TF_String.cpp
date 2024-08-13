@@ -819,7 +819,7 @@ bool tfStrEqual(const struct TStrSpan b0, const struct TStrSpan b1)
 {
     // printf("EQ: \"%.*s\" -- \"%.*s\"\n", (int)b0.len, b0.buf, (int)b1.len, b1.buf);
     if (b0.len != b1.len)
-        return 0;
+        return false;
     size_t i0 = 0;
     size_t i1 = 0;
     for (; i0 < b0.len && i1 < b1.len; i0++, i1++)

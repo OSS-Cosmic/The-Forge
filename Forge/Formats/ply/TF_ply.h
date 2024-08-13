@@ -4,6 +4,7 @@
 #include "Forge/Mem/TF_Allocators.h"
 #include "Forge/TF_FileSystem.h"
 #include "Forge/TF_String.h"
+#include "Forge/Math/TF_FastHash.h"
 
 enum PlyFormatData {
   PLY_FORMAT_ASCII,
@@ -25,8 +26,9 @@ enum PlyAttributeType {
 
 
 struct TPlyAttribute {
-  uint32_t attributeType: 4;
-  uint32_t attributeListType: 4;
+  uint32_t mAttributeType;
+  uint32_t mAttributeListType;
+  uint32_t mRefHash;
   struct TStrSpan mName;
 };
 
@@ -84,6 +86,8 @@ size_t tfPlyReadAttribCount(FileStream* stream, struct TPlyReader* reader, size_
 size_t tfPlyNextElement(FileStream* stream, struct TPlyReader* reader, size_t elementCursor, struct TPlyElement* element);
 bool   tfPlyFindAttrib(FileStream* stream, struct TPlyReader* reader, size_t elementCursor, struct TPlyElement* element,
                        struct TStrSpan attribName, struct TPlyAttribResult* result);
+bool   tfPlyFindAttribRef(FileStream* stream, struct TPlyReader* reader, size_t elementCursor, struct TPlyElement* element,
+                       hash32_t attribName, struct TPlyAttribResult* result);
 
 bool tfPlyDecodeNumber(FileStream* stream, size_t cursor, enum PlyFormatData format, enum PlyAttributeType type, struct TPlyNumber* result);
 

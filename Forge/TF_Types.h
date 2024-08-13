@@ -4,6 +4,7 @@
 #define _TF_TYPES_H
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #if INTPTR_MAX == 0x7FFFFFFFFFFFFFFFLL
   #define TF_PTR_SIZE 8
