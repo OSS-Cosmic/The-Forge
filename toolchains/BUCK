@@ -35,9 +35,15 @@ cxx_tools_info_toolchain(
         "config//os:windows": ":msvc_tools",
     }), 
     c_flags = select({
-        "config//os:linux": [
-            "-msse4.1"
-        ],
+        "config//os:linux": select({
+          "tf_platform//build:debug": [
+            "-g",
+            "-O0"
+          ],
+          "tf_platform//build:release": [
+             "-O2",
+          ]
+        }) + ["-msse4.1"],
         "config//os:windows": [
             "/c",
             "/Z7",

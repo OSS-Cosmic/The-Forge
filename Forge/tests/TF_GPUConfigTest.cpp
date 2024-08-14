@@ -12,7 +12,7 @@ UTEST(Core, loadData_0)
   struct GPUConfiguration def = {0};
   tfInitGPUConfiguration(&def);
 
-  bool res = tfLoadGPUData(&def, tfToRef(
+  bool res = tfLoadGPUData(&def, tfCToStrRef(
     "version:0.1"
   ));
   EXPECT_EQ(res, false); 
@@ -24,7 +24,7 @@ UTEST(Core, loadData_1)
   struct GPUConfiguration def = {0};
   tfInitGPUConfiguration(&def);
 
-  bool res = tfLoadGPUData(&def, tfToRef(
+  bool res = tfLoadGPUData(&def, tfCToStrRef(
     "version:0.2\r\n"
     "BEGIN_VENDOR_LIST;\r\n"
     "intel; 0x8086, 0x1004;\r\n"
@@ -35,10 +35,10 @@ UTEST(Core, loadData_1)
   ));
   EXPECT_TRUE(res); 
   EXPECT_EQ(def.mVendorCount,4); 
-  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[0].mVendorName, tfToRef("intel")));
-  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[1].mVendorName, tfToRef("amd")));
-  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[2].mVendorName, tfToRef("nvidia")));
-  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[3].mVendorName, tfToRef("qualcomm")));
+  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[0].mVendorName, tfCToStrRef("intel")));
+  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[1].mVendorName, tfCToStrRef("amd")));
+  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[2].mVendorName, tfCToStrRef("nvidia")));
+  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[3].mVendorName, tfCToStrRef("qualcomm")));
 
   EXPECT_EQ(def.mVendorDefinitions[0].mIdentifierCount, 2);
   EXPECT_EQ(def.mVendorDefinitions[0].mIdentifierArray[0], 0x8086);
@@ -60,7 +60,7 @@ UTEST(Core, loadData_2)
 {   
   struct GPUConfiguration def = {0};
   tfInitGPUConfiguration(&def);
-  bool res = tfLoadGPUData(&def, tfToRef(
+  bool res = tfLoadGPUData(&def, tfCToStrRef(
       "version: 0.2\n"
       "#Possible Classfications for Preset: ultra; high; medium; low; verylow; office\n"
       "#Sources:\n"
@@ -95,10 +95,10 @@ UTEST(Core, loadData_2)
   ));
   
   EXPECT_EQ(def.mVendorCount,4); 
-  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[0].mVendorName, tfToRef("intel")));
-  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[1].mVendorName, tfToRef("amd")));
-  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[2].mVendorName, tfToRef("nvidia")));
-  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[3].mVendorName, tfToRef("apple")));
+  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[0].mVendorName, tfCToStrRef("intel")));
+  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[1].mVendorName, tfCToStrRef("amd")));
+  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[2].mVendorName, tfCToStrRef("nvidia")));
+  EXPECT_TRUE(tfStrEqual(def.mVendorDefinitions[3].mVendorName, tfCToStrRef("apple")));
 
   EXPECT_EQ(def.mVendorDefinitions[0].mIdentifierCount, 1);
   EXPECT_EQ(def.mVendorDefinitions[0].mIdentifierArray[0], 0x8086);

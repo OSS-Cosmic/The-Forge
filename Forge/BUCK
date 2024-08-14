@@ -43,10 +43,10 @@ configure_define(
   file = "TF_Config.in",
   out = "TF_Config.h",
   variables = {
-    "LOG_LEVEL": read_config("tf", "log-level", "eAll")
+    "LOG_LEVEL": read_root_config("tf", "log-level", "eAll")
   },
   feature = {
-      "TF_ENABLE_MEMORY_TRACKING": read_config("tf", "memory-tracking", "0") == "1",
+      "TF_ENABLE_MEMORY_TRACKING": read_root_config("tf", "memory-tracking", "0") == "1",
       "TF_FEATURE_D3D12": select_has(["tf_platform//D3D12:supported"]),
       "TF_FEATURE_D3D11": select_has(["tf_platform//D3D11:supported"]),
       "TF_FEATURE_VULKAN": select_has(["tf_platform//VULKAN:supported"]),
@@ -66,7 +66,21 @@ cxx_library(
       "@tf//3rdparty:cgltf",
       "@tf//:TF"
   ],
-  srcs = ["Formats/TF_gltf.cpp"],
+  srcs = ["Formats/TF_gltf.c"],
+  link_style = "static",
+  visibility = ["PUBLIC"],
+)
+
+
+cxx_library(
+  name = "TF~Ply",
+  exported_headers = { 
+    "Forge/Formats/ply/TF_ply.h":"Formats/ply/TF_ply.h" 
+  },
+  deps = [
+      "@tf//:TF"
+  ],
+  srcs = ["Formats/ply/TF_ply.c"],
   link_style = "static",
   visibility = ["PUBLIC"],
 )
@@ -224,6 +238,7 @@ cxx_library(
         "Forge/TF_FileSystem.h": "TF_FileSystem.h",
         "Forge/TF_Log.h": "TF_Log.h",
         "Forge/TF_Thread.h": "TF_Thread.h",
+        "Forge/TF_Endian.h": "TF_Endian.h",
         "Forge/Graphics/Vulkan/volk/volk.c": "Graphics/Vulkan/volk/volk.c"
       } |
       { file: file for file in glob(["Common_3/**/*.h", "Common_3/**/*.hpp"]) } |

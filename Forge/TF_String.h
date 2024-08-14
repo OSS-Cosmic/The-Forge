@@ -41,6 +41,7 @@
 
 #include "Forge/TF_Types.h"
 #include "Forge/TF_Log.h"
+#include "Math/TF_FastHash.h"
 
 #define TFSTR_LLSTR_SIZE 21
 #define TFSTR_LSTR_SIZE 16 
@@ -56,16 +57,38 @@ struct TStrSpan {
   size_t len;
 }; 
 
-static inline struct TStrSpan tfToRef(const char* c) { return TStrSpan{ (char*)c, (size_t)strlen(c) }; }
-static inline struct TStrSpan tfToRef(struct TStr str) { return TStrSpan{ str.buf, str.len }; }
+static inline struct TStrSpan tfCToStrRef(const char* c) { 
+  struct TStrSpan result;
+  result.buf = (char*)c;
+  result.len = (size_t)strlen(c);
+  return result; 
+}
+static inline struct TStrSpan tfToStrRef(struct TStr str) { 
+  struct TStrSpan result;
+  result.buf = (char*)str.buf;
+  result.len = str.len;
+  return result; 
+}
 
 static inline struct TStrSpan tfSub(struct TStrSpan slice, size_t a, size_t b) {
     ASSERT((b - a) <= slice.len);
-    return TStrSpan{ slice.buf + a, b - a };
+    struct TStrSpan result;
+    result.buf = slice.buf + a;
+    result.len = b - a;
+    return result;
 }
 
-static inline size_t tfStrAvailLen(TStr str) { return str.alloc - str.len;}
-static inline TStrSpan tfStrAvailSpan(TStr str) { return TStrSpan{str.buf + str.len, tfStrAvailLen(str)};}
+static inline size_t tfStrAvailLen(struct TStr str) { return str.alloc - str.len;}
+static inline struct TStrSpan tfStrAvailSpan(struct TStr str) { 
+  struct TStrSpan result;
+  result.buf = str.buf + str.len;
+  result.len = tfStrAvailLen(str);
+  return result;
+}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Creates a string from a slice 
@@ -276,6 +299,8 @@ int tfstrfmtull(struct TStrSpan slice, unsigned long long value);
 bool tfStrReadll(struct TStrSpan, long long* result);
 bool tfStrReadull(struct TStrSpan, unsigned long long* result);
 
+bool tfStrReadFloat(struct TStrSpan, float* result);
+bool tfStrReadDouble(struct TStrSpan, double* result);
 /* Scan/search functions */
 /*  
  *  Compare two strings without differentiating between case. The return
@@ -316,5 +341,13 @@ int tfStrLastIndexOfAny(const struct TStrSpan haystack, const struct TStrSpan ch
 
 int tfPrettyPrintBytes(struct TStrSpan slice,ssize_t numBytes);
 int tfPrettyPrintDuration(struct TStrSpan slice,double nanoseconds);
+
+static inline hash32_t tfStrHash32(struct TStrSpan slice) { return tfHash32_data(TF_HASH_INITIAL_VALUE_32, slice.buf, slice.len); }
+static inline hash64_t tfStrHash64(struct TStrSpan slice) { return tfHash64_data(TF_HASH_INITIAL_VALUE_64, slice.buf, slice.len); }
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif
