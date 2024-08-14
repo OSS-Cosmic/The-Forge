@@ -54,7 +54,7 @@ def _host_os_configuration() -> str:
 
 def _common_constraints() -> list[str]:
     cfg = []
-    build_type = read_config("tf", "build", "debug")
+    build_type = read_root_config("tf", "build", "debug")
     if build_type == "debug":
         cfg.append("tf_platform//build:debug")
     elif build_type == "release":

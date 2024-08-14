@@ -26,9 +26,9 @@ enum PlyAttributeType {
 
 
 struct TPlyAttribute {
-  uint32_t mAttributeType;
-  uint32_t mAttributeListType;
   uint32_t mRefHash;
+  uint32_t mType;
+  uint32_t mListType;
   struct TStrSpan mName;
 };
 
@@ -90,10 +90,13 @@ bool   tfPlyFindAttribRef(FileStream* stream, struct TPlyReader* reader, size_t 
                        hash32_t attribName, struct TPlyAttribResult* result);
 
 bool tfPlyDecodeNumber(FileStream* stream, size_t cursor, enum PlyFormatData format, enum PlyAttributeType type, struct TPlyNumber* result);
+void tfPlyDecodeNumbersByRefs(FileStream* stream, struct TPlyReader* reader, struct TPlyElement* element, size_t cursor, size_t numAttribs,
+                              const hash32_t* refAttribs, struct TPlyNumber* attribNumbers);
 
 void tfFreePlyFileReader(struct TPlyReader* reader);
 
 enum PlyAttributeType toPlyAttribute(struct TStrSpan input);
+
 static inline size_t toPlyAttributeSize(enum PlyAttributeType attribute) {
     switch (attribute) {
     case PLY_ATTRIBUTE_CHAR8:

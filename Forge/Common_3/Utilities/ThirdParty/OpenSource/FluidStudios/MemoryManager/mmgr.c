@@ -657,8 +657,8 @@ static void dumpLine(FileStream* fileToWrite, const char* format, ...)
     vsnprintf(buffer, BUFFER_SIZE, format, args);
     va_end(args);
 
-    _OutputDebugString(buffer);
-    _OutputDebugString("\n");
+    LOGF(eDEBUG,"%s",buffer);
+    LOGF(eDEBUG, "\n");
     if (fileToWrite != NULL && fileToWrite->pIO)
     {
         fsWriteToStream(fileToWrite, buffer, strlen(buffer));

@@ -43,10 +43,10 @@ configure_define(
   file = "TF_Config.in",
   out = "TF_Config.h",
   variables = {
-    "LOG_LEVEL": read_config("tf", "log-level", "eAll")
+    "LOG_LEVEL": read_root_config("tf", "log-level", "eAll")
   },
   feature = {
-      "TF_ENABLE_MEMORY_TRACKING": read_config("tf", "memory-tracking", "0") == "1",
+      "TF_ENABLE_MEMORY_TRACKING": read_root_config("tf", "memory-tracking", "0") == "1",
       "TF_FEATURE_D3D12": select_has(["tf_platform//D3D12:supported"]),
       "TF_FEATURE_D3D11": select_has(["tf_platform//D3D11:supported"]),
       "TF_FEATURE_VULKAN": select_has(["tf_platform//VULKAN:supported"]),
